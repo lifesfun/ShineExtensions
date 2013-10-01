@@ -14,7 +14,7 @@ Plugin.Version = "0.1"
 Plugin.HasConfig = true
 Plugin.ConfigName = "Pug.json"
 Plugin.DefaultConfig = {
-    PugMode = true, -- Use Captain Mode
+    PugMode = true, -- Enabled Pug Mode
     ForceTeams = false, --force teams to stay the same
     MinPlayers = 8   
     GameSize = 12
@@ -30,14 +30,14 @@ local BlacklistMods = {
 }
 
 //saves Votes
-local Voted = {}
-local Votes = 0
-local Teams = {}
-local Captains = {}
-local Captain = 0
-local CurrentPick = nil
-local Ready = {}
-local Readied = 0
+Plugin.Voted = {}
+Plugin.Votes = 0
+Plugin.Teams = {}
+Plugin.Captains = {}
+Plugin.Captain = 0
+Plugin.CurrentPick = nil
+Plugin.Readied = {}
+Plugin.Ready = 0
  
 function Plugin:Initialise()
     	local GetMod = Server.GetActiveModId
@@ -52,41 +52,65 @@ function Plugin:Initialise()
        		end
     	end
     
-        self:CreateCommands()
+        if self:CreateCommands() then Plugin:Nag() end
 
         self.Enabled = true
 
         return true
 end
 
-function Plugin:Nag()
-    
-	if not Shared.GetEntitiesWithClassname( "Player" ):GetSize() >= self.Config.MinPlayers and self.Config.PugMode then 
-		
-        elseif Captains <= 1 then
-			Shine:Notify( Client, "", "", "Pick your captian by typing into the chat: !captain <playername>") 
-	elseif self.Captains[id] == true then 
-		Shine:Notify( Client, "", "", "Your are a team captain! Choose your teammates with !choose\n Type !rdy into chat when you are ready.")
-	else Shine:Notify( Client, "", "", "Pug Mode is enabled. Type !rdy into chat if you want to join the pug.")
+local NextStartNag = 0
 
-	--check which captain has won the vote  at the end of the vote time if statment + for statment 2 condidtions
-	--add name to catpain list and captain online + if not greater 1
+function Plugin:CheckGameStart( Gamerules )
+
+	local State = Gamerules:GetGameState()
+
+	if self.Config.PugMode and Shared.GetEntitiesWithClassname("Player" ):GetSize() >= self.Config.MinPlayers then
+		 
 	end
+	if State == kGameState.PreGame or State == kGameState.NotStarted then
+	if NextStartNag < Time then
+		NextStartNag = Time + 30
+	
+		local Nag = self:GetStartNag()
+	
+		if not Nag then return false end
+		
+		self:SendNetworkMessage( nil, "StartNag", { Message = Nag }, true )
+	end
+	
+	return false
+	end
+end 
+
+function Plugin:Nag()
+  
 end
 
-function Plugin:Check Votes
-    
-	if self.  then 
-		
-        elseif Captains <= 1 then
-			Shine:Notify( Client, "", "", "Pick your captian by typing into the chat: !captain <playername>") 
-	elseif self.Captains[id] == true then 
-		Shine:Notify( Client, "", "", "Your are a team captain! Choose your teammates with !choose\n Type !rdy into chat when you are ready.")
-	else Shine:Notify( Client, "", "", "Pug Mode is enabled. Type !rdy into chat when you are ready")
+function Plugin:CheckVotes(Client, Player )
+    if self.Config.PugMode and Plugin.Voted >= MinPlayer then
+	if not Plugin.Ready <= self.Config.GameSize and Plugin.Readied[Client:GetUserId()] == false then
+		Shine:Notify( Client, "", "", "Pug Mode is enabled. Type !rdy to join the Pueggg!")
+        	if not Plugin.Readied[Client:GetUserId()] then Plugin.Readied[Client:GetUserId()]= true Plugin.Readied = Plugin.Readied + 1 end
+        elseif Plugin.Captains <= 2 and Plugin.Voted[Client:GetUserId()] == false then
+		Shine:Notify( Client, "", "", "Time to choose your team captains. Type !vote followed by part of their player name to vote.")
+        	if not Plugin.Voted[Client:GetUserId()] then Plugin.Voted[Client:GetUserId()]= true Votes = Votes + 1 end
+        if self.Config.PugMode and Client:GetUserId() == CurrentPick and playersOnTeams <= self.Config.GameSize then
+            local Player = player:GetPlayer()
+            local playerTeam = Client:GetPlayer():GetTeam():GetTeamNumber()
+            if playerTeam ~= 0 then Shine:Notify( Client, "", "", "You can only choose players from the Ready Room") return end
+            Gamerules:JoinTeam( Player, playerTeam, nil, true )
+        end
+	--check which captain has won the vote  at the end of the vote time if statment + for statment 2 condidtions
+	--add name to catpain list and captain online + if not greater 1
+	elseif self.Config.PugMode and Client:GetUserId() == Plugin.CurrentPick and playersOnTeams <= self.Config.GameSize then
+		Shine:Notify( Client, "", "", "Your turn...")
 
-
-
-
+	end
+    Shine:Notify( Client, "", "", "You have been chosen as a team captain. When it is your turn type !choose followed by their player name to pick your teammate.")
+   end
+return 0
+end
 
 function Plugin:StartGame( Gamerules )
     Gamerules:ResetGame()
@@ -103,7 +127,7 @@ end
     
 function Plugin:ClientDisconnect(Client)
 
-    if Voted[Client:GetUserId()] then Voted[Client:GetUserId()]= nil Votes = Votes -1 end   
+    if Plugin.Voted[Client:GetUserId()] then Plugin.Voted[Client:GetUserId()]= nil Plugin.Votes = Plugin.Votes - 1 end   
 
 end
 
@@ -125,7 +149,7 @@ function Plugin:JoinTeam( Gamerules, Player, NewTeam, Force, ShineForce )
     return end
     
     --check if player is Captain
-    if self.Config.PugnMode then        
+    if self.Config.PugMode then        
         if self.Config.Captains[id] then
             self.Config.Teams[id] = NewTeam
             self:SaveConfig()            
@@ -137,39 +161,22 @@ end
 
 function Plugin:CreateCommands()
 
-    	local Ready = self:BindCommand( "sh_ready", {"rdy","ready"},function(Client)
-        if self.Config.PugMode and Readied <= self.Config.GameSize then
-        	if not Ready[Client:GetUserId()] then Ready[Client:GetUserId()]= true Readied = Readied + 1 end
-        end
-        Plugin:CheckVotes
-    end, true)
-    Ready:Help ("Join the Pug")
+    local Ready = self:BindCommand( "sh_ready", { "rdy", "ready" }, CheckVotes(Client, Player ) )
+    	Ready:Help ("Join the Pug")
     
-    local Captain = self:BindCommand( "sh_captain","captain" ,function(Client, player)
-        if self.Config.PugMode and Readied = self.Config.MinPlayers and not self.Config.Captains[Client:GetUserId()] then
-        	if not Voted[Client:GetUserId()] then Voted[Client:GetUserId()]= true Votes = Votes + 1 end
-        end
-        Plugin:CheckVotes
-    end,true)
-    Choose:AddParam{ Type = "client"}    
-    Choose:Help ("Type the name of the player to place him/her on your team.")
+    local Vote = self:BindCommand( "sh_vote", { "vote" }, CheckVotes(Client, Player  ) )
+    	Choose:AddParam{ Type = "client"}    
+    	Choose:Help ("Type the name of the player to place him/her on your team.")
     
-    local Choose = self:BindCommand( "sh_choose","choose" ,function(Client, player)
-        if self.Config.PugMode and Client:GetUserId() == CurrentPick and playersOnTeams <= self.Config.GameSize then
-            local Player = player:GetPlayer()
-            local playerTeam = Client:GetPlayer():GetTeam():GetTeamNumber()
-            if playerTeam ~= 0 then Shine:Notify( Client, "", "", "You can only choose players from the Ready Room") return end
-            Gamerules:JoinTeam( Player, playerTeam, nil, true )
-        end
-    end,true)
-    Choose:AddParam{ Type = "client"}    
-    Choose:Help ("Type the name of the player to place him/her on your team.")
+    local Choose = self:BindCommand( "sh_choose", { "choose" }, CheckVotes(Client, Player ) )
+    	Choose:AddParam{ Type = "client"}    
+    	Choose:Help ("Type the name of the player to place him/her on your team.")
     
-    local Clearteams = self:BindCommand( "sh_clearteams","clearteams" ,function()
+    local Clearteams = self:BindCommand( "sh_clearteams", "clearteams", function()
         self.Config.Teams = {}
-        self:SaveConfig()        
-    end)
-    Clearteams:Help("Removes all players from teams in config ")
+        self:SaveConfig()         
+	end, true)
+   	Clearteams:Help("Removes all players from teams in config ")
 end
 
 function Plugin:Cleanup()
