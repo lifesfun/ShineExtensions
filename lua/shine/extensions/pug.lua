@@ -105,8 +105,8 @@ function Plugin:CheckVotes(Client, Player )
 	--add name to catpain list and captain online + if not greater 1
 	elseif self.Config.PugMode and Client:GetUserId() == Plugin.CurrentPick and playersOnTeams <= self.Config.GameSize then
 		Shine:Notify( Client, "", "", "Your turn...")
-
 	end
+
     Shine:Notify( Client, "", "", "You have been chosen as a team captain. When it is your turn type !choose followed by their player name to pick your teammate.")
    end
 return 0
