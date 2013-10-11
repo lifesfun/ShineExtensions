@@ -64,7 +64,7 @@ Plugin.MatchPlayers = {
 }
 
 function Plugin:Initialise()
-    
+   	--check rounds from mapvote and override  
         if self:CreateCommands() then Plugin:StartGame() end
 
         self.Enabled = true
@@ -72,155 +72,145 @@ function Plugin:Initialise()
         return true
 end
 
-function Plugin:Nag()
+function Plugin:StartGame()
+	--if gamestatus and no started  then  
+	--	rest game scores and etc
+	--	startwarmup
+	--	subtract round 
+	--	add stats to true 
+	--	return true
+	--if not gamesatus and ready 
+	--	place on teams 
+	--	send message 
+	--	startgame() 
+	--else 
+	--	 nag 
+	--end
+end 
+function endgame()
+	--if rounds != 0
+	--then switch teams reset and start warmup
+	--else reset all arrays reset pu
+	--StartGame
 
-	Plugin:Timer.Simple( self.Config.NagInterval , function() 
-		Plugin:StartGame()
-			
-	end )
+function Plugin:GameStatus()
+--[[round:teams:mode	
+--	need minplayers
+--	need capacity
+	voting
+	captains 
+	warmup
+	else
+	true
+		--]]
 end
 
-function Plugin:StartGame()
-	--basics	
-	--
-	if then
+function Plugin:AtCapacity()
 
-	else
+	local NumPlayers = Count( Plugin.MatchPlayers )
+
+	if NumPlayers < self.Config.GameSize then 
 	
-		Plugin:Nag()
+		return false 
+	
+	else 
+	
+		return true 
 
-	end
+	end 
 
+end
+
+function Readied( CliendId )
+
+ --function( ClientId )if Plugin.MatchPlayers[ ClientId ] then return true else return false end end
 end 
 
-function Plugin:GameStatus(Client)
+function Plugin:NagCaptain( Client ) 
 
-	local Readied = Plugin:Count( Plugin.Match ) 
-	
-	local ClientId = Client:GetUserId()
-
-	if Readied  <  self.Config.MinPlayers then
-		
-		if Plugin:MatchPlayers[ Client ] == true then
-
-			Shine:Notify( Client, "", "", "Waiting on more players to join the pug to start the captain vote.")
-		else
-
-			Shine:Notify( Client, "", "", "Pug Mode is enabled. Type !rdy to join the Pueggg!")
-		end
-
-	elseif Readied >=  self.Config.GameSize or Plugin.CaptainStatus() == true then
-		--check captain pick status
-		--captains 
-		--captainmode
-		--else
-		--check game gamestarted warmup pregame	
-		--check missing players
-		--started
-	else
-
-		Shine:Notify( Client, "", "", "Waiting on the pug to fill, so captains can pick teams.")
-
-	end
+end
+function Plugin:CaptainStatus( ClientId )
 
 end
 
-function Plugin:VoteStatus( Client )
+function Plugin:CurrentCaptain( ClientId )
 
-	if Plugin.Captain[ Client ] then
+end
 
-    		Shine:Notify( Client, "", "", "Waiting on Captain vote to finish.")
+
+function Nag( Client ) 
+
+	local ClientId = Client:GetUserId()
+	local Ready = ReadyStatus( ClientId ) 
+	local Voted = VoteStatus( ClientId )
+	local Captain = CaptainStatus( Client )
+	local Full = AtCapacity()
+
+	if Ready and not Captain then 
 		
-		return "captain"
+		NagReadied( Client )	
 
-	elseif Plugin.Voted[ Client ] then 
+	elseif Ready and Captain then
 
-    		Shine:Notify( Client, "", "", "Waiting on Captain vote to finish.")
+		NagCaptains( Client ) 
+
+	elseif Full then
+
+		Shine:Notify( Client, "", "", "Pug Mode is enabled, however is full wait for the rounds to finish and then type !rdy to join the next Pueggg!")
+
+	else
+	
+		Shine:Notify( Client, "", "", "Pug Mode is enabled and not Full. Type !rdy to join the Pueggg!")
+
+	end
+ 
+	Plugin:Timer.Simple( self.Config.NagInterval , function() 
+		Plugin:StartGame()
+
+	end )
+
+end
+
+function Plugin:NagReadied( Client )
 		
-		return "Voted"
+	local Voted = VoteStatus( ClientId )
 
-	elseif Plugin.Readied[ Client ] then 
+	if not Minplayers then 	
+
+		Shine:Notify( Client, "", "", "Waiting on more players to join the pug to start the captain vote.")
+
+	elseif not Voted and MinPlayers then  
 
 		Shine:Notify( Client, "", "", " Captain Vote has started. Type !vote followed by part of their player name to vote.")
-		
-		return "readied"
-	else 
-		Shine:Notify( Client, "", "", "Pug Mode is enabled. Type !rdy to join the Pueggg!")
-		
-		return false
-	end
 
-end
+	elseif Voted and MinPlayers then  
 
-function Plugin:CaptainsStatus( Client )			
+		Shine:Notify( Client, "", "", "Waiting on Captain vote to finish.")
 
-	if Plugin.Captain[ Client:GetUserId() ] ~=  Plugin.CurrentCaptain then
+	end 
 
-		Shine:Notify( Client, "", "", "You have choosen, waiting on other captain.")
-		return Plugin.CurrentCaptain
-
-	elseif Count( Plugin.Captain[] )== 2  then
-
-		Shine:Notify( Client, "", "", "Your turn to choose...")
-		return "onecaptain"
-	else
-		
-		Shine:Notify( Client, "", "", "Waiting on more players to pick teams to pick teams.")
-		return false
-	end
-
-end
+end 
 
 function Plugin:Choose( Client )
 	
 	local ClientId = Client:GetUserId()
+	local Captain = Plugin:CaptainStatus( ClientId )
+	local Current = CurrentCaptain( ClientId )
 
-	if Plugin.CaptainStatus[ ClientId ] ==  true then
+	if Captain and Current then
 	
 		Shine:Notify( Client, "", "", "Nice choice.. or hopefully it was. Please wait for your next turn.")
 		return true 
 
-	elseif Plugin:CaptainStatus[ ClientId ] == false then 
+	elseif Captian and not Current then 
 
-		Shine:Notify( Client, "", "", "You have to be a captain to choose teams...")
-		return false
-
-	else
-		
 		Shine:Notify( Client, "", "", "You are not the current captain.")
-		return false 
-	end
-
-end
-
-function Plugin:Vote( Client )
-
-	local ClientId = Client:GetUserId()
-
-	if Plugin:VoteStatus( ClientId ) == false and Plugin:CaptainStatus( ClientId ) == false then 	
-
-		Shine:Notify( Client, "", "", "Thanks for voting! Please wait to be assigned to a team.") 
-		return true 
-
-	elseif Plugin:CaptainStatus( ClientId )  == true then
-
-		Shine:Notify( Client, "", "", "You are a captain now and are not allowed to vote for the second captain.")
 		return false
 
-	elseif Plugin.Voted[ ClientId ] == true then 
-
-		Shine:Notify( Client, "", "", "You have already voted.")
-		return false
-
-	elseif  Plugin:ReadyStatus( ClientId )  == false then
-
-		Shine:Notify( Client, "", "", "You have not joined the Pug yet. Type !rdy to join the Pueggg!")
-		return false
-
-	else
+	elseif not Captain then 
 		
-		return false
-
+		Shine:Notify( Client, "", "", "You have to be a captain to choose teams...")
+		return false 
 	end
 
 end
@@ -228,20 +218,21 @@ end
 function Plugin:Ready( Client )
 
 	local ClientId = Client:GetClientId() 
+	local Readied = Plugin.Readied( clientId )
+	local Full = AtCapacity()	
 	
-	local Full = function() if Count( Plugin.MatchPlayers ) < self.Config.GameSize then return false else return true end end  
-	
-	if Full == false and Plugin.MatchPlayers[ ClientId ] then
+	if not Full and not Readied then
 
 		Shine:Notify( Client, "", "", "You have joined the Pug! Wait for Captain Vote.")
+
 		return true 
 
-	elseif Plugin.MatchPlayers[ ClientId ] == true then
+	elseif Readied then
  		
 		Shine:Notify( Client, "", "", "You have already joined the pug. Type !unready to leave or !vote to vote for your team captain.") 
 		return false 
 
-	elseif Full == true then 
+	elseif Full then 
 	
 		Shine:Notify( Client, "", "", "The pug is full. Please wait for the next one to start and then ready.") 
 		return false 
@@ -257,7 +248,7 @@ function Plugin:ClientDisconnect( Client )
 
 	remove[	Plugin.MatchPlayers[ Client:GetUserId() ] ] and FixArray( Plugin.MathPlayers )  
 
-	remove[ Plugin.Captain[ Client:GetUserId() ] ]  and FixArray( Plugin.Captain )
+	remove[ Plugin.Captain[ Client:GetUserId() ] ] and FixArray( Plugin.Captain )
 	
 end
 
