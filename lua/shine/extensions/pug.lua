@@ -29,40 +29,34 @@ Plugin.Version = "0.1"
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "Pug.json"
+
 Plugin.DefaultConfig = {
 
 	PugMode = true, -- Enabled Pug Mode	
-
-	MinPlayers = 8 , 
-	GameSize = 12 ,
-	VoteLength = 30 ,
-	ChooseLength = 30 ,
-	NagInterval = 20 ,
 	
-	Rounds = 2
+	MinPlayersToStart = 0, --Enable the Pug mode at this many players until the end of the round	
+	TeamSize = 6, --Size of Team 
+	SpectatorSlots = 2 --number of spectator slots  
 
+	VoteFinish = 0.6 --amount that ends the vote for each captain, else if 0 then vote waits until the pug is filled or VoteTimeout to decide the captain. 
+
+	LobbyTimeout = 1, --min before kicked if not ready or a spectator.
+	VoteTimeout = 0.5 , --length of vote for captain; vote is enabled after teams are filled, else if 0 vote finishes when teams are filled
+	ChooseTimeout = 0.5, --length a captain has to choose a player until randomly assigned a player
+	NagInterval = 0.3, --how often players are informed or their gamestatus
+	
+	Rounds = 2 -- rounds played unit pug ends and pug does not end until the next map
 }
 
 Plugin.CheckConfig = true
 
-Plugin.Rounds = { 
+Plugin.Readied = {} --number value that states which team they are on 0 readied, 1 marines, 2 aliens, 3 spectator
+Plugin.Voted = {} --id vote
+Plugin.Captain = {} --captain 
+Plugin.Spectator = {}--id
+Plugin.Rounds = self.Config.Rounds 
 
-	Team { 
-
-		Group = '@readyroom',
-	
-	}
-
-}
-		
-Plugin.MatchPlayers = {
-
-		Team = 0 , 
-		Captain = 0 , 
-		VotedCapt = 0 
-
-}
-
+--When Captain Vote ends round resets players readied are placed in the readyroom, other players are placed in the spectators Team
 function Plugin:Initialise()
    	--check rounds from mapvote and override  
         if self:CreateCommands() then Plugin:StartGame() end
@@ -73,6 +67,7 @@ function Plugin:Initialise()
 end
 
 function Plugin:StartGame()
+	
 	--if gamestatus and no started  then  
 	--	rest game scores and etc
 	--	startwarmup
@@ -86,12 +81,27 @@ function Plugin:StartGame()
 	--else 
 	--	 nag 
 	--end
+	
+		
 end 
-function endgame()
-	--if rounds != 0
-	--then switch teams reset and start warmup
-	--else reset all arrays reset pu
-	--StartGame
+function EndGame()
+
+	if PluginRounds == 1 then
+		--Remove all from Readied except Spectators 
+
+		return true
+		
+	elseif Plugin.Rounds > 0 then 
+			
+		Plugin.Rounds = Plugins.Rounds - 1 
+
+		return true
+	
+	else
+
+		return false	
+	end
+end
 
 function Plugin:GameStatus()
 --[[round:teams:mode	
@@ -107,7 +117,7 @@ end
 
 function Plugin:AtCapacity()
 
-	local NumPlayers = Count( Plugin.MatchPlayers )
+	local NumPlayers = Count( Plugin.Readied )
 
 	if NumPlayers < self.Config.GameSize then 
 	
@@ -246,10 +256,13 @@ end
 
 function Plugin:ClientDisconnect( Client ) 
 
-	remove[	Plugin.MatchPlayers[ Client:GetUserId() ] ] and FixArray( Plugin.MathPlayers )  
+	remove[	Plugin.Readied[ Client:GetUserId() ] ] and FixArray( Plugin.Readied )  
 
 	remove[ Plugin.Captain[ Client:GetUserId() ] ] and FixArray( Plugin.Captain )
 	
+	remove[ Plugin.Voted[ Client:GetUserId() ] ] and FixArray( Voted.Captain )
+
+	remove[ Plugin.Spectator[ Client:GetUserId() ] ] and FixArray( Spectator.Captain )
 end
 
 function Plugin:JoinTeam( Gamerules, Player, NewTeam, Force, ShineForce )
@@ -259,45 +272,14 @@ function Plugin:JoinTeam( Gamerules, Player, NewTeam, Force, ShineForce )
 
 	if playerTeam ~= 0 then Shine:Notify( Client, "", "", "You can only choose players from the Ready Room") return end
             Gamerules:JoinTeam( Player, playerTeam, nil, true )
-
-		local id= Player:GetClient():GetUserId()
-    
-    --block f4 if forceteams is true
-		if self.Config.ForceTeams then
-
-		if NewTeam == kTeamReadyRoom then return false end 
-
-	end 
-    
-    --cases in which jointeam is not limited
-	if not self.Config.PugMode or ShineForce then
-
-        	self.Config.Teams[id] = NewTeam
-        	self:SaveConfig()
-
-	return 
-
-	end
-    
-    --check if player is Captain
-	if self.Config.PugMode then        
-
-		if self.Config.Captains[id] then
-
-			self.Config.Teams[id] = NewTeam
-			self:SaveConfig()            
-
-			return
-
-		end
-
-	end    
-
 	return false
-
 end
 
 function Plugin:CreateCommands()
+
+    local Ready = self:BindCommand( "sh_spectator" , { "spec" , "spectator" } , CheckVotes( Client ) )
+
+    	Ready:Help ( "Join the Pug" )
 
     local Ready = self:BindCommand( "sh_ready" , { "rdy" , "ready" } , CheckVotes( Client ) )
 
@@ -305,7 +287,7 @@ function Plugin:CreateCommands()
     
     local Ready = self:BindCommand( "sh_unready" , { "unrdy" , "unready" } , CheckVotes( Client ) )
 
-    	Ready:Help ( "Join the Pug" )
+    	Ready:Help ( "Leaves the pug" )
 
     local Vote = self:BindCommand( "sh_vote", { "vote" }, CheckVotes( Client , Player  ) )
 
@@ -316,16 +298,20 @@ function Plugin:CreateCommands()
 
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
+
+    local Ready = self:BindCommand( "sh_assign" , { "assign" } , CheckVotes( Client ) )
+
+    	Ready:Help ( "Assigns Player to a team" )
     
-    local Clearteams = self:BindCommand( "sh_clearteams" , "clearteams" , function()
+	--marine spectator captain ready remove
+    local Ready = self:BindCommand( "sh_redo", { "redo" } , CheckVotes( Client ) )
 
-	        self.Config.Teams = {}
-       		self:SaveConfig()         
+    	Ready:Help ( "Starts a new vote for ready players or captains" )
+	--vote choose 
 
-	end , true )
+    local Ready = self:BindCommand( "sh_round" , { "round" } , CheckVotes( Client ) )
 
-   	Clearteams:Help( "Removes all players from teams in config" )
-
+    	Ready:Help ( "Adds the number of rounds or 0 ends the current round" )
 end
 
 function Plugin:Cleanup()
