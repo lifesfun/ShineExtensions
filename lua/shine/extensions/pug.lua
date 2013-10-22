@@ -34,30 +34,39 @@ Plugin.DefaultConfig = {
 
 	PugMode = true, -- Enabled Pug Mode	
 	
-	MinPlayersToStart = 0, --Enable the Pug mode at this many players until the end of the round	
-	TeamSize = 6, --Size of Team 
-	SpectatorSlots = 2 --number of spectator slots  
+	MinPlayersToStart = 1, --players to start the pug mode	
+	TeamSize = 6, --Size of Team; if 0 the pug is based upon the # in the server 
 
-	VoteFinish = 0.6 --amount that ends the vote for each captain, else if 0 then vote waits until the pug is filled or VoteTimeout to decide the captain. 
+	NagInterval = 0.3, --how often players are Nagged 
 
-	LobbyTimeout = 1, --min before kicked if not ready or a spectator.
-	VoteTimeout = 0.5 , --length of vote for captain; vote is enabled after teams are filled, else if 0 vote finishes when teams are filled
+	SpectatorSlots = 2 --number of spectator slots if 0 all players not in the pug are kicked 
+	
+
+	LobbyTimeout = 1, --min before kicked if not ready or a spectator; if 0 players will not be kicked
+
+	Ready Queue = 2 -- allows players to ready into the next round once the pug is full. Players on teams cannot reready until after the game is ended 
+
+	VoteFinish = 0.6 --ratio of the game size to end the captain vote when; if 0 waits untill pug is full 
+
 	ChooseTimeout = 0.5, --length a captain has to choose a player until randomly assigned a player
-	NagInterval = 0.3, --how often players are informed or their gamestatus
 	
 	Rounds = 2 -- rounds played unit pug ends and pug does not end until the next map
 }
 
 Plugin.CheckConfig = true
 
+Plugin.Queue = {}
 Plugin.Readied = {} --number value that states which team they are on 0 readied, 1 marines, 2 aliens, 3 spectator
 Plugin.Voted = {} --id vote
-Plugin.Captain = {} --captain 
-Plugin.Spectator = {}--id
+Plugin.Captain = {} --captain; 1 = current captain 
+Plugin.Spectator = {}--id 
 Plugin.Rounds = self.Config.Rounds 
 
---When Captain Vote ends round resets players readied are placed in the readyroom, other players are placed in the spectators Team
+
+--When Captain Vote ends round resets players readied are placed in the readyroom; Spectators, non Readied players, Players in the queue are placed into the spectators.
+
 function Plugin:Initialise()
+	--block gamestart
    	--check rounds from mapvote and override  
         if self:CreateCommands() then Plugin:StartGame() end
 
@@ -68,19 +77,15 @@ end
 
 function Plugin:StartGame()
 	
-	--if gamestatus and no started  then  
+	--if pregame and gamestatus then
 	--	rest game scores and etc
-	--	startwarmup
 	--	subtract round 
 	--	add stats to true 
 	--	return true
-	--if not gamesatus and ready 
-	--	place on teams 
-	--	send message 
-	--	startgame() 
-	--else 
-	--	 nag 
 	--end
+	--nag 
+	--
+	--return false
 	
 		
 end 
@@ -96,14 +101,15 @@ function EndGame()
 		Plugin.Rounds = Plugins.Rounds - 1 
 
 		return true
-	
-	else
+
+	end	
 
 		return false	
-	end
+
 end
 
 function Plugin:GameStatus()
+
 --[[round:teams:mode	
 --	need minplayers
 --	need capacity
@@ -134,16 +140,13 @@ end
 function Readied( CliendId )
 
  --function( ClientId )if Plugin.MatchPlayers[ ClientId ] then return true else return false end end
+	return false
+
 end 
 
-function Plugin:NagCaptain( Client ) 
-
-end
-function Plugin:CaptainStatus( ClientId )
-
-end
-
 function Plugin:CurrentCaptain( ClientId )
+	
+	return false
 
 end
 
@@ -179,6 +182,14 @@ function Nag( Client )
 
 	end )
 
+	return false
+
+end
+
+function Plugin:NagCaptains()
+
+	return false
+
 end
 
 function Plugin:NagReadied( Client )
@@ -198,8 +209,22 @@ function Plugin:NagReadied( Client )
 		Shine:Notify( Client, "", "", "Waiting on Captain vote to finish.")
 
 	end 
+	
+	return false
 
 end 
+
+function Plugin:Vote()
+
+	return false
+
+end
+
+function Plugin:Spectator()
+
+	return false
+
+end
 
 function Plugin:Choose( Client )
 	
@@ -210,18 +235,17 @@ function Plugin:Choose( Client )
 	if Captain and Current then
 	
 		Shine:Notify( Client, "", "", "Nice choice.. or hopefully it was. Please wait for your next turn.")
-		return true 
 
 	elseif Captian and not Current then 
 
 		Shine:Notify( Client, "", "", "You are not the current captain.")
-		return false
 
 	elseif not Captain then 
 		
 		Shine:Notify( Client, "", "", "You have to be a captain to choose teams...")
-		return false 
 	end
+
+	return false
 
 end
 
@@ -240,18 +264,13 @@ function Plugin:Ready( Client )
 	elseif Readied then
  		
 		Shine:Notify( Client, "", "", "You have already joined the pug. Type !unready to leave or !vote to vote for your team captain.") 
-		return false 
 
 	elseif Full then 
 	
 		Shine:Notify( Client, "", "", "The pug is full. Please wait for the next one to start and then ready.") 
-		return false 
-
-	else 
-	
-		return false
-
 	end
+
+	return false
 end
 
 function Plugin:ClientDisconnect( Client ) 
@@ -263,6 +282,9 @@ function Plugin:ClientDisconnect( Client )
 	remove[ Plugin.Voted[ Client:GetUserId() ] ] and FixArray( Voted.Captain )
 
 	remove[ Plugin.Spectator[ Client:GetUserId() ] ] and FixArray( Spectator.Captain )
+
+	return false
+
 end
 
 function Plugin:JoinTeam( Gamerules, Player, NewTeam, Force, ShineForce )
@@ -272,6 +294,7 @@ function Plugin:JoinTeam( Gamerules, Player, NewTeam, Force, ShineForce )
 
 	if playerTeam ~= 0 then Shine:Notify( Client, "", "", "You can only choose players from the Ready Room") return end
             Gamerules:JoinTeam( Player, playerTeam, nil, true )
+
 	return false
 end
 
