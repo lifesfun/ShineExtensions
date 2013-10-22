@@ -1,7 +1,9 @@
 --[[
 Shine Pug Plugin 
-]]
---[[
+Pug - Pick Up Games
+	Mod Types: 
+
+
 --ns2stats history
 --player readied for gametype:lobby:localserverlobby:browser
 --
@@ -89,6 +91,7 @@ function Plugin:StartGame()
 	
 		
 end 
+
 function EndGame()
 
 	if PluginRounds == 1 then
