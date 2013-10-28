@@ -194,25 +194,38 @@ end
 function 
 if 1 <=  NumPlayers < TeamSize and Num == 2, 
 1 
-function Plugin:Turns
---if team 1 = 1 
---if  team 1 = 2, 4, 6, 8, 10, 12
---
 function Plugin:CaptainsPick( cap1 , cap2 )
-	Move	
-	
-function Plugin:OnePick()
-	if N1 == TeamSize -1 or N2 == TeamSize - 1 then 
-		return true	
-	elseif N1 == 1 and N1 == 1 then
+	--send players to readyroom
+	--send spectators to spectators
+	--send queue to spectators
+	if self:CaptainTeams() == false then return end 
+function Plugin:CaptainTeams()
+
+	if team[1] == 0 or team[2] == 0 then
+		--nag to pick teams 
+		--Timer
+		--then send captain1 to random if not on team
+		--send captain2 to the other team
 		return true
-	elseif N1 == 
-	
+
+	end 
+
+	return false
+end
+		
+		--
+function Plugin:TwoPick()
+function Plugin:NeedPlayers()
+	if 1 =<  NumPlayers < TeamSize then 
+		return true
+	end
+
 	return false 
 
-function Plugin:DeterminePick( N1 , N2 )
+end
+
+function Plugin:TwoPick( N1 , N2 )
 	if N1 < N2 then
-		P = T1
 		return true
 	elseif N1 > N2 then	
 		P = T2
