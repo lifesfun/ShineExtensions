@@ -87,9 +87,6 @@ Plugin.DefaultConfig = {
 	VoteFinish = 0.6 --ratio of the game size to end the captain vote when; else waits until pug is full captains with the most votes wins
 	TeamTimeout = 0.1 --time before captains are randomly assigned to a team; else auto randomed
 	ChooseTimeout = 0.5, --length a captain has to choose a player until randomly assigned a player; 0 creates no timeout.
-	
-	Rounds = 2 -- rounds played unit pug ends; else pug does not end until the next map; best of odd #s
-	SpectatorSlots = 2 --number of spectator slots and will not be kicked; else 0 all players not in the pug are kicked 
 
 }
 
@@ -135,7 +132,7 @@ end
 
 function Plugin:GameStatus( )
 
-	if votestatus = false and CaptainsJoin == false and CaptainsPick == false then
+	if needvotes ==false and needplayer == false captainsJoin == false and CaptainsPick == false then
 	 
 		return true
 
@@ -144,25 +141,20 @@ function Plugin:GameStatus( )
 	return false
 
 end
+GameStatus 
 
-function Plugin:VoteStatus()
+ 	if Plugin:NeedPlayer == true then
 
-	if NeedVotes then 	
+		Shine:Notify( Client, "", "", "Waiting on more players. ")
+			
+	elseif Plugin:VoteRatio = false then
 
-		Shine:Notify( Client, "", "", "Waiting on more player to vote to choose the the captain")
-
-		return true
-
-	elseif NeedPlayers then  
-
-		Shine:Notify( Client, "", "", "Need more players to start the game this is at 'minplays' so captains can shoose teams.")
-		return true
-
-	end 
- 
-return false
-
-end 
+		Shine:Notify( Client, "", "", "Voting on Captains. ")
+	
+	elseif self:Captains or self:CurrentCaptain then 
+		Shine:Notify( Client, "", "", "Captains are deciding Teams ")
+	
+		
 
 function Plugin:NeedCaptJoin()
 	
@@ -203,7 +195,8 @@ function Plugin:PickPlayer()
 			return true
 		elseif self:Time >= config.timeout then 
 
-			--randomoneplayer:
+			--randomoneplayer
+			self:SetCaptain
 		 	return true
 
 		end
@@ -219,7 +212,7 @@ function Plugin:PickPlayer()
 
 end
 	
-function Plugin:SetCurrentCaptain()
+function Plugin:SetCaptain()
 
 	if Team1 == 1 and Team 2 == 1 then 
 
@@ -239,8 +232,17 @@ function Plugin:SetCurrentCaptain()
 end
 
 function NeedVotes()
-	-- count 12 ingame first on matchplayers that have voted < VotedRation *TeamSize 
-		return true
+	
+	--local Capt1 = count both votes only clients in game < VotedRation *TeamSize 
+	--local Capt1 = count both votes only clients in game < VotedRation *TeamSize 
+	--if capt1 and 2
+	--	then here are your captains
+	--	return true
+	--if capt1 then
+	--	Your first captain is  xxx
+	--if capt2 then 
+	--	Yourfirst cpatian is xxxk
+	--end
 	
 	return false
 
@@ -248,7 +250,25 @@ end
 
 function Plugin:NeedPlayers()
 
-	if NumPlayers < self.config.TeamSize * 2 then
+	local GameSize = self.config.TeamSize * 2
+
+
+	if gamstarted then
+
+	local Numplayers = ingame (Team1 + Team2)  
+
+		if  NumPlayers < GameSize  then 
+
+		--needsub
+		-- return true
+
+		end
+	
+	elseif not gamestarted thne 
+
+	local Numplayers = ingame (Team1 + Team2)  
+
+	if Team1 + Team2 < GameSize then
 
 		return true
 	
@@ -258,12 +278,18 @@ function Plugin:NeedPlayers()
 
 end
 
+function Plugin:
+
+--on disconnect
+--Needplayers
+--on connect
+--needplayers
+--do
 function Plugin:NeedSub()
-
-  --count team 1 count team 2
+  --count team 1 count team 2 array 
   --if one is not full then move players on playersmatch to readyroom
-  --if one has more player then move sub back to specatator
-
+  --if one has more player then move to readyroom 
+ -- no sub avaliable
 end
 
 function Plugin:JoinTeam(Client , choice )
@@ -293,12 +319,17 @@ function Plugin:Vote( Client )
 	local Player = PlayerStatus( ClientId ) 
 
 	if Player and not Voted then 	
-
+		
+			
 		Shine:Notify( Client, "", "", "You have voted for xxxx!" ) 
+	
+		return true
 
 	elseif Player and Voted then  
 
 		Shine:Notify( Client, "", "", "You have revoted for xxx" ) 
+
+		return true
 
 	end 
 	
@@ -365,10 +396,8 @@ function Plugin:CreateCommands()
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
     
-    local Choose = self:BindCommand( "sh_choose", { "choose" } , Choose( Client , sel.Team ) )
-    		
-		if self:PickTwo() == "true" then end
-				
+    local Choose = self:BindCommand( "sh_choose", { "choose" } , Choose( Client , Team ) )
+    			
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
 
