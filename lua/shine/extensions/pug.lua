@@ -277,19 +277,25 @@ function Plugin:StartPug()
 	--send players to spectator
 	--sendMatchPlayers to readyroom
 		
-	self:Timer.Simple( self.Config.VoteTimeout , function() 
-------------------------------
-		if Plugin:VotedCaptains() ==  1 then Plugin:CaptainsJoined() == true then 
-		if Plugin:VotedCaptains() ==  true  then CaptainTeams == true then 
+	if Plugin:VotedCaptains() ==  1 then Plugin:CaptainsJoined() == true then 
+
+		return true	
+
+	elseif self:Timer.Simple( self.Config.VoteTimeout , function() 
+
+			if Plugin:VotedCaptains() ==  true  then CaptainTeams == true then 
 				
-			return true 
+				return true 
 
+			end
 
-		end
+		end ) then 
 
-	end )  
+		return true
 
-	return true
+	end 
+
+	return false
 	
 end
 	
