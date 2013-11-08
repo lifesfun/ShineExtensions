@@ -22,7 +22,7 @@ local Timer = Shine.Timer
 local FixArray = table.FixArray
 local Count = table.Count
 local Notify = Shared.Message
-local GetAllPlayers = Shine.GetAllPlayers
+local GetAllClients = Shine.GetAllClients
 local GetClient = Shine.GetClient 
 
 local Plugin = Plugin
@@ -36,32 +36,27 @@ Plugin.DefaultConfig = {
 	PugMode = true, -- Enabled Pug Mode	
 	
 	TeamSize = 6, --Size of Team; if 0 the pug is based upon the # in the server  and still take there spot. 
+	
+	VoteStart = 0.6 --ratio of the game size to start the captains vote; 0 waits for the game to become full.
 
 	NagInterval = 0.3, --how often players are Nagged of the game status 
-
-	VoteStart = 0.6 --ratio of the game size to start the captains vote; 0 waits for the game to become full.
 
 	VoteTimeout = 0.5, --length for all vote timeouts. Captains vote, Captains Teams, Captains choose
 
 }
 
 Plugin.CheckConfig = true
+
 Plugin.GameStarted = false
 Plugin.PugsStarted = false
 
-Plugin.Players = {} --player queue for who gets into the pug 
 
-Plugin.MatchPlayers = {} --list of match players, in case of dissconnect the next player on queue subs in; parameters are there captain votes
+Plugin.Players = {} --player queue for who gets into the pug array is numeric order 
+Plugin.MatchPlayers = {} --list of match players, in case of disconnect the next player on queue subs in; parameters are there captain votes
+Plugin.Votes = {} -- live count of # of votes ting is a type of rank based voting. Each vote is rank of your choice. Vote 1 is your first choice. If your first vote is not one of top voted or that member is a captain then your second choice is counted 
+Plugin.Captains {}  --The first captain to join a team after the VoteTimeout will get second pick. 
+--If the captain leaves before the teams are chosen the next highist votes player on the team will become captain. 
 
-Plugin.Votes = {} -- live count of # of votes 
---voting is a type of rank based voting. Each vote is rank of your choice. Vote 1 is your first choice. If your first vote is not one of top voted or that member is a captain then your second choice is counted. 
-
-Plugin.Captains {}  --The first top voted to join a team after the Pug is full or Vote is finished becomes a capain. 
---If that person leaves then the next highest voted will be put on a team i
---If the person leaves after the first choice the highest voted person on the team becomes the captain
---
-
---add rounds ? best of 3 etc or adds to tournamentmode actually
 function Plugin:Initialise()
 
         if self:CreateCommands() and GameStarted == false then  
@@ -71,13 +66,16 @@ function Plugin:Initialise()
 		self:Timer.Simple( self.Config.NagInterval function() 
 
 			self:GameStatus()
-			self:PlayerStatus()
-	
+
 		end )
 
         self.Enabled = true
 
-        return true
+		return true
+
+	end
+
+	return false
 end
 
 function Plugin:StartGame()
@@ -105,9 +103,10 @@ function Plugin:StartGame()
 
 end 
 
-Shine:Notify( Client, "", "", "Captains are deciding Teams ")
-Shine:Notify( Client, "", "", "Waiting on more players to start the pug.") 
-Shine:Notify( Client, "", "", "Need more votes for captains to be decided. ")
+--funciton messages for game and player statuses
+--Shine:Notify( Client, "", "", "Captains are deciding Teams ")
+--Shine:Notify( Client, "", "", "Waiting on more players to start the pug.") 
+--Shine:Notify( Client, "", "", "Need more votes for captains to be decided. ")
 --for all nonmatchplayers key = x and notify
 --The pug is full you are x in line.
 --MatchPlayers
@@ -115,40 +114,6 @@ Shine:Notify( Client, "", "", "Need more votes for captains to be decided. ")
 --if votedcaptains 
 --pleasevote for captains by....
 --For captain1 2
--
-function UpdateMatchPlayers() 
-	
-	for Key, Value in ipairs( self.Players ) do 	
-			
-		if PugFull == false then
-		
-			self:MakeMatchPlayer( Value ) 
-
-		elseif PugFull == true then
-			--VotedCaptains 
-			--else timer nag 
-
-			return true
-
-		end
-	
-	end 
-
-	return false
-
-end
-
-function Plugin:MakeMatchPlayer( ClientId )
-
-		if Client[ ClientId ] == true then
-		--not sure if this works
-
-			self.MatchPlayers[ ClientId ] = 0 	
-			return true 
-
-		end
-
-end 
 
 function Plugin:CheckExists( ClientId ) 
 
@@ -161,7 +126,7 @@ function Plugin:CheckExists( ClientId )
 
 	end
 
-	if Players[#Players+1] = CliendId then
+	if Players[ #Players + 1 ] = CliendId then
 		
 		return true
 	
@@ -173,7 +138,7 @@ end
 
 function Plugin:NumPlayers()
 
-	return Count( Shine.Getallclients() )
+	return Count( GetallClients() )
 
 end
 
@@ -217,25 +182,18 @@ function Plugin:OnDisconnect( Client )
 
 	elseif self.PugStarted == true and self:RemoveCaptain( ClientId ) == true then
 
-		--getteam 
-		--lookfor players on team and get top player and make captain
-		--find player with top votes else voteCapatins
+		--if captain get team look for players on team and get top player and make captain
+		--
+
 	end
 	
 	return false
 
 end
 
-
-
 function Plugin:StartVote() 
 
-	local PugSize = function() 
-		
-			return self.config.TeamSize * 2
-
-		end
-
+	local TeamSize = self.Config.TeamSize
 	local StartVote = self.Config.StartVote
 	local Players = self:NumPlayers() 
 
@@ -247,34 +205,82 @@ function Plugin:StartVote()
 	elseif function() Players == StartVote * PugSize end == true and self:StartPug() == true then 
 
 		return true
+
 	end
 
 	return false
 
 end
 
-
 function Plugin:StartPug()
 
-	self.PugsStarted = true
-	--creatematchplayers
-	--send players to spectator
-	--sendMatchPlayers to readyroom
-	--tell the about till vote timeout	
-	if self:Timer.Simple( self.Config.VoteTimeout , function() 
+	if self.PugsStarted == true and self:Timer.Simple( self.Config.VoteTimeout , function() 
 
-		if self:CountVotes() == true then 
+			if self:CountVotes() == true then 
 			
-			return true
+				return true
 
-		end
+			end
+		
+		end ) then 
 
-	end ) then return true end
+		--tell the about till vote timeout	
+
+		return true 
+	
+	end
+
+	return false
+end
+
+function Plugin:PugSetup()
+
+	if self:CreateMatchPlayers() then
+
+		--send players to spectator
+		--sendMatchPlayers to readyroom
+	
+		return true
+
+	end
 
 	return false
 	
 end
-	
+
+function Plugin:CreateMatchPlayers() 
+
+	local MatchSize = self.Config.MatchSize
+
+	for i, ClientId in ipairs( self.Players ) do 	
+			
+		if Count( self.MatchPlayers ) >= MatchSize then 
+
+			return true
+
+		end
+
+		self:MakeMatchPlayer( ClientId )
+
+	end
+
+	return false
+
+end
+
+function Plugin:MakeMatchPlayer( ClientId )
+
+		if Client[ ClientId ] == true then
+		--not sure if this works
+
+			self.MatchPlayers[ ClientId ] = 0 	
+
+			return true 
+
+		end
+
+end 
+
 function Plugin:Vote( Client , VoteOne , VoteTwo )
 	
 --todo display vote
@@ -298,6 +304,7 @@ function Plugin:Vote( Client , VoteOne , VoteTwo )
 end
 
 function Plugin:CountVotes( ClientId )
+
 	-- counts 1 round of votes
 	for _, Value in pairs( self:MatchPlayers() )  do
 				
@@ -314,22 +321,27 @@ function Plugin:CountVotes( ClientId )
 end
 
 function Plugin:CaptainTeams()	
+	--check if captains are on teams
+	--if 1 captain joined
+	--
+	if Count( self.Captains ) == 2 and self:CaptainJoined( ClientId ) == true then
 
-	--check if captains is on a team if  so captain joined
 	--captains can now join teams you have naginterval seconds 
 	self:Timer.Simple( self.Config.NagInterval , function() 
 		
 			self:RandomCaptains() 
+			self:CaptainJoined()
 
 		end )  
 				
 end
-function OnTeamJoin( Client )
+function Plugin:JoinTeam( Client )
 		
-	local PugStarted = self.PugsStarted
+	local PugsStarted = self.PugsStarted
 	local ClientId = Client:GetClientId()
 
-	if PugsStarted == true and Count( self.Captains ) == 2 and self:CaptainJoined( ClientId ) == true then
+	if self.Captain[ ClientId ]  then
+		if PugsStarted == true and Count( self.Captains ) > 0 and self:CaptainJoined( ClientId ) == true then
 
 		return true
 
@@ -345,20 +357,58 @@ end
 
 function Plugin:CaptainJoined( ClientId ) 
 
-	--make captain send other captain to otherside and make current 
-	--captain notify
+	self.Captain[ 2 ] == ClientId
+	self.Captain[ ClientId ] == nil
+	--find other captain 
+	self.Captain[ 1 ] == catpain2
+	self.Captain[ captain2 ] == nil
+	FixArray( self.Captain ) 
+	self:PickTeams()
 
 end
+
+function Plugin:PickTeam() 
+
+	Shine:Notify( self:CurrentPick(), "", "", "It is your turn to pick!" ) 
+
+function Plugin:PickPlayer( Client , PlayerId )
+
+	local Client = Client:GetClientId()
+	local Player = GetClient( PlayerId ) 
+
+	local Exists = function( Player ) if type( Player ) == "table"  then return true end return false end
+	
+
+	if Exists == true and self.MatchPlayer[ Player:GetClientId() ] == true then 
+
+		--find team
+		--or send to readyroom
+		--
+		return true 
+
+	elseif Exists == true then
+	
+		--got spectators
+		
+		return true
+	
+	end
+		
+	return false
+
+	
+
+end 
 
 function Plugin:Choose( Client , PlayerId )
 
 	local PlayerClient = self:GetClient( PlayerId ) 
 
-	if self:CurrentCaptain( ClientId ) == true and self:SendToTeam( PlayerClient ) == true then
+	if self:CurrentCaptain( ClientId ) == true and self:PickPlayer( PlayerId ) == true then
 
 		Shine:Notify( Client, "", "", "Nice choice.. or hopefully it was. Please wait for your next turn." )
 
-		Shine:Notify( self:CurrentPick(), "", "", "It is your turn to pick!" ) 
+		self:PickTeam()
 
 		return true
 		
@@ -375,7 +425,7 @@ end
 
 function SendToTeam( Client ) 
 	
-	local Client ==  Client:GetClientId()
+	local Client = Client:GetClientId()
 	local MatchPlayer = self.MatchPlayer[ ClientId ] 
 
 	local ClientId = Client:GetClientId()
