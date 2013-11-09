@@ -281,7 +281,6 @@ function Plugin:MakeMatchPlayer( ClientId )
 
 end 
 
-
 function Plugin:PugSetup()
 
 	if self:CreateMatchPlayers() then
@@ -302,6 +301,7 @@ function Plugin:StartPug()
 		--tell the about till vote timeout	
 			self:Timer.Simple( self.Config.VoteTimeout , function() 
 			
+				--countVotes CaptainTeams
 			--	ManageCaptains() || Captain Teams
 
 		end ) 
@@ -333,7 +333,7 @@ end
 
 function Plugin:ManageCaptains()
 --remove captains that are not on the server 
---check captains are on teams  ==2 
+--check captains are on teams  == 2 
 --	return true
 --check if captains exist == 2 
 --	
@@ -408,15 +408,17 @@ end
 
 function Plugin:CaptainsTeams()	
 
+		if self:ManageCaptains() == true then
 		--captains can now join teams you have naginterval seconds 
-		if self:Timer.Simple( self.Config.Timeout, function() 
+			self:Timer.Simple( self.Config.Timeout, function() 
 		
-			if self:RandomCaptains() == true and self:PickTeams() then
+				if self:RandomCaptains() == true and self:PickTeams() then
 
-				return true
-			end
+					return true
 
-		end ) then 
+				end 
+
+			end )  
 
 		return true
 	end
