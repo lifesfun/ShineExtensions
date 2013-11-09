@@ -103,6 +103,8 @@ function Plugin:StartGame()
 
 end 
 
+function Plugin:GameStatus()
+
 --funciton messages for game and player statuses
 --Shine:Notify( Client, "", "", "Captains are deciding Teams ")
 --Shine:Notify( Client, "", "", "Waiting on more players to start the pug.") 
@@ -114,6 +116,7 @@ end
 --if votedcaptains 
 --pleasevote for captains by....
 --For captain1 2
+
 
 function Plugin:PlayerExist( ClientId ) 
 
@@ -136,211 +139,16 @@ function Plugin:PlayerExist( ClientId )
 
 end
 
-function Plugin:NumPlayers()
+function Plugin:CaptainsExist()
 
-	return Count( GetallClients() )
-
-end
-
-function ClientExists( ClientId )
-	
-	if type( Client[ clientId ] ) == "table" then
-
+	if Count( self.Captains  ) == 2  and self.Captains[ 1 ] >= 5 and self.Captains[ 2 ] >= 5 then
+		
 		return true
 
 	end
 
 	return false
 
-end
-
-
-function Plugin:OnConnect( Client )
-
-	local ClientId = Client:GetClientId() 
-
-	if self:PlayerExists( ClientId ) == false then 
-	
-		--disconnect
-		--return false
-	end
-
-	if self.GameStarted == true and self:CheckSubs() == true then
-
-		return true
-	
-	elseif self.PugStarted == true and self:SendToTeam( ClientId ) == true then
-
-		return true
-	
-	elseif Self.PugStarted == false then 
-	
-		self:StartVote() 
-			
-		return true
-
-	end
-
-	return false
-
-end
-	
-function Plugin:OnDisconnect( Client ) 
-
-	local ClientId = Client:GetClientId()
-
-	if self.GameStarted == true and self:CheckSubs() == true then 
-
-		return true
-
-	elseif self.PugStarted == true and self:ManageCaptains() == true then
-
-		return true
-
-	end
-	
-	return false
-
-end
-function Plugin:Vote( Client , VoteOne , VoteTwo )
-	
---todo display vote
-	local ClientId = Client:GetClientId()
-
-	if self.MatchPlayer[ GetClientId ] == true then 	
-
-			--for each param
-			--Players[ClientId][1] = checkif exists ( Vote )
-
-		Shine:Notify( Client, "", "", "You have voted for xxxx xxxx!" ) 
-	
-		return true
-
-	end 
-	
-	return false
-
-end
-
-function Plugin:StartVote() 
-
-	local MatchSize = self.Config.MatchSize
-	local StartVote = self.Config.StartVote
-	local Players = self:NumPlayers() 
-	local StartSize = StartVote * MatchSize 
-	
-	if StartVote == 0 and Players >= MatchSize and self:StartPug() == true then
-
-		self.PugsStarted = true
-
-		return true
-
-	elseif Players == StartSize and self:StartPug() == true then 
-
-		self.PugsStarted = true 
-
-		return true
-
-	end
-
-	return false
-
-end
-
-function Plugin:CreateMatchPlayers() 
-
-	local MatchSize = self.Config.MatchSize
-
-	for i, ClientId in ipairs( self.Players ) do 	
-			
-		if Count( self.MatchPlayers ) >= MatchSize then 
-
-			return true
-
-		end
-
-		self:MakeMatchPlayer( ClientId )
-
-	end
-
-	return false
-
-end
-
-function Plugin:MakeMatchPlayer( ClientId )
-
-	if ClientExists( ClientId ) == true then
-
-		self.MatchPlayers[ ClientId ] = 0 	
-
-		return true 
-
-	end
-
-	return false
-
-end 
-
-function Plugin:PugSetup()
-
-	if self:CreateMatchPlayers() then
-
-		--send players to spectator
-		--sendMatchPlayers to readyroom
-	
-		return true
-
-	end
-
-	return false
-	
-end
-function Plugin:StartPug()
-
-	if self.StartVote() == true and self.PugSetup() == true then
-		--tell the about till vote timeout	
-			self:Timer.Simple( self.Config.VoteTimeout , function() 
-			
-				--countVotes CaptainTeams
-			--	ManageCaptains() || Captain Teams
-
-		end ) 
-
-		return true 
-	
-	end
-
-	return false
-end
-
-
-function Plugin:CountVotes( ClientId )
-
-	-- counts 1 round of votes
-	for _, Value in pairs( self.MatchPlayers )  do
-				
-				Votes .i = 1
-			if Votes.Value.i + 1 then
-
-			elseif  Vote.VoteId ] == true then
-			Vote.VoteId = Vote.VoteId + 1
-			--addcaptain to 
-			--ingame
-			end
-	end
-
-end
-
-function Plugin:ManageCaptains()
---remove captains that are not on the server 
---check captains are on teams  == 2 
---	return true
---check if captains exist == 2 
---	
---	return true
---check if 1 captain on team exists check if another captain exists not on team and captains joined
---check if captains exist and start captain teams
---check if missing one captain and do captains voted
 end
 
 function Plugin:CaptainsHaveTeams()
@@ -369,11 +177,30 @@ function Plugin:CaptainsHaveTeams()
 
 end
 
+function Plugin:CanPick( PlayerId )
 
-function Plugin:CaptainsExist()
+	local Client = GetClient( PlayerId ) 
 
-	if Count( self.Captains  ) == 2  and self.Captains[ 1 ] >= 5 and self.Captains[ 2 ] >= 5 then
+	if self.ClientExists( Client ) == true and self.MatchPlayer[ Client:GetClientId() ] == true then 
+
+		return true 
+	
+	end
 		
+	return false
+
+end 
+
+function Plugin:NumPlayers()
+
+	return Count( GetallClients() )
+
+end
+
+function Plugin:ClientExists( ClientId )
+	
+	if type( Client[ clientId ] ) == "table" then
+
 		return true
 
 	end
@@ -382,61 +209,258 @@ function Plugin:CaptainsExist()
 
 end
 
+function Plugin:OnConnect( Client )
 
-function Plugin:JoinTeam( Client )
+	local ClientId = Client:GetClientId() 
 
-	-- check captain or send to team block f4 etc	
-	local PugsStarted = self.PugsStarted
-	local ClientId = Client:GetClientId()
-
-	if self.Captains[ ClientId ]  then
-
-		if PugsStarted == true and Count( self.Captains ) > 0 and self:CaptainsJoined( ClientId ) == true then
-
-		return true
-
-		end
+	if self:PlayerExists( ClientId ) == false then 
 	
-	elseif PugsStarted == false and self.GameStarted == false then
+		--disconnect
+		--return false
+	end
+
+	if self.GameStarted == true and self:CheckSubs() == true then
 
 		return true
+	
+	elseif self.PugStarted == true and self:SendToTeam( ClientId ) == true then
+
+		return true
+	
+	elseif Self.PugStarted == false then 
+	
+		self:StartPug() 
+			
+		return true
+
 	end
 
 	return false
+
+end
+	
+function Plugin:OnDisconnect( Client ) 
+
+	local ClientId = Client:GetClientId()
+
+	if self.GameStarted == true and self:CheckSubs() == true then 
+
+		return true
+
+	elseif self.PugStarted == true and self:ManageCaptains() == true then
+
+		return true
+
+	end
+	
+	return false
+
+end
+
+function Plugin:StartPug()
+
+	if self.StartVote() == true and self.PugSetup() == true then
+		self:GameStatus()
+	
+		self:Timer.Simple( self.Config.VoteTimeout , function() 
+			
+			self:ManageCaptains()
+
+		end ) 
+
+		return true 
+	
+	end
+
+	return false
+end
+
+function Plugin:StartVote() 
+
+	local MatchSize = self.Config.MatchSize
+	local StartVote = self.Config.StartVote
+	local Players = self:NumPlayers() 
+	local StartSize = StartVote * MatchSize 
+	
+	if StartVote == 0 and Players >= MatchSize and self:StartPug() == true then
+
+		self.PugsStarted = true
+
+		return true
+
+	elseif Players == StartSize and self:StartPug() == true then 
+
+		self.PugsStarted = true 
+
+		return true
+
+	end
+
+	return false
+
+end
+
+function Plugin:Vote( Client , VoteOne , VoteTwo )
+	
+	local ClientId = Client:GetClientId()
+
+	if self.MatchPlayer[ GetClientId ] == true then 	
+
+			--for each param
+			--Players[ClientId][1] = checkif exists ( Vote )
+
+		Shine:Notify( Client, "", "", "You have voted for xxxx xxxx!" ) 
+	
+		return true
+
+	end 
+	
+	return false
+
+end
+
+function Plugin:PugSetup()
+
+	if self:CreateMatchPlayers() then
+
+		--send players to spectator
+		--sendMatchPlayers to readyroom
+	
+		return true
+
+	end
+
+	return false
+	
+end
+
+function Plugin:CreateMatchPlayers() 
+
+	local MatchSize = self.Config.MatchSize
+
+	for i, ClientId in ipairs( self.Players ) do 	
+			
+		if Count( self.MatchPlayers ) >= MatchSize then 
+
+			return true
+
+		end
+
+		self:MakeMatchPlayer( ClientId )
+
+	end
+
+	--delete matchplayersfromqueue
+
+	return false
+
+end
+
+function Plugin:MakeMatchPlayer( ClientId )
+
+	if ClientExists( ClientId ) == true then
+
+		self.MatchPlayers[ ClientId ] = 0 	
+
+		return true 
+
+	end
+
+	return false
+
+end 
+
+function Plugin:ManageCaptains()
+
+	local CaptainsTeams = self:CaptainsOnTeams()
+	local Captains = self:CaptainsExist() 
+
+	if CaptainsTeams == 2 and Captains == 0 then
+
+		return true
+
+	elseif CaptainsTeams == 1 and Captains == 1 then
+
+		self:CaptainsJoined()	
+
+		return true
+	
+	elseif CaptainsTeams == 1 and Captains == 0 then
+
+		self:NewCaptain()
+		self:CaptainsJoined()	
+
+		return true
+	
+	elseif CaptainsTeams == 0 and Captains == 1 then
+
+		self:NewCaptain()
+		self:CaptainTeams()
+	
+		return true
+		
+	elseif CaptainsTeams == 0 and Captains == 2 then
+
+		self:CaptainTeams()
+	
+		return true
+	
+	elseif CaptainsTeams == 0 and Captains == 0 then
+
+		self:NewCaptain()
+		self:NewCaptain()
+		self:CaptainTeams()
+	
+		return true
+	
+	end
+
+	return false
+
+end
+
+function Plugin:CountVotes( ClientId )
+
+	for _, Value in pairs( self.MatchPlayers )  do
+				
+				Votes .i = 1
+			if Votes.Value.i + 1 then
+
+			elseif  Vote.VoteId ] == true then
+			Vote.VoteId = Vote.VoteId + 1
+
+			--addcaptain to 
+			
+			end
+
+	end
 
 end
 
 function Plugin:CaptainsTeams()	
 
-		if self:ManageCaptains() == true then
-		--captains can now join teams you have naginterval seconds 
-			self:Timer.Simple( self.Config.Timeout, function() 
+	self:Timer.Simple( self.Config.Timeout, function() 
+		--gamestatus	
+		--randomcaptains
+		if self:ManageCaptains() == true and self:PickTeams() then
+
 		
-				if self:RandomCaptains() == true and self:PickTeams() then
+			return true
 
-					return true
+		end 
 
-				end 
+	end ) 
 
-			end )  
-
-		return true
-	end
-
-	return false
+	return true
 
 end
 
-function Plugin:RandomCaptains()
-	
-	--Captains Joined  x x 
-end
+function Plugin:CaptainsJoined() 
+	--find each captain and assing a number and delete
 
-function Plugin:CaptainsJoined( Client1 , Client2 ) 
-
-	self.Captains[ 2 ] == ClientId
+	self.Captains[ 2 ] == Captain1
 	self.Captains[ ClientId ] == nil
-	self.Captains[ 1 ] == catpain2
+	self.Captains[ 1 ] == Captain2
 	self.Captains[ captain2 ] == nil
 	FixArray( self.Captains ) 
 
@@ -452,13 +476,9 @@ function Plugin:PickTeams()
 
 		self:Timer.Simple( self.Config.VoteTimeOut , function() 
 		
-			if self:RandomPlayer() == true then
-			
-				self:PickTeams() 
+			--randomplayertoteam
+			self:PickTeams() 
 
-				return true
-
-			end
 
 		end )  
 
@@ -499,6 +519,8 @@ function Plugin:Choose( Client , PlayerId )
 	local PlayerClient = self:GetClient( PlayerId ) 
 
 	if Captain == ClientId and self:CanPick( PlayerId ) == true then
+	
+	--GameRules:JoinTeam( Client:GetControllingPlayer,   get captains team ) 
 
 		Shine:Notify( Client, "", "", "Nice choice.. or hopefully it was. Please wait for your next turn." )
 
@@ -516,29 +538,31 @@ function Plugin:Choose( Client , PlayerId )
 
 end
 
-function Plugin:CanPick( PlayerId )
-
-	local Client = GetClient( PlayerId ) 
-
-	if self.ClientExists( Client ) == true and self.MatchPlayer[ Client:GetClientId() ] == true then 
-
-		return true 
-	
-	end
-		
-	return false
-
-end 
-
-
-
-function RandomCaptains() --randomchooses a team for the captains
-function RandomPlayer() --chooses a random player from the readroom
 function Plugin:NeedSub()
   --count team 1 count team 2 array 
   --if one is not full then move players on playersmatch to readyroom
   --if one has more player then move to readyroom 
  -- no sub avaliable
+end
+
+function Plugin:JoinTeam( GameRules, Client:GetControllingPlayer, OldTEam , NewTeam , Force , ShineForce )
+
+	-- check captain or send to team block f4 etc	
+	
+	local PugsStarted = self.PugsStarted
+	local ClientId = Client:GetClientId()
+
+	if self.Captains[ ClientId ] ~= nil and PugsStarted == true and self:ManageCaptains() == true then 
+
+		return true
+
+	elseif PugsStarted == false and self.GameStarted == false then
+
+		return true
+	end
+
+	return false
+
 end
 
 function Plugin:JoinTeam( Client , Player )
@@ -575,7 +599,7 @@ end
 
 function Plugin:CreateCommands()
 
-    local Vote = self:BindCommand( "sh_vote", { "vote" }, Votes( Client , PlayerId ) )
+    local Vote = self:BindCommand( "sh_vote", { "vote" }, Vote( Client , PlayerId ) )
 
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
