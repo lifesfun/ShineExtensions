@@ -3,15 +3,13 @@ Shine Pug Plugin
 Pug - Pick Up Games
 	This creates array of players in order to manage the formation of teams.
 	Progression:
-		Amount needed to be enabled and start nagging
+		Amount needed to be enabled when match size it hit
 		Player either ready or become a spectator; else are kicked after the timeout amount
-		Captatins are decided when the percentage of matchsize votes or when the pug fills up
+		spectators and non-match players are sent into spectator.
+		Captatins are decided after the vote timeout 
 
-		Once captain is decided spectators and non-readied players are sent into spectator.
-			All other players are put in the ready room.
-			All players except the commander are blocked from switching teams and joining
-			Commanders will be randomed if they surpass the teamtimeout
-			Round is reset
+		All players are blocked from switching teams and joining
+		Commanders will be random to picking teams and for which team they start 
 		Captains then have to decide there players and are limited by the choosetimeout
 		Players are picked from the ready room and placed on the same side as the commander
 --]]
@@ -53,9 +51,7 @@ Plugin.CheckConfig = true
 Plugin.Conflicts = {
 	DisableThem = {
 		"pregame",
-		"mapvote",
-		"readyroom",
-		"afkkick"
+		"readyroom"
 	}
 }
 
@@ -71,6 +67,7 @@ local BlacklistMods = {
 }
 
 function Plugin:Initialise()
+
 	local GetMod = Server.GetActiveModId
 
 	for i = 1, Server.GetNumActiveMods() do
@@ -90,7 +87,7 @@ function Plugin:Initialise()
 	--If the captain leaves before the teams are chosen the next highist votes player on the team will become captain. 
 	self.FirstVote = {} 
 	self.SecondVote = {}
-	self.Captain = {}  --The first captain to join a team after the VoteTimeout will get second pick. 
+	self.Captain = {}  
 	self.CurrentCaptain = nil
 
 	self.TeamMembers = {}
@@ -108,6 +105,7 @@ function Plugin:Initialise()
 
 	--We've been reactivated, we can disable autobalance here and now.
 	if self.Enabled ~= nil then
+
 		Server.SetConfigSetting( "auto_team_balance", false )
 		Server.SetConfigSetting( "end_round_on_team_unbalance", false )
 		Server.SetConfigSetting( "force_even_teams_on_join", false )
@@ -168,6 +166,7 @@ function Plugin:CheckCommanders( Gamerules )
 	end
 
 	if AliensReady and not Team2Com then
+
 		self.ReadyStates[ 2 ] = false
 
 		self:Notify( false, nil, "%s is no longer ready.", true, self:GetTeamName( 2 ) )
@@ -185,15 +184,25 @@ function Plugin:StartGame( Gamerules )
 	Gamerules.lastCountdownPlayed = nil
 
 	for _, Player in ientitylist( Shared.GetEntitiesWithClassname( "Player" ) ) do
+
 		if Player.ResetScores then
+
 			Player:ResetScores()
+
 		end
+
 	end
 
 	TableEmpty( self.ReadyStates )
-
+	TableEmpty( self.Captains )
+	TableEmpty( self.MatchPlayers ) 
+	TableEmpty( self.FirstVote ) 
+	TableEmpty( self.SecondVote )
+	
 	self.PugsStarted = false
+	self.CurrentCaptain = nil
 	self.GameStarted = true
+
 
 end
 
@@ -201,21 +210,24 @@ end
 	Rejoin a reconnected client to their old team.
 ]]
 function Plugin:ClientConfirmConnect( Client )
+
 	if not self.DisabledAutobalance then
+	
 		Server.SetConfigSetting( "auto_team_balance", false )
 		Server.SetConfigSetting( "end_round_on_team_unbalance", false )
 		Server.SetConfigSetting( "force_even_teams_on_join", false )
 
 		self.DisabledAutobalance = true
+
 	end
 	
 	if Client:GetIsVirtual() then return end
 
 	local ID = Client:GetUserId()
 
-	if self.Config.ForceTeams then
+	if self.Config.ForceTeams and self.TeamMembers[ ID ] then
 
-		if self.TeamMembers[ ID ] then
+		if GameStarted == true or self.PugsStarted == true then	
 
 			Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ ID ], nil, true )     
 
@@ -288,18 +300,11 @@ end
 function Plugin:GetOppositeTeam( Team )
 
 	return Team == 1 and 2 or 1
+
 end
 
-
-	
 	--	if stats enabeld add stats to true 
-	--	start tournament mode with tracking players for teams
 	--	send MatchPlayer to back of the queue
-	--
-	-- 	clear arrays
-	--		voted
-	--		captains
-	--		MatchPlayers
 	--
 
 function Plugin:GameStatus()
@@ -387,7 +392,11 @@ function Plugin:StartPug()
 	local Players = Count( GetallClients() )
 
 
-	if  Players >= MatchSize and self:CreateMatchPlayers() == true and self:StartVote() == true and  then
+	if Players >= MatchSize then 
+	
+		self:CreateMatchPlayers() 
+		self:StartVote() 
+		self:PickTeams()
 
 		return true
 	
@@ -436,11 +445,23 @@ end
 
 function Plugin:StartVote() 
 
+	local Players = Shine.GetAllPlayers 
+	
 	self.PugsStarted = true  
 
+	for Value , Key in pairs( Players ) do
+
+		GameRules:JoinTeam( Player:GetControllingPlayer() , 3 , nil , true ) 
+
+	end
+
+	for Value , Key in pairs( self.MatchPlayers ) do
+
+		GameRules:JoinTeam( Client:GetControllingPlayer() , 0 , nil , true ) 
+
+	end
+
 	--gamestatus
-	--send players to spectator
-	--sendMatchPlayers to readyroom
 	--vote for voth captains ....
 
 	self:Timer.Simple( self.Config.VoteTimeout , function() 
@@ -573,8 +594,8 @@ function Plugin:CaptainsTeams()
 		
 	elseif Team == 2 then
 
-		GameRules:JoinTeam( Client[ CaptainOne ]:GetControllingPlayer() , 1 , nil , true ) 
-		GameRules:JoinTeam( Client[ CaptainTwo ]:GetControllingPlayer() , 2 2 , nil , true ) 
+		GameRules:JoinTeam( Client[ CaptainOne ]:GetControllingPlayer() , 2 , nil , true ) 
+		GameRules:JoinTeam( Client[ CaptainTwo ]:GetControllingPlayer() , 1 , nil , true ) 
 		
 	end
 	
@@ -587,7 +608,7 @@ function Plugin:PickTeams()
 		self:PickPlayer()
 
 	end
-	
+
 	self:StartGame() 
 
 	return true
@@ -710,11 +731,29 @@ end
 
 function Plugin:NeedSub()
 
-  --count team 1 count team 2 array 
-  --if one is not full then move players on playersmatch to readyroom
-  --if one has more player then move to readyroom 
- -- no sub avaliable
- 
+	local TeamSize = self.Config.TeamSize
+
+	if Count( shine.GetTeamClients( 1 ) ) < TeamSize then
+
+		--add players to teamone	
+	end
+
+	if Count( shine.GetTeamClients( 2 ) ) < TeamSize then
+
+		--addplayers to teamtwo
+	
+	end 
+
+	if Count( shine.GetTeamClients( 1 ) ) > TeamSize then
+
+		--remove player	
+	end
+
+	if Count( shine.GetTeamClients( 2 ) ) > TeamSize then
+
+		--remove player	
+	end
+
 end
 
 --[[
@@ -730,9 +769,12 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 
 	local ID = Client:GetUserId()
 	
-	self.MatchPlayers[ ID ] = nil
 
+	if self.PugsStarted == true then 
+	
 	self.TeamMembers[ ID ] = NewTeam
+
+	self.MatchPlayers[ ID ] = nil
 
 end
 
@@ -743,13 +785,8 @@ function Plugin:JoinTeam( GameRules, Client:GetControllingPlayer, OldTEam , NewT
 		--send players to spectator
 	
 	local PugsStarted = self.PugsStarted
-	local ClientId = Client:GetClientId()
 
-	if PugsStarted == true and self.Captains[ ClientId ] ~= nil then 
-
-		return true
-
-	elseif PugsStarted == false and self.GameStarted == false then
+	if PugsStarted == false and self.GameStarted == false then
 
 		return true
 	end
@@ -757,7 +794,6 @@ function Plugin:JoinTeam( GameRules, Client:GetControllingPlayer, OldTEam , NewT
 	return false
 
 end
-
 
 function Plugin:CreateCommands()
 
@@ -774,6 +810,7 @@ function Plugin:CreateCommands()
 		if Team ~= 1 and Team ~= 2 then return end
 
 		if not Player:isa( "Commander" ) then
+
 			Shine:NotifyError( Client, "Only the commander can ready up the team." )
 
 			return
@@ -808,7 +845,9 @@ function Plugin:CreateCommands()
 
 			self:CheckStart()
 		else
+
 			Shine:NotifyError( Client, "Your team is already ready! Use !unready to unready your team." )
+
 		end
 
 	end
@@ -829,6 +868,7 @@ function Plugin:CreateCommands()
 		if Team ~= 1 and Team ~= 2 then return end
 
 		if not Player:isa( "Commander" ) then
+
 			Shine:NotifyError( Client, "Only the commander can ready up the team." )
 
 			return
@@ -930,5 +970,3 @@ function Plugin:Cleanup()
 end
 
 Shine:RegisterExtension( "pug", Plugin )
-
-	
