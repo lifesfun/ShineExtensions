@@ -81,6 +81,7 @@ function Plugin:Initialise()
 	end
 
 	self.PugsStarted = false
+	self.GameStarted = false
 
 	self.Players = {} --player queue for who gets into the pug array is numeric order 
 	self.MatchPlayers = {} --list of match players, in case of disconnect the next player on queue subs in; parameters are there captain votes
@@ -121,6 +122,27 @@ function Plugin:Initialise()
 		--Pick Up Game Mode enabled!
 	return true
 end
+
+	--	if stats enabeld add stats to true 
+	--	send MatchPlayer to back of the queue
+	--
+
+function Plugin:GameStatus()
+
+--funciton messages for game and player statuses
+--Shine:Notify( Client, "", "", "Captains are deciding Teams ")
+--Shine:Notify( Client, "", "", "Waiting on more players to start the pug.") 
+--Shine:Notify( Client, "", "", "Need more votes for captains to be decided. ")
+--for all nonmatchplayers key = x and notify
+--The pug is full you are x in line.
+--MatchPlayers
+--You are in the pug
+--if votedcaptains 
+--pleasevote for captains by....
+--For captain1 2
+
+end
+
 
 function Plugin:GetStartNag()
 
@@ -202,7 +224,6 @@ function Plugin:StartGame( Gamerules )
 	self.PugsStarted = false
 	self.CurrentCaptain = nil
 	self.GameStarted = true
-
 
 end
 
@@ -303,25 +324,6 @@ function Plugin:GetOppositeTeam( Team )
 
 end
 
-	--	if stats enabeld add stats to true 
-	--	send MatchPlayer to back of the queue
-	--
-
-function Plugin:GameStatus()
-
---funciton messages for game and player statuses
---Shine:Notify( Client, "", "", "Captains are deciding Teams ")
---Shine:Notify( Client, "", "", "Waiting on more players to start the pug.") 
---Shine:Notify( Client, "", "", "Need more votes for captains to be decided. ")
---for all nonmatchplayers key = x and notify
---The pug is full you are x in line.
---MatchPlayers
---You are in the pug
---if votedcaptains 
---pleasevote for captains by....
---For captain1 2
-end
-
 function Plugin:ClientConnect( Client )
 
 	local ClientId = Client:GetClientId() 
@@ -351,7 +353,9 @@ function Plugin:ClientConnect( Client )
 
 		return true
 	
-	elseif self.PugsStarted == true and self:SendToTeam( ClientId ) == true then
+	elseif self.PugsStarted == true then
+
+		GameRules:JoinTeam( Client:GetControllingPlayer() , 3 , nil , true ) 
 
 		return true
 	
@@ -457,6 +461,7 @@ function Plugin:StartVote()
 
 	for Value , Key in pairs( self.MatchPlayers ) do
 
+		GameRules:JoinTeam( Client:GetControllingPlayer() , 0 , nil , true ) 
 		GameRules:JoinTeam( Client:GetControllingPlayer() , 0 , nil , true ) 
 
 	end
@@ -768,7 +773,6 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 	if not Client then return end
 
 	local ID = Client:GetUserId()
-	
 
 	if self.PugsStarted == true then 
 	
@@ -780,13 +784,15 @@ end
 
 function Plugin:JoinTeam( GameRules, Client:GetControllingPlayer, OldTEam , NewTeam , Force , ShineForce )
 
-	--if started 
-		--block f4 
-		--send players to spectator
-	
 	local PugsStarted = self.PugsStarted
+	local GameStarted = self.GameStarted 
 
-	if PugsStarted == false and self.GameStarted == false then
+	if PugsStarted == true or GameStarted == true then 
+	
+			Gamerules:JoinTeam( Player , 3 , nil ,true ) 
+			return false 
+
+	elseif PugsStarted == false and GameStarted == false then
 
 		return true
 	end
