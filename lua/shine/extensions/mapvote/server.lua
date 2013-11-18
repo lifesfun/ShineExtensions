@@ -172,7 +172,7 @@ function Plugin:Initialise()
 	end
 
 	self.MapCycle = Cycle or {}
-	self.MapCycle.time = self.MapCycle.time or 30
+	self.MapCycle.time = tonumber( self.MapCycle.time ) or 30
 
 	local ForcedMaps = self.Config.ForcedMaps
 	local IsArray = IsTableArray( ForcedMaps )
@@ -1428,6 +1428,8 @@ function Plugin:CreateCommands()
 			self:StartVote( nil, true )
 
 			Shine:Print( "%s[%s] forced a map vote.", true, PlayerName, Client and Client:GetUserId() or "N/A" )
+
+			Shine:CommandNotify( Client, "forced a map vote." )
 		else
 			if Client then
 				Shine:NotifyError( Client, "Unable to start a new vote, a vote is already in progress." )

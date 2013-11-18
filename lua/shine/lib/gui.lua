@@ -123,7 +123,7 @@ function SGUI:CallEvent( FocusChange, Name, ... )
 	for i = WindowCount, 1, - 1 do
 		local Window = Windows[ i ]
 
-		if Window[ Name ] and Window:GetIsVisible() then
+		if Window and Window[ Name ] and Window:GetIsVisible() then
 			local Success, Result = xpcall( Window[ Name ], OnError, Window, ... )
 
 			if Success then
@@ -183,7 +183,7 @@ function SGUI:EnableMouse( Enable )
 		self.MouseObjects = self.MouseObjects + 1
 	
 		if self.MouseObjects == 1 then
-			if not IsCommander() then
+			if not ( IsCommander and IsCommander() ) then
 				ShowMouse( true )
 				self.EnabledMouse = true
 			end
@@ -197,7 +197,7 @@ function SGUI:EnableMouse( Enable )
 	self.MouseObjects = self.MouseObjects - 1
 
 	if self.MouseObjects == 0 then
-		if not IsCommander() or self.EnabledMouse then
+		if not ( IsCommander and IsCommander() ) or self.EnabledMouse then
 			ShowMouse( false )
 			self.EnabledMouse = false
 		end
@@ -421,6 +421,11 @@ Hook.Add( "OnMapLoad", "LoadGUIElements", function()
 
 	for i = 1, #Skins do
 		include( Skins[ i ] )
+	end
+
+	--Apparently this isn't loading for some people???
+	if not SGUI.Skins.Default then
+		include "lua/shine/lib/gui/skins/default.lua"
 	end
 
 	SGUI:SetSkin( "Default" )

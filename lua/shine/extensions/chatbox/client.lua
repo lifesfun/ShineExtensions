@@ -8,6 +8,7 @@ local Shine = Shine
 
 local Hook = Shine.Hook
 local SGUI = Shine.GUI
+local IsType = Shine.IsType
 
 local Clamp = math.Clamp
 local Clock = os.clock
@@ -41,8 +42,13 @@ function Plugin:HookChat( ChatElement )
 
 		self.Vis = Vis
 
-		for Index, Element in pairs( self.messages ) do
-			Element.Background:SetIsVisible( Vis )
+		if self.messages then
+			for Index, Element in pairs( self.messages ) do
+				--There's non-table elements in here???
+				if IsType( Element, "table" ) then
+					Element.Background:SetIsVisible( Vis )
+				end
+			end
 		end
 	end
 
@@ -76,7 +82,7 @@ function Plugin:HookChat( ChatElement )
 			local Message = select( 2, ... )
 
 			--This is called when the message is added to the GUIChat's message list.
-			if Message and Message.Background and Plugin.Enabled and Plugin.Visible then
+			if IsType( Message, "table" ) and Message.Background and Plugin.Enabled and Plugin.Visible then
 				Message.Background:SetIsVisible( false )
 			end
 		end
@@ -94,7 +100,15 @@ Hook.Add( "Think", "ChatBoxHook", function()
 	end
 end )
 
+local Hooked
+
 function Plugin:Initialise()
+	if not Hooked then
+		Shine.Hook.SetupGlobalHook( "ClientUI.EvaluateUIVisibility", "EvaluateUIVisibility", "PassivePost" )
+
+		Hooked = true
+	end
+
 	self.Messages = self.Messages or {}
 
 	self.Enabled = true
@@ -103,9 +117,7 @@ function Plugin:Initialise()
 end
 
 --We need the default chat script so we can hide its messages.
-function Plugin:Think()
-	if self.GUIChat then return end
-	
+function Plugin:EvaluateUIVisibility()
 	local Manager = GetGUIManager()
 	local Scripts = Manager.scripts
 
@@ -197,6 +209,17 @@ end
 		6. A settings button that opens up the chatbox settings.
 ]]
 function Plugin:CreateChatbox()
+	--For some reason, some people don't have this. Without it, we can't do anything...
+	if not self.GUIChat.inputItem then
+		Shine:AddErrorReport( "GUIChat is missing its inputItem!",
+			"Type: %s. inputItem: %s. messages: %s.", true, type( self.GUIChat ), 
+			tostring( self.GUIChat.inputItem ), tostring( self.GUIChat.messages ) )
+
+		Shine:UnloadExtension( "chatbox" )
+
+		return
+	end
+
 	local UIScale = GUIScale( Vector( 1, 1, 1 ) )
 	local ScalarScale = GUIScale( 1 )
 
@@ -395,6 +418,8 @@ function Plugin:CreateChatbox()
 	end
 
 	self.SettingsButton = SettingsButton
+
+	return true
 end
 
 function Plugin:CreateSettings( DummyPanel, UIScale, ScalarScale )
@@ -683,7 +708,7 @@ function Plugin:OnResolutionChanged( OldX, OldY, NewX, NewY )
 
 	--Recreate the entire chat box, it's easier than rescaling.
 	self.MainPanel:Destroy()
-	self:CreateChatbox()
+	if not self:CreateChatbox() then return end
 
 	TableEmpty( Messages )
 
@@ -740,8 +765,6 @@ local function WordWrap( XPos, Width, Label, LastSpace )
 end
 
 local IntToColour
-
-local IsType = Shine.IsType
 
 --[[
 	Adds a message to the chatbox.
@@ -886,12 +909,15 @@ end
 	Opens the chatbox, and creates it first if it's not created yet.
 ]]
 function Plugin:StartChat( Team )
+	if MainMenu_GetIsOpened and MainMenu_GetIsOpened() then return true end
 	if not self.GUIChat then return end
 	
 	self.TeamChat = Team
 
 	if not SGUI.IsValid( self.MainPanel ) then
-		self:CreateChatbox()
+		if not self:CreateChatbox() then
+			return
+		end
 	end
 
 	--The little text to the left of the text entry.
