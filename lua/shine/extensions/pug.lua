@@ -24,7 +24,7 @@ local Count = table.Count
 local Notify = Shared.Message
 local GetAllClients = Shine.GetAllClients
 local GetClient = Shine.GetClient 
-local ChoseRandom = table.ChooseRandom
+local ChooseRandom = table.ChooseRandom
 
 local Plugin = Plugin
 Plugin.Version = "0.98"
@@ -132,7 +132,7 @@ function Plugin:GameStatus()
 
 	local PugsStarted = self.PugsStarted 
 
-	while self.GameStarted ~= true do 
+	while self.GameStarted == true do 
 
 		self:Timer.Simple( self.Config.NagInterval , function() 
 
@@ -506,8 +506,6 @@ function Plugin:GetStartNag()
 
 end
 
-
-
 function Plugin:StartVote() 
 
 	local Players = Shine.GetAllPlayers 
@@ -588,7 +586,7 @@ function Plugin:VoteTwo( Client , Vote )
 end
 
 
-function Plugin:NewCaptain( Votes ) 
+function Plugin:NewCaptain( VoteList ) 
 
 	local TopVoted = 0
 	local Captain = nil
@@ -819,29 +817,72 @@ function Plugin:Choose( Client , PlayerId )
 
 end
 
+function Plugin:RemovePlayer( Team )
+
+		for Key , Value in ipairs( self.Players ) do
+
+		Client = Client[ Value ] 
+		Player = Client:GetControllingPlayer()
+
+		if Player:GetTeamNumber() == Team then
+
+			GameRules:JoinTeam( Player , 3 , nil , true ) 
+
+			return true
+
+		end
+
+	end
+
+	return false
+
+end
+
+function Plugin:AddPlayer( Team )
+
+	for Key , Value in ipairs( self.Players ) do
+
+		Client = Client[ Value ] 
+		Player = Client:GetControllingPlayer()
+
+		if Player:GetTeamNumber() == 0 or 3 then
+
+			GameRules:JoinTeam( Player , Team , nil , true ) 
+
+			return true
+
+		end
+
+	end
+
+	return false
+
+end
+
 function Plugin:NeedSub()
 
 	local TeamSize = self.Config.TeamSize
 
 	if Count( shine.GetTeamClients( 1 ) ) < TeamSize then
 
-		--add players to teamone	
+		self.AddPlayer( 1 )	
+
 	end
 
 	if Count( shine.GetTeamClients( 2 ) ) < TeamSize then
 
-		--addplayers to teamtwo
+		self.AddPlayer( 2 )	
 	
 	end 
 
 	if Count( shine.GetTeamClients( 1 ) ) > TeamSize then
 
-		--remove player	
+		self.RemovePlayer( 1 )	
 	end
 
 	if Count( shine.GetTeamClients( 2 ) ) > TeamSize then
 
-		--remove player	
+		self.RemovePlayer( 1 )	
 	end
 
 end
@@ -861,9 +902,11 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 
 	if self.PugsStarted == true then 
 	
-	self.TeamMembers[ ID ] = NewTeam
+		self.TeamMembers[ ID ] = NewTeam
 
-	self.MatchPlayers[ ID ] = nil
+		self.MatchPlayers[ ID ] = nil
+
+	end
 
 end
 
