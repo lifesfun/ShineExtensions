@@ -60,10 +60,12 @@ Plugin.FiveSecondTimer = "Tournament5SecondCount"
 
 --List of mods not compatible with tournament mode
 local BlacklistMods = {
+
 	[ "5f35045" ] = "Combat",
 	[ "7e64c1a" ] = "Xenoswarm",
 	[ "7957667" ] = "Marine vs Marine",
 	[ "6ed01f8" ] = "The Faded"
+
 }
 
 function Plugin:Initialise()
@@ -121,50 +123,78 @@ function Plugin:Initialise()
 
 	Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Pick Up Game Mode Now Enabled!", 5, 255, 255, 255, 1, 3, 1 ) )
 
-	self:GameStatus()
-
 
 	return true
+
 end
 
 function Plugin:GameStatus() 
 
 	local PugsStarted = self.PugsStarted 
 
-	self:Timer.Simple( self.Config.NagInterval , function() 
+	while self.GameStarted ~= true do 
 
-		if PugsStarted == false then
+		self:Timer.Simple( self.Config.NagInterval , function() 
 
-			local Num = self.Config.TeamSize 
+			if PugsStarted == false then
 
-			Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Waiting for the Pick up Game to begin for a "..Num.."V"..Num.."Pug", 5, 255, 255, 255, 1, 3, 1 ) )
-			self:GameStatus() 
+				local Num = self.Config.TeamSize 
 
-			return true
+				Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Waiting for the Pick up Game to begin for a "..Num.."V"..Num.."Pug", 5, 255, 255, 255, 1, 3, 1 ) )
 
-		elseif PugsStarted == true and self.CurrentCaptain == nil then
 
-			Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
-			self:GameStatus() 
+			elseif PugsStarted == true and self.CurrentCaptain == nil then
 
-			return true
+				Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
 
-		elseif self.CurrentCaptain ~= nil then
 
-			Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
-			self:GameStatus() 
+			elseif self.CurrentCaptain ~= nil then
 
-			return true
+				Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
 
-		end
+			elseif self.MatchPlayers ~= nil then
 
-	end )
+				
+				self:CheckGameStart() 
+
+	 		end
+
+		end )
+
+	end
 
 end
 
 	--	if stats enabeld add stats to true 
 	--	send MatchPlayer to back of the queue
 	--
+local NextStartNag = 0
+
+function Plugin:CheckGameStart( Gamerules )
+	local State = Gamerules:GetGameState()
+	
+	if State == kGameState.PreGame or State == kGameState.NotStarted then
+		self.GameStarted = false
+
+		self:CheckCommanders( Gamerules )
+
+		local Time = Shared.GetTime()
+
+		--Have you started yet? No? Start pls.
+		if NextStartNag < Time then
+			NextStartNag = Time + 30
+
+			local Nag = self:GetStartNag()
+
+			if not Nag then return false end
+
+			self:SendNetworkMessage( nil, "StartNag", { Message = Nag }, true )
+		end
+
+		return false
+	end
+end
+
 
 function Plugin:CheckCommanders( Gamerules )
 
@@ -245,7 +275,7 @@ function Plugin:ClientConfirmConnect( Client )
 
 	local ID = Client:GetUserId()
 
-	if  self.TeamMembers[ ID ] then
+	if self.TeamMembers[ ID ] then
 
 		if GameStarted == true or self.PugsStarted == true then	
 
@@ -322,6 +352,8 @@ function Plugin:GetOppositeTeam( Team )
 	return Team == 1 and 2 or 1
 
 end
+--add endgame rounds? add teammembers to the end of the array. 
+--changemap? save player queue 
 
 function Plugin:ClientConnect( Client )
 
@@ -477,7 +509,7 @@ end
 
 
 function Plugin:StartVote() 
---notify vote started
+
 	local Players = Shine.GetAllPlayers 
 	
 	self.PugsStarted = true  
@@ -654,11 +686,12 @@ function Plugin:PickTeams()
 
 	while self.MatchPlayers ~= nil do
 
-	StringFormat( "You have %s unitl a player is randomed to your team.", self:GetTeamName( 1 ) )
+	Shine:Notify( Captain , "", "", "You have %s unitl a player is randomed to your team.", self.Config.VoteTimeout )
 
 		self:PickPlayer()
 
 	end
+
 	self:Timer.Simple( self.Config.NagInterval , function() 
 
 		self:GetStartNag()
@@ -673,7 +706,6 @@ end
 	
 function Plugin:PickPlayer()
 
-	--gamestatus
 	local Captain = self.CurrentCaptain 
 
 	Shine:Notify( Captain , "", "", "It is now your turn to pick!" ) 
@@ -842,7 +874,7 @@ function Plugin:JoinTeam( GameRules, Client:GetControllingPlayer, OldTEam , NewT
 
 	if PugsStarted == true or GameStarted == true then 
 	
-	--check if not a matchplayer
+	--get client id and check if MatchPlayer[ ClientId ] ~= nil then 
 			Gamerules:JoinTeam( Player , 3 , nil ,true ) 
 			return false 
 
