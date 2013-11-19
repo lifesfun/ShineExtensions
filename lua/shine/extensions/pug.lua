@@ -35,8 +35,8 @@ Plugin.DefaultConfig = {
 
 	PugMode = true, -- Enabled Pug Mode	
 	
-	ForceTeams = true, --Force teams to stay the same.
 	CountdownTime = 15, --How long should the game wait after team are ready to start?
+
 	TeamSize = 6, --Size of Team
 	
 	NagInterval = 0.3, --how often players are Nagged of the game status 
@@ -119,53 +119,52 @@ function Plugin:Initialise()
 
 	self.Enabled = true
 
-		--Pick Up Game Mode enabled!
+	Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Pick Up Game Mode Now Enabled!", 5, 255, 255, 255, 1, 3, 1 ) )
+
+	self:GameStatus()
+
+
 	return true
+end
+
+function Plugin:GameStatus() 
+
+	local PugsStarted = self.PugsStarted 
+
+	self:Timer.Simple( self.Config.NagInterval , function() 
+
+		if PugsStarted == false then
+
+			local Num = self.Config.TeamSize 
+
+			Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Waiting for the Pick up Game to begin for a "..Num.."V"..Num.."Pug", 5, 255, 255, 255, 1, 3, 1 ) )
+			self:GameStatus() 
+
+			return true
+
+		elseif PugsStarted == true and self.CurrentCaptain == nil then
+
+			Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
+			self:GameStatus() 
+
+			return true
+
+		elseif self.CurrentCaptain ~= nil then
+
+			Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
+			self:GameStatus() 
+
+			return true
+
+		end
+
+	end )
+
 end
 
 	--	if stats enabeld add stats to true 
 	--	send MatchPlayer to back of the queue
 	--
-
-function Plugin:GameStatus()
-
---funciton messages for game and player statuses
---Shine:Notify( Client, "", "", "Captains are deciding Teams ")
---Shine:Notify( Client, "", "", "Waiting on more players to start the pug.") 
---Shine:Notify( Client, "", "", "Need more votes for captains to be decided. ")
---for all nonmatchplayers key = x and notify
---The pug is full you are x in line.
---MatchPlayers
---You are in the pug
---if votedcaptains 
---pleasevote for captains by....
---For captain1 2
-
-end
-
-
-function Plugin:GetStartNag()
-
-	local MarinesReady = self.ReadyStates[ 1 ]
-	local AliensReady = self.ReadyStates[ 2 ]
-
-	if MarinesReady and AliensReady then return nil end
-	
-	if MarinesReady and not AliensReady then
-
-		return StringFormat( "Waiting on %s to start", self:GetTeamName( 2 ) )
-
-	elseif AliensReady and not MarinesReady then
-
-		return StringFormat( "Waiting on %s to start", self:GetTeamName( 1 ) )
-		
-	else
-
-		return StringFormat( "Waiting on both teams to start" )
-
-	end
-
-end
 
 function Plugin:CheckCommanders( Gamerules )
 
@@ -221,7 +220,7 @@ function Plugin:StartGame( Gamerules )
 	TableEmpty( self.FirstVote ) 
 	TableEmpty( self.SecondVote )
 	
-	self.PugsStarted = false
+	self.PugsStarted = true 
 	self.CurrentCaptain = nil
 	self.GameStarted = true
 
@@ -246,7 +245,7 @@ function Plugin:ClientConfirmConnect( Client )
 
 	local ID = Client:GetUserId()
 
-	if self.Config.ForceTeams and self.TeamMembers[ ID ] then
+	if  self.TeamMembers[ ID ] then
 
 		if GameStarted == true or self.PugsStarted == true then	
 
@@ -363,9 +362,14 @@ function Plugin:ClientConnect( Client )
 			
 		return true
 
+	elseif self.PugsStarted == false then
+
+		StringFormat( "%s more players required to start the Pueegh", (self.Config.TeamSize * 2) - Count( GetAllClients())  )
+
 	end
 
 	return false
+
 
 end
 
@@ -399,8 +403,8 @@ function Plugin:StartPug()
 	if Players >= MatchSize then 
 	
 		self:CreateMatchPlayers() 
+
 		self:StartVote() 
-		self:PickTeams()
 
 		return true
 	
@@ -447,33 +451,65 @@ function Plugin:CreateMatchPlayers()
 		
 end
 
-function Plugin:StartVote() 
+function Plugin:GetStartNag()
 
+	local MarinesReady = self.ReadyStates[ 1 ]
+	local AliensReady = self.ReadyStates[ 2 ]
+
+	if MarinesReady and AliensReady then return nil end
+	
+	if MarinesReady and not AliensReady then
+
+		return StringFormat( "Waiting on %s to start", self:GetTeamName( 2 ) )
+
+	elseif AliensReady and not MarinesReady then
+
+		return StringFormat( "Waiting on %s to start", self:GetTeamName( 1 ) )
+		
+	else
+
+		return StringFormat( "Waiting on both teams to start" )
+
+	end
+
+end
+
+
+
+function Plugin:StartVote() 
+--notify vote started
 	local Players = Shine.GetAllPlayers 
 	
 	self.PugsStarted = true  
 
 	for Value , Key in pairs( Players ) do
 
-		GameRules:JoinTeam( Player:GetControllingPlayer() , 3 , nil , true ) 
+		Player = Value:GetControllingPlayer()
+		GameRules:JoinTeam(  , 3 , nil , true ) 
 
 	end
 
 	for Value , Key in pairs( self.MatchPlayers ) do
 
-		GameRules:JoinTeam( Client:GetControllingPlayer() , 0 , nil , true ) 
-		GameRules:JoinTeam( Client:GetControllingPlayer() , 0 , nil , true ) 
+		Player = GetClient( Key ) 
+		Player = Player:GetControllingPlayer() 
+
+		GameRules:JoinTeam( Player , 0 , nil , true ) 
 
 	end
 
-	--gamestatus
-	--vote for voth captains ....
+
+	StringFormat( "Players have %s to vote for the first captain.", self.Config.VoteTimeout )
+	Shine:Notify( Client, "", "", "Use sh_vote1 in console or !vote1 in chat followed by the player name.")
 
 	self:Timer.Simple( self.Config.VoteTimeout , function() 
 
 		self.Captain[ 1 ] = self:NewCaptain( self.FirstVoted ) 
 
 	end ) 
+
+	StringFormat( "Players have %s to vote for the second captain captain.", self.Config.VoteTimeout )
+	Shine:Notify( Client, "", "", "Use sh_vote1 in console or !vote1 in chat followed by the player name.")
 
 	self:Timer.Simple( self.Config.VoteTimeout , function() 
 
@@ -488,10 +524,12 @@ end
 function Plugin:VoteOne( Client , Vote )
 	
 	local ClientId = Client:GetClientId()
+	local PlayerClient = GetClient( Vote ) 
+	local PlayerName = GetClientByName( Vote ) 
 
-	if self.MatchPlayer[ ClientId ] == true and self.SecondVote[ ClientId ] = Vote then	
+	if self.MatchPlayer[ ClientId ] == true and PlayerClient ~= nil and self.SecondVote[ ClientId ] = Vote then	
 
-		Shine:Notify( Client, "", "", "You have voted for xxxx xxxx!" ) 
+		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
 		return true 
 	end 
@@ -503,10 +541,12 @@ end
 function Plugin:VoteTwo( Client , Vote )
 	
 	local ClientId = Client:GetClientId()
+	local PlayerClient = GetClient( Vote ) 
+	local PlayerName = GetClientByName( Vote ) 
 
-	if self.MatchPlayer[ Client ] == true and self.FirstVote[ ClientId ] = Vote then	
+	if self.MatchPlayer[ Client ] == true and PlayerClient ~= nil and self.FirstVote[ ClientId ] = Vote then	
 
-		Shine:Notify( Client, "", "", "You have voted for xxxx xxxx!" ) 
+		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
 		return true 
 	end 
@@ -603,16 +643,27 @@ function Plugin:CaptainsTeams()
 		GameRules:JoinTeam( Client[ CaptainTwo ]:GetControllingPlayer() , 1 , nil , true ) 
 		
 	end
+
+	self:PickTeams() 
 	
 end
 
 function Plugin:PickTeams()
 
+	Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
+
 	while self.MatchPlayers ~= nil do
+
+	StringFormat( "You have %s unitl a player is randomed to your team.", self:GetTeamName( 1 ) )
 
 		self:PickPlayer()
 
 	end
+	self:Timer.Simple( self.Config.NagInterval , function() 
+
+		self:GetStartNag()
+
+	end) 
 
 	self:StartGame() 
 
@@ -626,13 +677,14 @@ function Plugin:PickPlayer()
 	local Captain = self.CurrentCaptain 
 
 	Shine:Notify( Captain , "", "", "It is now your turn to pick!" ) 
+	Shine:Notify( Captain , "", "", "Use sh_choose in console or !choose in chat followed by a players name." ) 
 
 	self:Timer.Simple( self.Config.VoteTimeout , function() 
 		
-	local Value , Key = ChooseRandom( self.MatchPlayer ) 
+		local Value , Key = ChooseRandom( self.MatchPlayer ) 
 
-		self:Choose( self.CurrentCaptain , Value ) 
-		self:CurrentPick()
+			self:Choose( self.CurrentCaptain , Value ) 
+			self:CurrentPick()
 
 	end )  
 
@@ -691,6 +743,7 @@ function Plugin:CurrentPick()
 		if Client[ Captain ] ~= nil then
 
 			ReplaceCaptain[ CaptainTwo ]
+			--notify of replacement
 
 		else
 
@@ -710,12 +763,12 @@ function Plugin:Choose( Client , PlayerId )
 
 	local ClientId = Client:GetClientId()
 	local PlayerClient = GetClient( PlayerId ) 
-	local Player = Client:GetControllingPlayer()  
+	local Player = PlayerClient:GetControllingPlayer()  
 	local Team = Player:GetTeamNumber()
 
 	if ClientId == self.CurrentCaptain() and PlayerClient ~= nil then
 		
-		GameRules:JoinTeam( PlayerClient:GetControllingPlayer() , Team , nil , true ) 
+		GameRules:JoinTeam( Player , Team , nil , true ) 
 
 		self.MatchPlayers[ ClientId ] = nil
 		Shine:Notify( Client, "", "", "Nice choice.. or hopefully it was. Please wait for your next turn." )
@@ -789,6 +842,7 @@ function Plugin:JoinTeam( GameRules, Client:GetControllingPlayer, OldTEam , NewT
 
 	if PugsStarted == true or GameStarted == true then 
 	
+	--check if not a matchplayer
 			Gamerules:JoinTeam( Player , 3 , nil ,true ) 
 			return false 
 
@@ -899,7 +953,7 @@ function Plugin:CreateCommands()
 
 			self:CheckStart()
 		else
-			Shine:NotifyError( Client, "Your team has not readied yet! Use !ready to ready your team." )
+			Shine:NotifyError( Client, "Your team has not readied yet! The commander has to type !ready to ready your team." )
 		end
 		
 	end
@@ -937,11 +991,11 @@ function Plugin:CreateCommands()
 	SetTeamScoresCommand:AddParam{ Type = "number", Min = 0, Max = 255, Round = true, Optional = true, Default = 0 }
 	SetTeamScoresCommand:Help( "<Marine Score> <Alien Score> Sets the score for the marine and alien teams." )
 
-	local VoteOne = self:BindCommand( "sh_vote", { "vote" }, VoteOne( Client , PlayerId ) )
+	local VoteOne = self:BindCommand( "sh_vote1", { "vote1" }, VoteOne( Client , PlayerId ) )
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
 
-	local VoteTwo = self:BindCommand( "sh_vote", { "vote" }, VoteTwo( Client , PlayerId ) )
+	local VoteTwo = self:BindCommand( "sh_vote2", { "vote2" }, VoteTwo( Client , PlayerId ) )
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
     
