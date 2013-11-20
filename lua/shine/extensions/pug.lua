@@ -68,7 +68,6 @@ function Plugin:Initialise()
 	self.GameStarted = false
 
 	self.Players = {} --player queue for who gets into the pug array is numeric order 
-	self.MatchPlayers = {} --list of match players, in case of disconnect the next player on queue uubs in; parameters are there captain votes
 	--If the captain leaves before the teams are chosen the next highist votes player on the team will become captain. 
 	self.FirstVote = {} 
 	self.SecondVote = {}
@@ -134,11 +133,6 @@ function Plugin:GameStatus()
 			elseif self.CurrentCaptain ~= nil then
 
 				Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
-
-			elseif self.MatchPlayers ~= nil then
-
-				
-				self:CheckGameStart() 
 
 	 		end
 
@@ -228,7 +222,6 @@ function Plugin:StartGame( Gamerules )
 
 	TableEmpty( self.ReadyStates )
 	TableEmpty( self.Captains )
-	TableEmpty( self.MatchPlayers ) 
 	TableEmpty( self.FirstVote ) 
 	TableEmpty( self.SecondVote )
 
@@ -417,9 +410,9 @@ function Plugin:ReplaceCaptain( Client )
 			
 		if Votes == nil then
 
-			for Key , Value in pairs( self.MatchPlayers ) do
+			for Key , Value in pairs( self.TeamMember ) do
 
-				if Value == Team then
+				if Value == 0 then
 
 					Votes[ Key ] = Value 
 
@@ -429,7 +422,6 @@ function Plugin:ReplaceCaptain( Client )
 
 			Captain = self.NewCaptain( Votes )
 			
-			self.TeamMember[ CliendId ] = nil 
 			GameRules:JoinTeam( Captain , Team , nil , true ) 
 			self.TeamMember[ Captain ] = Team 
 
@@ -465,13 +457,8 @@ function Plugin:ClientDisconnect( Client )
 		return true
 
 	elseif self.PugsStarted == true then
-	
-		if self.MatchPlayers[ GetClientId ] == true then 
 
-			self.MatchPlayers[ ClientId ] = nil
-			self:CreateMatchPlayers()
-
-		elseif self.Captain[ 1 ] == ClientId or self.Captain[ 2 ] == ClientId then
+		if self.Captain[ 1 ] == ClientId or self.Captain[ 2 ] == ClientId then
 
 			self:ReplaceCaptain( Client )
 			
@@ -494,7 +481,7 @@ function Plugin:StartPug()
 	
 		self.Rounds = self.Config.Rounds
 
-		self:CreateMatchPlayers() 
+		self:CreateTeamMembers() 
 
 		self:StartVote() 
 
@@ -506,7 +493,7 @@ function Plugin:StartPug()
 
 end
 
-function Plugin:CreateMatchPlayers() 
+function Plugin:CreateTeamMembers() 
 
 	local MatchSize = self.Config.TeamSize * 2
 
@@ -514,7 +501,7 @@ function Plugin:CreateMatchPlayers()
 
 		if Client[ ClientId ] ~= nil then
 
-			self.MatchPlayers[ ClientId ] = 0 	
+			self.TeamMembers[ ClientId ] = 0 	
 
 			return true 
 
@@ -526,9 +513,9 @@ function Plugin:CreateMatchPlayers()
 
 	for i , ClientId in ipairs( self.Players ) do 	
 			
-		if Count( self.MatchPlayers ) >= MatchSize then 
+		if Count( self.TeamMembers ) >= MatchSize then 
 
-			FixArray( self.MatchPlayers )  
+			FixArray( self.Players )  
 
 			return true
 
@@ -579,7 +566,7 @@ function Plugin:StartVote()
 
 	end
 
-	for Value , Key in pairs( self.MatchPlayers ) do
+	for Value , Key in pairs( self.TeamMembers ) do
 
 		Player = GetClient( Key ) 
 		Player = Player:GetControllingPlayer() 
@@ -617,7 +604,7 @@ function Plugin:VoteOne( Client , Vote )
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
-	if self.MatchPlayer[ ClientId ] == true and PlayerClient ~= nil and self.SecondVote[ ClientId ] = Vote then	
+	if self.TeamMembers[ ClientId ] == true and PlayerClient ~= nil and self.SecondVote[ ClientId ] = Vote then	
 
 		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
@@ -634,7 +621,7 @@ function Plugin:VoteTwo( Client , Vote )
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
-	if self.MatchPlayer[ Client ] == true and PlayerClient ~= nil and self.FirstVote[ ClientId ] = Vote then	
+	if self.TeamMembers[ Client ] == true and PlayerClient ~= nil and self.FirstVote[ ClientId ] = Vote then	
 
 		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
@@ -650,6 +637,7 @@ function Plugin:NewCaptain( VoteList )
 
 	local TopVoted = 0
 	local Captain = nil
+	local TeamMembers = {} 
 
 	local function GetCount( VoteList )
 		
@@ -671,27 +659,32 @@ function Plugin:NewCaptain( VoteList )
 
 	if self.FirstVoted == nil or self.SecondVoted == nil then
 
-		local Value , Key = self:ChooseRandom( self.MatchPlayers ) 
+		for Key , Value in pairs( self.TeamMembers ) do  
+
+				if Value ~= Captain[ 1 ] or Captain[ 2 ] then 
+
+					TeamMembers[ Key ] = Value 
+				end
+
+		end
+
+		local Key , Value = self:ChooseRandom( TeamMembers ) 
 
 		Captain = Value 
 		
-		self.MatchPlayers[ Captain ] = nil
-
 		return Captain
 
 	else 
 
 		for Key , Value in pairs( Votes ) do
 			
-			if Client[ Value ] ~= nil and GetCount( Value ) >= TopVoted then 
+			if Client[ Value ] ~= nil and Value ~= Captain[ 1 ] or Captain[ 2 ] and GetCount( Value ) >= TopVoted then 
 				
 				Captain = Value 
 
 			end
 			
 		end
-
-		self.MatchPlayers[ Captain ] = nil
 
 		return Captain
 
@@ -742,7 +735,8 @@ function Plugin:PickTeams()
 
 	Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
 
-	while self.MatchPlayers ~= nil do
+	
+	while  Count( shine.GetTeamClients( 0 ) ) ~= 0 do
 
 		Shine:Notify( Captain , "", "", "You have %s unitl a player is randomed to your team.", self.Config.VoteTimeout )
 
@@ -752,7 +746,7 @@ function Plugin:PickTeams()
 
 	self:Timer.Simple( self.Config.NagInterval , function() 
 
-		self:GetStartNag()
+		self:CheckGameStart()
 
 	end) 
 
@@ -769,9 +763,9 @@ function Plugin:PickPlayer()
 
 	self:Timer.Simple( self.Config.VoteTimeout , function() 
 		
-		local Value , Key = ChooseRandom( self.MatchPlayer ) 
+		local Value , Key = ChooseRandom( shine.GetTeamClients( 0 ) ) 
 
-			self:Choose( self.CurrentCaptain , Value ) 
+			self:Choose( self.CurrentCaptain , Value:GetClientId ) 
 			self:CurrentPick()
 
 	end )  
@@ -823,7 +817,6 @@ function Plugin:Choose( Client , PlayerId )
 		
 		GameRules:JoinTeam( Player , Team , nil , true ) 
 
-		self.MatchPlayers[ ClientId ] = nil
 		Shine:Notify( Client, "", "", "Nice choice.. or hopefully it was. Please wait for your next turn." )
 
 		self:PickTeams() 
@@ -934,8 +927,6 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 	if self.PugsStarted == true then 
 	
 		self.TeamMembers[ ID ] = NewTeam
-
-		self.MatchPlayers[ ID ] = nil
 
 	end
 
