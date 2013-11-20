@@ -60,29 +60,9 @@ Plugin.Conflicts = {
 Plugin.CountdownTimer = "TournamentCountdown"
 Plugin.FiveSecondTimer = "Tournament5SecondCount"
 
---List of mods not compatible with tournament mode
-local BlacklistMods = {
-
-	[ "5f35045" ] = "Combat",
-	[ "7e64c1a" ] = "Xenoswarm",
-	[ "7957667" ] = "Marine vs Marine",
-	[ "6ed01f8" ] = "The Faded"
-
-}
-
 function Plugin:Initialise()
 
-	local GetMod = Server.GetActiveModId
-
-	for i = 1, Server.GetNumActiveMods() do
-		local Mod = GetMod( i ):lower()
-
-		local OnBlacklist = BlacklistMods[ Mod ]
-
-		if OnBlacklist then
-			return false, StringFormat( "The tournamentmode plugin does not work with %s.", OnBlacklist )
-		end
-	end
+	if Shine.GetGamemode() ~= "ns2" then return false end
 
 	self.PugsStarted = false
 	self.GameStarted = false
@@ -168,9 +148,6 @@ function Plugin:GameStatus()
 
 end
 
-	--	if stats enabeld add stats to true 
-	--	send MatchPlayer to back of the queue
-	--
 local NextStartNag = 0
 
 function Plugin:CheckGameStart( Gamerules )
@@ -233,6 +210,7 @@ end
 
 function Plugin:StartGame( Gamerules )
 
+	--	if stats enabeld add stats to true 
 	Gamerules:ResetGame()
 	Gamerules:SetGameState( kGameState.Countdown )
 	Gamerules.countdownTime = kCountDownLength
@@ -257,37 +235,6 @@ function Plugin:StartGame( Gamerules )
 	self.PugsStarted = true 
 	self.CurrentCaptain = nil
 	self.GameStarted = true
-
-end
-
---[[
-	Rejoin a reconnected client to their old team.
-]]
-function Plugin:ClientConfirmConnect( Client )
-
-	if not self.DisabledAutobalance then
-	
-		Server.SetConfigSetting( "auto_team_balance", false )
-		Server.SetConfigSetting( "end_round_on_team_unbalance", false )
-		Server.SetConfigSetting( "force_even_teams_on_join", false )
-
-		self.DisabledAutobalance = true
-
-	end
-	
-	if Client:GetIsVirtual() then return end
-
-	local ID = Client:GetUserId()
-
-	if self.TeamMembers[ ID ] then
-
-		if GameStarted == true or self.PugsStarted == true then	
-
-			Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ ID ], nil, true )     
-
-		end
-		
-	end
 
 end
 
@@ -328,10 +275,10 @@ function Plugin:CheckStart()
 		end )
 
 		return
-	end
+
 
 	--One or both teams are not ready, halt the countdown.
-	if Timer.Exists( self.CountdownTimer ) then
+	elseif Timer.Exists( self.CountdownTimer ) then
 
 		Timer.Destroy( self.FiveSecondTimer )
 		Timer.Destroy( self.CountdownTimer )
@@ -394,11 +341,13 @@ function Plugin:EndGame( GameRules , WinningTeam )
 	--changemap? save player queue 
 	
 end
-
+--[[
+	Rejoin a reconnected client to their old team.
+]]
 function Plugin:ClientConnect( Client )
-
-	local ClientId = Client:GetClientId() 
 	
+	local ClientId = Client:GetClientId() 
+
 	local PlayerExist = function( ClientId ) 
 
 		for Key, Value in ipairs( self.Players ) do 	
@@ -420,23 +369,29 @@ function Plugin:ClientConnect( Client )
 
 	end
 
-	if self.GameStarted == true and self:CheckSubs() == true then
 
-		return true
-	
+	if Client:GetIsVirtual() then return end
+
+	if self.PugsStarted == true and self.TeamMembers[ ClientId ] then
+
+		Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ ClientId ], nil, true )     
+
 	elseif self.PugsStarted == true then
 
 		GameRules:JoinTeam( Client:GetControllingPlayer() , 3 , nil , true ) 
 
-		return true
-	
-	elseif self.PugsStarted == false and self:StartPug() == true then
+	end
+
+	if self.GameStarted == true and self.PugsStarted == true then 
+
+		self:CheckSubs() 
+
+	elseif self.PugsStarted == false and self:StartPug() == false then 
 			
-		return true
+		local Num = self.Config.TeamSize * 2 
 
-	elseif self.PugsStarted == false then
-
-		self:Notify( false, nil , "%s more players required to start the Pueegh", true , (self.Config.TeamSize * 2) - Count( GetAllClients()) )
+		Num = Num - Count( GetAllClients()) 
+		self:Notify( false, nil , "%s more players required to start the Pueegh", true , Num )
 
 	end
 
@@ -801,8 +756,6 @@ function Plugin:PickTeams()
 
 	end) 
 
-	self:StartGame() 
-
 	return true
 
 end
@@ -940,27 +893,28 @@ function Plugin:NeedSub()
 
 	local TeamSize = self.Config.TeamSize
 
-	if Count( shine.GetTeamClients( 1 ) ) < TeamSize then
+	local TeamOne = Count( shine.GetTeamClients( 1 ) ) 
+	local TeamTwo = Count( shine.GetTeamClients( 2 ) ) 
+
+	if TeamOne > TeamSize then
+
+		self.RemovePlayer( 1 )	
+
+	elseif TeamOne < TeamSize then
 
 		self.AddPlayer( 1 )	
-
 	end
 
-	if Count( shine.GetTeamClients( 2 ) ) < TeamSize then
+	if TeamTwo > TeamSize then
+
+		self.RemovePlayer( 2 )	
+
+	elseif TeamTwo < TeamSize then
 
 		self.AddPlayer( 2 )	
 	
 	end 
 
-	if Count( shine.GetTeamClients( 1 ) ) > TeamSize then
-
-		self.RemovePlayer( 1 )	
-	end
-
-	if Count( shine.GetTeamClients( 2 ) ) > TeamSize then
-
-		self.RemovePlayer( 1 )	
-	end
 
 end
 
