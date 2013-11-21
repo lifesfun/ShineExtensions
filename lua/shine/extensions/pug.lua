@@ -472,16 +472,18 @@ function Plugin:ReplaceCaptain( ID )
 	end
 		
 	Captain = self.NewCaptain( Votes )
-	
+	local Client = GetUserByID( Captain ) 	
+	local PlayerName = Client:GetControlllingPlayer():GetName() 
+
 	GameRules:JoinTeam( Captain , Team , nil , true ) 
 
-	self.Captain[ Team ] == Captain
+	self.Captain[ Team ] = Captain
 	self:PickPlayer() 
 
 	local Name = false
 	-- Name =GetByName the client self.CurrentCaptain 
 
-	Shine:Notify( false , nil , "One of the captains has left the game. %s is the new captain." , true , Name )
+	Shine:Notify( false , nil , "One of the captains has left the game. %s is the new captain." , true , PlayerName )
 
 	return true
 
@@ -715,6 +717,7 @@ end
 	
 function Plugin:PickPlayer()
 
+	local Captain = GetUserById( self.CurrentCaptain ) 
 
 	Shine:Notify( Captain , "", "", "It is now your turn to pick!" ) 
 	Shine:Notify( Captain , "", "", "Use sh_choose in console or !choose in chat followed by a players name." ) 
@@ -901,11 +904,14 @@ end
 
 function Plugin:JoinTeam( GameRules , Player , NewTeam , Force ) 
 
+	if self.PugsStarted == false then return end
+
 	if PugsStarted == true and GameStarted == false then return false end 
 
 	if NewTeam == 0 or NewTeam == 3 then return end
+
+	return false
 	
-	if self.PugsStarted == true then return false end
 
 end
 
