@@ -799,15 +799,14 @@ function Plugin:RemovePlayer( Team )
 	
 	for Key , Value in ipairs( self.Players ) do
 
-	Client = Client[ Value ] 
-	Player = Client:GetControllingPlayer()
+		local Player = Client[ Value ]:GetControllingPlayer()
 
-	if Player:GetTeamNumber() == Team then
+		if Player ~= nil and Player:GetTeamNumber() == Team then
 
-		GameRules:JoinTeam( Player , 3 , nil , true ) 
-		Shine:Notify( false , nil , "A team member has joined the game. The sub %s is being moved to spectator.", true ,  PlayerName )
+			GameRules:JoinTeam( Player , 3 , nil , true ) 
+			Shine:Notify( false , nil , "A team member has joined the game. The sub %s is being moved to spectator.", true ,  PlayerName )
 
-		return true
+			return true
 
 		end
 
@@ -849,23 +848,23 @@ function Plugin:NeedSub()
 	local TeamOne = Count( shine.GetTeamClients( 1 ) ) 
 	local TeamTwo = Count( shine.GetTeamClients( 2 ) ) 
 
-	if TeamOne > TeamSize then
+	if TeamOne > TeamSize and self.RemovePlayer( 1 ) == false then	
 
-		self.RemovePlayer( 1 )	
+		return false
 
-	elseif TeamOne < TeamSize then
+	elseif TeamOne < TeamSize and self.AddPlayer( 1 ) == false then
 
-		self.AddPlayer( 1 )	
+		return false
 	end
 
-	if TeamTwo > TeamSize then
+	if TeamTwo > TeamSize and self.RemovePlayer( 2 ) == false then	
 
-		self.RemovePlayer( 2 )	
+		return false
 
-	elseif TeamTwo < TeamSize then
+	elseif TeamTwo < TeamSize and self.AddPlayer( 2 ) == false then	
 
-		self.AddPlayer( 2 )	
-	
+		return false
+
 	end 
 
 	if TeamSize ~= TeamOne and TeamTwo then
