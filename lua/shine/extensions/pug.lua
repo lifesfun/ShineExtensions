@@ -868,7 +868,13 @@ function Plugin:NeedSub()
 	
 	end 
 
+	if TeamSize ~= TeamOne and TeamTwo then
 
+		self:NeedSub()
+
+	end
+
+	return true
 end
 
 --[[
@@ -877,7 +883,8 @@ end
 function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 
 	if PugsStarted == false and GameStarted == false then return end 
-
+	if PugsStarted == true and GameStarted == false then return false end 
+	
 	if OldTeam == 0 or 3 and NewTeam == 0 or 3 then return end
 	
 	local Client = Server.GetOwner( Player )
@@ -897,9 +904,11 @@ end
 
 function Plugin:JoinTeam( GameRules , Player , NewTeam , Force ) 
 
-	if NewTeam == 0 or NewTeam == 3 then return end
+	if PugsStarted == true and GameStarted == false then return false end 
 
-	if PugsStarted then return false end
+	if NewTeam == 0 or NewTeam == 3 then return end
+	
+	if self.PugsStarted == true then return false end
 
 end
 
