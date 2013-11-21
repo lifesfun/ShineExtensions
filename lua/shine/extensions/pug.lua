@@ -27,7 +27,7 @@ local GetClient = Shine.GetClient
 local ChooseRandom = table.ChooseRandom
 local Shuffle = table.Shuffle
 local GetTeamClients = Shine.GetTeamClients
-
+local GetClientByID = Shine.GetClientByID
 local Plugin = Plugin
 Plugin.Version = "0.99"
 
@@ -321,21 +321,13 @@ function Plugin:EndGame( GameRules , WinningTeam )
 		
 		for Key , Value in pairs( self.TeamMembers ) do
 			
-			
-			if Value == 1 then
+			self.TeamMembers[ Key ] = GetOppositeTeam( Value )	
+
+			local Client = GetClientByID( Key ) 	
+
+			if Client:GetIsVirtual() ~= nil then return end
 	
-				self.TeamMembers[ Key ] == 2
-	
-			elseif Value == 2 then
-	
-				self.TeamMembers[ Key ] == 1
-	
-			end
-			
-	
-			if Client[ Value ] ~= nil then return end
-	
-			Gamerules:JoinTeam( Client[ Value ]:GetControllingPlayer(), self.TeamMembers[ Key ], nil, true )     
+			Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ Key ], nil, true )     
 		end
 	
 	elseif RoundsLeft == 0 then 
@@ -357,22 +349,22 @@ end
 ]]
 function Plugin:ClientConnect( Client )
 	
-	local ClientId = Client:GetClientId() 
+	local ID = Client:GetUserID() 
 	local PugsStarted = self.PugsStarted
 	local GameStarted = self.GameStarted
 
-	local PlayerExist = function( ClientId ) 
+	local PlayerExist = function( ID ) 
 
 		for Key, Value in ipairs( self.Players ) do 	
 
-			if Value == ClientId then
+			if Value == ID then
 				
 				return true
 			end
 
 		end
 
-		if Players[ #Players + 1 ] = CliendId then
+		if Players[ #Players + 1 ] = ID then
 			
 			return true
 		
@@ -384,9 +376,9 @@ function Plugin:ClientConnect( Client )
 
 	if Client:GetIsVirtual() then return end
 
-	if self.TeamMembers[ ClientId ] then
+	if self.TeamMembers[ ID ] then
 
-		Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ ClientId ], nil, true )     
+		Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ ID ], nil, true )     
 
 	end
 
@@ -394,7 +386,7 @@ function Plugin:ClientConnect( Client )
 
 		self:NeedSubs() 
 
-		if self.Players[ ClientId ] then 
+		if self.Players[ ID ] then 
 
 			GameRules:JoinTeam( Client:GetControllingPlayer() , 0 , nil , true ) 
 
@@ -404,7 +396,7 @@ function Plugin:ClientConnect( Client )
 
 	elseif PugsStarted == true and GameStarted == false then
 
-		if self.Players[ ClientId ] then 
+		if self.Players[ ID ] then 
 		
 			GameRules:JoinTeam( Client:GetControllingPlayer() , 3 , nil , true ) 
 
@@ -429,7 +421,7 @@ end
 
 function Plugin:ClientDisconnect( Client ) 
 
-	local ClientId = Client:GetUserId() 
+	local ID = Client:GetUserID() 
 
 	if self.GameStarted == true and self.PugsStarted == true then 
 	
@@ -439,9 +431,9 @@ function Plugin:ClientDisconnect( Client )
 
 	elseif self.PugsStarted == true then
 
-		if self.Captain[ 1 ] == ClientId or self.Captain[ 2 ] == ClientId then
+		if self.Captain[ 1 ] == ID or self.Captain[ 2 ] == ID then
 
-			self:ReplaceCaptain( ClientId )
+			self:ReplaceCaptain( ID )
 			
 		end
 
@@ -453,9 +445,9 @@ function Plugin:ClientDisconnect( Client )
 
 end
 
-function Plugin:ReplaceCaptain( ClientId ) 
+function Plugin:ReplaceCaptain( ID ) 
 
-	local Team = self.TeamMembers[ CliendId ] 
+	local Team = self.TeamMembers[ CliendID ] 
 	local Votes = {}
 	local Captain = nil
 
@@ -520,11 +512,12 @@ function Plugin:CreateTeamMembers()
 
 	local MatchSize = self.Config.TeamSize * 2
 
-	local function MakeMatchPlayer( ClientId )
+	local function MakeMatchPlayer( ID )
+		local Client = GetClientByID( ID ) 
 
-		if Client[ ClientId ] ~= nil then
+		if Client:GetIsVirtual() ~= nil then
 
-			self.TeamMembers[ ClientId ] = 0 	
+			self.TeamMembers[ ID ] = 0 	
 
 			return true 
 
@@ -534,7 +527,7 @@ function Plugin:CreateTeamMembers()
 
 	end 
 
-	for i , ClientId in ipairs( self.Players ) do 	
+	for i , ID in ipairs( self.Players ) do 	
 			
 		if Count( self.TeamMembers ) >= MatchSize then 
 
@@ -544,7 +537,7 @@ function Plugin:CreateTeamMembers()
 
 		end
 
-		self:MakeMatchPlayer( ClientId )
+		self:MakeMatchPlayer( ID )
 		self.Players[ i ] = nil
 
 	end
@@ -563,15 +556,16 @@ function Plugin:StartVote()
 
 	for Value , Key in pairs( Players ) do
 
-		Player = Value:GetControllingPlayer()
+		local Player = Value:GetControllingPlayer()
+
 		GameRules:JoinTeam( Value , 3 , nil , true ) 
 
 	end
 
 	for Value , Key in pairs( self.TeamMembers ) do
 
-		Player = GetClient( Key ) 
-		Player = Player:GetControllingPlayer() 
+		local Client = GetClientByID( Key ) 
+		local Player = Player:GetControllingPlayer() 
 
 		GameRules:JoinTeam( Value , 0 , nil , true ) 
 
@@ -604,11 +598,11 @@ end
 
 function Plugin:VoteOne( Client , Vote )
 	
-	local ClientId = Client:GetClientId()
+	local ID = Client:GetUserID()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
-	if self.TeamMembers[ ClientId ] == true and PlayerClient ~= nil and self.SecondVote[ ClientId ] = Vote then	
+	if self.TeamMembers[ ID ] == true and PlayerClient ~= nil and self.SecondVote[ ID ] = Vote then	
 
 		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
@@ -621,11 +615,11 @@ end
 
 function Plugin:VoteTwo( Client , Vote )
 	
-	local ClientId = Client:GetClientId()
+	local ID = Client:GetUserID()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
-	if self.TeamMembers[ ClientId ] == true and PlayerClient ~= nil and self.FirstVote[ ClientId ] = Vote then	
+	if self.TeamMembers[ ID ] == true and PlayerClient ~= nil and self.FirstVote[ ID ] = Vote then	
 
 		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
@@ -643,13 +637,13 @@ function Plugin:NewCaptain( VoteList )
 	local Captain = nil
 	local TeamMembers = {} 
 
-	local function GetCount( VoteId )
+	local function GetCount( VoteID )
 		
 		for Key , Value in pairs( VoteList ) do
 
 			local Count = 0
 
-			if Value == VotedId then 
+			if Value == VotedID then 
 				
 				Count = Count + 1
 
@@ -662,8 +656,10 @@ function Plugin:NewCaptain( VoteList )
 	end
 
 	for Key , Value in pairs( self.TeamMembers ) do
-		
-		if Client[ Value ] ~= nil and Value ~= Captain[ 1 ] or Captain[ 2 ] then 
+
+		local Client = GetClientByID( Key )	
+
+		if Client:GetIsVirtual() ~= nil and Key ~= Captain[ 1 ] or Captain[ 2 ] then 
 	
 			GetCount( Value ) >= TopVoted  
 			--else == random
@@ -680,10 +676,10 @@ end
 
 function Plugin:CaptainsTeams()	
 
-	local CaptainOne = self.Captains[ 1 ] 
-	local CaptainTwo = self.Captains[ 2 ]
-	local Player[ 1 ] = Client:[ CaptainOne ]:GetControllingPlayer() 
-	local Player[ 2 ] = Client[ CaptainTwo ]:GetControllingPlayer() 
+	local CaptainOne = GetClientByID( self.Captains[ 1 ] )
+	local CaptainTwo = GetClientByID( self.Captains[ 2 ] )
+	local Player[ 1 ] = CaptainOne:GetControllingPlayer() 
+	local Player[ 2 ] = CaptainTwo:GetControllingPlayer() 
 
 	Shuffle( self.Captains )
 	Shuffle( Player )
@@ -719,7 +715,6 @@ end
 	
 function Plugin:PickPlayer()
 
-	local Captain = self.CurrentCaptain 
 
 	Shine:Notify( Captain , "", "", "It is now your turn to pick!" ) 
 	Shine:Notify( Captain , "", "", "Use sh_choose in console or !choose in chat followed by a players name." ) 
@@ -728,8 +723,9 @@ function Plugin:PickPlayer()
 		
 		local Value , Key = ChooseRandom( GetTeamClients( 0 ) ) 
 
-			self:Choose( Client[ self.CurrentCaptain ], Value:GetClientId ) 
-			self:CurrentPick()
+		local Client = GetClientByID( self.CurrentCaptain )
+		self:Choose( Client , Value:GetID ) 
+		self:CurrentPick()
 
 	end )  
 
@@ -739,10 +735,10 @@ end
 
 function Plugin:CurrentPick()
 
-	local CaptainOne = self.Captain[ 1 ]
-	local CaptainTwo = self.Captain[ 2 ]
-	local PlayerOne = Client[ CaptainOne ]:GetControllingPlayer()  
-	local PlayerTwo = Client[ CaptainTwo ]:GetControllingPlayer()  
+	local CaptainOne = GetClientByID( self.Captain[ 1 ] )
+	local CaptainTwo = GetClientByID( self.Captain[ 2 ] )
+	local PlayerOne = CaptainOne:GetControllingPlayer()  
+	local PlayerTwo = CaptainTwo:GetControllingPlayer()  
 	local TeamOne = PlayerOne:GetTeamSize()
 	local TeamTwo = PlayerTwo:GetTeamSize()
 	local MaxSize = self.Config.TeamSize
@@ -766,14 +762,14 @@ function Plugin:CurrentPick()
 
 end
 
-function Plugin:Choose( Client , PlayerId )
+function Plugin:Choose( Client , PlayerID )
 
-	local ClientId = Client:GetClientId()
-	local PlayerClient = GetClient( PlayerId ) 
+	local ID = Client:GetUserID()
+	local PlayerClient = GetClient( PlayerID ) 
 	local Player = PlayerClient:GetControllingPlayer()  
 	local Team = Player:GetTeamNumber()
 
-	if ClientId == self.CurrentCaptain() and PlayerClient ~= nil then
+	if ID == self.CurrentCaptain() and PlayerClient ~= nil then
 		
 		GameRules:JoinTeam( Player , Team , nil , true ) 
 
@@ -783,7 +779,7 @@ function Plugin:Choose( Client , PlayerId )
 
 		return true
 		
-	elseif Captain ~= ClientId then 
+	elseif Captain ~= ID then 
 
 		Shine:Notify( Client, "", "", "You are not the current Captain." )
 
@@ -795,13 +791,14 @@ end
 
 function Plugin:RemovePlayer( Team )
 
-	local PlayerName = nil
 	
 	for Key , Value in ipairs( self.Players ) do
 
-		local Player = Client[ Value ]:GetControllingPlayer()
+		local Client = GetClientByID( Value )
+		local Player = Client:GetControllingPlayer()
+		local PlayerName = Player:GetName()
 
-		if Player ~= nil and Player:GetTeamNumber() == Team then
+		if Player:GetTeamNumber() == Team then
 
 			GameRules:JoinTeam( Player , 3 , nil , true ) 
 			Shine:Notify( false , nil , "A team member has joined the game. The sub %s is being moved to spectator.", true ,  PlayerName )
@@ -822,8 +819,9 @@ function Plugin:AddPlayer( Team )
 	
 	for Key , Value in ipairs( self.Players ) do
 
-		local Client = Client[ Value ] 
+		local Client = GetClientByID( Value )
 		local Player = Client:GetControllingPlayer()
+		local PlayerName = Player:GetName() 
 
 		if Player:GetTeamNumber() == 0 or 3 then
 
@@ -845,8 +843,8 @@ function Plugin:NeedSub()
 
 	local TeamSize = self.Config.TeamSize
 
-	local TeamOne = Count( shine.GetTeamClients( 1 ) ) 
-	local TeamTwo = Count( shine.GetTeamClients( 2 ) ) 
+	local TeamOne = Count( GetTeamClients( 1 ) ) 
+	local TeamTwo = Count( GetTeamClients( 2 ) ) 
 
 	if TeamOne > TeamSize and self.RemovePlayer( 1 ) == false then	
 
@@ -890,7 +888,7 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 
 	if not Client then return end
 
-	local ID = Client:GetUserId()
+	local ID = Client:GetUserID()
 
 	if self.PugsStarted == true then 
 	
@@ -915,7 +913,7 @@ function Plugin:CreateCommands()
 
 	local function ReadyUp( Client )
 
-		if self.GameStarted then return end
+		if self.GameStarted == false then return end
 
 		local Player = Client:GetControllingPlayer()
 
@@ -973,7 +971,7 @@ function Plugin:CreateCommands()
 	
 	local function Unready( Client )
 
-		if self.GameStarted then return end
+		if self.GameStarted == false then return end
 
 		local Player = Client:GetControllingPlayer()
 
@@ -1047,11 +1045,11 @@ function Plugin:CreateCommands()
 	SetTeamScoresCommand:AddParam{ Type = "number", Min = 0, Max = 255, Round = true, Optional = true, Default = 0 }
 	SetTeamScoresCommand:Help( "<Marine Score> <Alien Score> Sets the score for the marine and alien teams." )
 
-	local VoteOne = self:BindCommand( "sh_vote1", { "vote1" }, VoteOne( Client , PlayerId ) )
+	local VoteOne = self:BindCommand( "sh_vote1", { "vote1" }, VoteOne( Client , PlayerID ) )
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
 
-	local VoteTwo = self:BindCommand( "sh_vote2", { "vote2" }, VoteTwo( Client , PlayerId ) )
+	local VoteTwo = self:BindCommand( "sh_vote2", { "vote2" }, VoteTwo( Client , PlayerID ) )
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
     
