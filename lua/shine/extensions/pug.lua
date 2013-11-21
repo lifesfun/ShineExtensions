@@ -25,6 +25,8 @@ local Notify = Shared.Message
 local GetAllClients = Shine.GetAllClients
 local GetClient = Shine.GetClient 
 local ChooseRandom = table.ChooseRandom
+local Shuffle = table.Shuffle
+local GetTeamClients = Shine.GetTeamClients
 
 local Plugin = Plugin
 Plugin.Version = "0.99"
@@ -69,10 +71,9 @@ function Plugin:Initialise()
 	self.GameStarted = false
 
 	self.Players = {} --player queue for who gets into the pug array is numeric order 
-	--If the captain leaves before the teams are chosen the next highist votes player on the team will become captain. 
 	self.FirstVote = {} 
 	self.SecondVote = {}
-	self.Captain = {}  
+	self.Captain = {} --If the captain leaves before the teams are chosen the next highist votes player on the team will become captain. 
 	self.CurrentCaptain = nil
 
 	self.Rounds = nil
@@ -432,7 +433,7 @@ function Plugin:ClientDisconnect( Client )
 
 	if self.GameStarted == true and self.PugsStarted == true then 
 	
-		self:NeedSubs() 
+		self:NeedSub() 
 
 		return true
 
@@ -597,6 +598,8 @@ function Plugin:StartVote()
 
 	self:CaptainsTeams()
 
+	return true
+
 end
 
 function Plugin:VoteOne( Client , Vote )
@@ -622,7 +625,7 @@ function Plugin:VoteTwo( Client , Vote )
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
-	if self.TeamMembers[ Client ] == true and PlayerClient ~= nil and self.FirstVote[ ClientId ] = Vote then	
+	if self.TeamMembers[ ClientId ] == true and PlayerClient ~= nil and self.FirstVote[ ClientId ] = Vote then	
 
 		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
@@ -677,38 +680,16 @@ end
 
 function Plugin:CaptainsTeams()	
 
-	local Value , Key = ChooseRandom{ 1 , 2 } 
-	local Team , Random = ChooseRandom{ 1 , 2 } 
 	local CaptainOne = self.Captains[ 1 ] 
 	local CaptainTwo = self.Captains[ 2 ]
-		
-	local Value , Key = ChooseRandom( self.Captain ) 
+	local Player[ 1 ] = Client:[ CaptainOne ]:GetControllingPlayer() 
+	local Player[ 2 ] = Client[ CaptainTwo ]:GetControllingPlayer() 
 
-	-- tableshuffle?
-	if Key == 1 then
+	Shuffle( self.Captains )
+	Shuffle( Player )
 
-		self.Captains[ 1 ] = CaptainOne 
-		self.Captains[ 2 ] = CaptainTwo
-		
-		
-	elseif Key == 2 then
-
-		self.Captains[ 1 ] = CaptainTwo 
-		self.Captains[ 2 ] = CaptainOne
-		
-	end
-
-	if Team == 1 then
-
-		GameRules:JoinTeam( Client[ CaptainOne ]:GetControllingPlayer() , 1 , nil , true ) 
-		GameRules:JoinTeam( Client[ CaptainTwo ]:GetControllingPlayer() , 2 , nil , true ) 
-		
-	elseif Team == 2 then
-
-		GameRules:JoinTeam( Client[ CaptainOne ]:GetControllingPlayer() , 2 , nil , true ) 
-		GameRules:JoinTeam( Client[ CaptainTwo ]:GetControllingPlayer() , 1 , nil , true ) 
-		
-	end
+	GameRules:JoinTeam( Player[ 1 ] , 1 , nil , true ) 
+	GameRules:JoinTeam( Player[ 2 ] , 2 , nil , true ) 
 
 	self:PickTeams() 
 	
@@ -745,7 +726,7 @@ function Plugin:PickPlayer()
 
 	self:Timer.Simple( self.Config.VoteTimeout , function() 
 		
-		local Value , Key = ChooseRandom( shine.GetTeamClients( 0 ) ) 
+		local Value , Key = ChooseRandom( GetTeamClients( 0 ) ) 
 
 			self:Choose( Client[ self.CurrentCaptain ], Value:GetClientId ) 
 			self:CurrentPick()
@@ -896,7 +877,8 @@ end
 function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 
 	if PugsStarted == false and GameStarted == false then return end 
-	if NewTeam == 0 or NewTeam == 3 then return end
+
+	if OldTeam == 0 or 3 and NewTeam == 0 or 3 then return end
 	
 	local Client = Server.GetOwner( Player )
 
@@ -909,6 +891,15 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 		self.TeamMembers[ ID ] = NewTeam
 
 	end
+
+	return false
+end
+
+function Plugin:JoinTeam( GameRules , Player , NewTeam , Force ) 
+
+	if NewTeam == 0 or NewTeam == 3 then return end
+
+	if PugsStarted then return false end
 
 end
 
