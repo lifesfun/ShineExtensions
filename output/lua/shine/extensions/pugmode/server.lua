@@ -594,7 +594,9 @@ function Plugin:StartVote()
 end
 
 function Plugin:VoteOne( Client , Vote )
-	
+
+	if not Client then return end	
+
 	local ID = Client:GetUserID()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
@@ -612,6 +614,8 @@ end
 
 function Plugin:VoteTwo( Client , Vote )
 	
+	if not Client then return end	
+
 	local ID = Client:GetUserID()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
@@ -761,6 +765,8 @@ function Plugin:CurrentPick()
 end
 
 function Plugin:Choose( Client , PlayerID )
+
+	if not Client then return end	
 
 	local ID = Client:GetUserID()
 	local PlayerClient = GetClient( PlayerID ) 
@@ -1054,7 +1060,7 @@ function Plugin:CreateCommands()
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
     
-	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , Choose( Client , Team ) )
+	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , self:hoose( Client , Team ) )
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
 
