@@ -1084,4 +1084,4 @@ function Plugin:Cleanup()
 
 end
 
-Shine:RegisterExtension( "pug", Plugin )
+Shine:RegisterExtension( "pugmode", Plugin )
