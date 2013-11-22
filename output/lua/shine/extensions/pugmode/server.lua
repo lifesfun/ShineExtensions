@@ -672,10 +672,12 @@ end
 
 function Plugin:CaptainsTeams()	
 
+	local Player = {}
 	local CaptainOne = GetClientByID( self.Captains[ 1 ] )
 	local CaptainTwo = GetClientByID( self.Captains[ 2 ] )
-	local Player[ 1 ] = CaptainOne:GetControllingPlayer() 
-	local Player[ 2 ] = CaptainTwo:GetControllingPlayer() 
+
+	Player[ 1 ] = CaptainOne:GetControllingPlayer() 
+	Player[ 2 ] = CaptainTwo:GetControllingPlayer() 
 
 	Shuffle( self.Captains )
 	Shuffle( Player )
@@ -719,9 +721,9 @@ function Plugin:PickPlayer()
 	Timer.Simple( self.Config.VoteTimeout , function() 
 		
 		local Value , Key = ChooseRandom( GetTeamClients( 0 ) ) 
-
 		local Client = GetClientByID( self.CurrentCaptain )
-		self:Choose( Client , Value:GetID ) 
+
+		self:Choose( Client , Value ) 
 		self:CurrentPick()
 
 	end )  
@@ -1045,15 +1047,15 @@ function Plugin:CreateCommands()
 	SetTeamScoresCommand:AddParam{ Type = "number", Min = 0, Max = 255, Round = true, Optional = true, Default = 0 }
 	SetTeamScoresCommand:Help( "<Marine Score> <Alien Score> Sets the score for the marine and alien teams." )
 
-	local VoteOne = self:BindCommand( "sh_vote1", { "vote1" }, VoteOne( Client , PlayerID ) )
+	local VoteOneCommand = self:BindCommand( "sh_vote1", { "vote1" }, self:VoteOne( Client , PlayerID ) )
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
 
-	local VoteTwo = self:BindCommand( "sh_vote2", { "vote2" }, VoteTwo( Client , PlayerID ) )
+	local VoteTwoCommand = self:BindCommand( "sh_vote2", { "vote2" }, self:VoteTwo( Client , PlayerID ) )
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
     
-	local Choose = self:BindCommand( "sh_choose", { "choose" } , Choose( Client , Team ) )
+	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , Choose( Client , Team ) )
     	Choose:AddParam{ Type = "client"}    
     	Choose:Help ( "Type the name of the player to place him/her on your team." )
 
