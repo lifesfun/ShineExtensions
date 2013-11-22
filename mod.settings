@@ -1,5 +1,6 @@
 name        = "PugMode[Shine]Alpha"
 source_dir  = "source/"
 output_dir  = "output/"
-description = [=[]=]
+description = [=[Pick Up Game mode using the shine framework]=]
 image       = "preview.jpg"
+publish_id = "bbebd10"
