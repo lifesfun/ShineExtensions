@@ -103,7 +103,7 @@ function Plugin:Initialise()
 	self:StartPug()
 
 
-	self:Timer.Create( self.GameStatus , self.Config.NagInterval , 1 , self:GameStatus )  
+	Timer.Create( self.GameStatus , self.Config.NagInterval , 1 , self:GameStatus() )  
 
 	self.Enabled = true
 
@@ -116,10 +116,10 @@ end
 
 function Plugin:GameStatus() 
 
-	if self:Timer.Exists( self.GameStatus ) == true then
+	if Timer.Exists( self.GameStatus ) == true then
 	
 		Shine:RemoveText( nil, { ID = 2 } )
-		self:Timer:Destroy( self.GameStatus )
+		Timer:Destroy( self.GameStatus )
 
 	end
 
@@ -151,7 +151,7 @@ function Plugin:GameStatus()
 
 	end
 
-	self:Timer.Create( self.GameStatus , self.Config.NagInterval , 1 , self:GameStatus() )  
+	Timer.Create( self.GameStatus , self.Config.NagInterval , 1 , self:GameStatus() )  
 
 	return true
 		
@@ -217,7 +217,7 @@ end
 function Plugin:StartGame( Gamerules )
 	
 	-- does stats need to be reenabled ? 
-	self:Timer.Destroy( self.GameStatus ) 
+	Timer.Destroy( self.GameStatus ) 
 
 	Gamerules:ResetGame()
 	Gamerules:SetGameState( kGameState.Countdown )
@@ -346,7 +346,7 @@ end
 ]]
 function Plugin:ClientConnect( Client )
 	
-	if Client:GetIsVirtual() then return end
+	if Client:GetIsVirtual() == true then return end
 
 	local ID = Client:GetUserID() 
 	local PugsStarted = self.PugsStarted
@@ -363,7 +363,7 @@ function Plugin:ClientConnect( Client )
 
 		end
 
-		if Players[ #Players + 1 ] = ID then
+		if Players[ #Players + 1 ] == ID then
 			
 			return true
 		
@@ -573,7 +573,7 @@ function Plugin:StartVote()
 	Shine:Notify( false , nil , "Players have %s to vote for the first captain.", true ,  self.Config.VoteTimeout )
 	Shine:Notify( false, nil ,  "Use sh_vote1 in console or !vote1 in chat followed by the player name.", true  )
 
-	self:Timer.Simple( self.Config.VoteTimeout , function() 
+	Timer.Simple( self.Config.VoteTimeout , function() 
 
 		self.Captain[ 1 ] = self:NewCaptain( self.FirstVoted ) 
 
@@ -582,7 +582,7 @@ function Plugin:StartVote()
 	Shine:Notify( false , nil , "Players have %s to vote for the first captain.", true ,  self.Config.VoteTimeout )
 	Shine:Notify( false, nil ,  "Use sh_vote2 in console or !vote2 in chat followed by the player name.", true  )
 
-	self:Timer.Simple( self.Config.VoteTimeout , function() 
+	Timer.Simple( self.Config.VoteTimeout , function() 
 
 		self.Captain[ 2 ] = self:NewCaptain( self.SecondVoted )
 
@@ -600,7 +600,7 @@ function Plugin:VoteOne( Client , Vote )
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
-	if self.TeamMembers[ ID ] == true and PlayerClient ~= nil and self.SecondVote[ ID ] = Vote then	
+	if self.TeamMembers[ ID ] == true and PlayerClient ~= nil and self.SecondVote[ ID ] == Vote then	
 
 		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
@@ -617,7 +617,7 @@ function Plugin:VoteTwo( Client , Vote )
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
-	if self.TeamMembers[ ID ] == true and PlayerClient ~= nil and self.FirstVote[ ID ] = Vote then	
+	if self.TeamMembers[ ID ] == true and PlayerClient ~= nil and self.FirstVote[ ID ] == Vote then	
 
 		Shine:Notify( Client, "", "", "You have voted for %s !", PlayerName ) 
 	
@@ -718,7 +718,7 @@ function Plugin:PickPlayer()
 	Shine:Notify( Captain , "", "", "It is now your turn to pick!" ) 
 	Shine:Notify( Captain , "", "", "Use sh_choose in console or !choose in chat followed by a players name." ) 
 
-	self:Timer.Simple( self.Config.VoteTimeout , function() 
+	Timer.Simple( self.Config.VoteTimeout , function() 
 		
 		local Value , Key = ChooseRandom( GetTeamClients( 0 ) ) 
 
