@@ -1,0 +1,5 @@
+name        = "Pug Mode Shine"
+source_dir  = "source"
+output_dir  = "output"
+description = [=[Pick Game Mode using shine framework]=]
+image       = "preview.jpg"
