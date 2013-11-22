@@ -656,16 +656,14 @@ function Plugin:NewCaptain( VoteList )
 	for Key , Value in pairs( self.TeamMembers ) do
 
 		local Client = GetClientByID( Key )	
+		local Count = GetCount( Value )
 
-		if Client ~= nil and Key ~= Captain[ 1 ] or Captain[ 2 ] then 
-	
-			GetCount( Value ) >= TopVoted  
-			--else == random
-			
-			Captain = Value 
+		if Client ~= nil and Key ~= Captain[ 1 ] or Captain[ 2 ] and Count >= TopVoted then 
+
+			TopVoted = Count
+			Captain = Key 
 
 		end
-		
 	end
 
 	return Captain
