@@ -595,6 +595,7 @@ end
 
 function Plugin:VoteOne( Client , Vote )
 
+	if self.GameStarted == false then return end
 	if not Client then return end	
 
 	local ID = Client:GetUserID()
@@ -614,6 +615,7 @@ end
 
 function Plugin:VoteTwo( Client , Vote )
 	
+	if self.GameStarted == false then return end
 	if not Client then return end	
 
 	local ID = Client:GetUserID()
@@ -766,6 +768,7 @@ end
 
 function Plugin:Choose( Client , PlayerID )
 
+	if self.GameStarted == false then return end
 	if not Client then return end	
 
 	local ID = Client:GetUserID()
