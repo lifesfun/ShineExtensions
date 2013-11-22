@@ -39,7 +39,7 @@ function Plugin:NetworkUpdate( Key, Old, New )
 	end
 end
 
-Shine:RegisterExtension( "tournamentmode", Plugin )
+Shine:RegisterExtension( "pugmode", Plugin )
 
 if Server then return end
 

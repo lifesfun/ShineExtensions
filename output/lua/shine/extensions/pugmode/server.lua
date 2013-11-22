@@ -28,6 +28,7 @@ local ChooseRandom = table.ChooseRandom
 local Shuffle = table.Shuffle
 local GetTeamClients = Shine.GetTeamClients
 local GetClientByID = Shine.GetClientByID
+
 local Plugin = Plugin
 Plugin.Version = "0.99"
 
@@ -1084,4 +1085,3 @@ function Plugin:Cleanup()
 
 end
 
-Shine:RegisterExtension( "pugmode", Plugin )
