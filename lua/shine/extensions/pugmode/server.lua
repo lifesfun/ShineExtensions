@@ -32,7 +32,7 @@ local Plugin = Plugin
 Plugin.Version = "0.99"
 
 Plugin.HasConfig = true
-Plugin.ConfigName = "Pug.json"
+Plugin.ConfigName = "PugMode.json"
 Plugin.DefaultConfig = {
 
 	PugMode = true, -- Enabled Pug Mode	
