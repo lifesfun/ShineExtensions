@@ -444,13 +444,13 @@ end
 
 function Plugin:ReplaceCaptain( ID ) 
 
-	local Team = self.TeamMembers[ CliendID ] 
+	local Team = self.TeamMembers[ ID ] 
 	local Votes = {}
 	local Captain = nil
 
 	for Key , Value in pairs( self.FirstVoted ) do	
 		
-		if TeamMembers[ Value] == Team then 
+		if TeamMembers[ Value ] == Team then 
 
 			Votes[ Key ] = Value
 
@@ -469,6 +469,7 @@ function Plugin:ReplaceCaptain( ID )
 	end
 		
 	Captain = self.NewCaptain( Votes )
+
 	local Client = GetUserByID( Captain ) 	
 	local PlayerName = Client:GetControlllingPlayer():GetName() 
 
@@ -476,8 +477,6 @@ function Plugin:ReplaceCaptain( ID )
 
 	self.Captain[ Team ] = Captain
 	self:PickPlayer() 
-
-	-- Name =GetByName the client self.CurrentCaptain 
 
 	Shine:Notify( false , nil , "One of the captains has left the game. %s is the new captain." , true , PlayerName )
 
@@ -713,7 +712,7 @@ end
 	
 function Plugin:PickPlayer()
 
-	local Captain = GetUserById( self.CurrentCaptain ) 
+	local Captain = GetUserByID( self.CurrentCaptain ) 
 
 	Shine:Notify( Captain , "", "", "It is now your turn to pick!" ) 
 	Shine:Notify( Captain , "", "", "Use sh_choose in console or !choose in chat followed by a players name." ) 
