@@ -1053,16 +1053,17 @@ function Plugin:CreateCommands()
 	SetTeamScoresCommand:Help( "<Marine Score> <Alien Score> Sets the score for the marine and alien teams." )
 
 	local VoteOneCommand = self:BindCommand( "sh_vote1", { "vote1" }, self:VoteOne( Client , PlayerID ) )
-    	Choose:AddParam{ Type = "client"}    
-    	Choose:Help ( "Type the name of the player to place him/her on your team." )
+    	VoteOneCommand:AddParam{ Type = "client"}    
+    	VoteOneCommand:Help ( "Type the name of the player to place him/her on your team." )
+
 
 	local VoteTwoCommand = self:BindCommand( "sh_vote2", { "vote2" }, self:VoteTwo( Client , PlayerID ) )
-    	Choose:AddParam{ Type = "client"}    
-    	Choose:Help ( "Type the name of the player to place him/her on your team." )
+    	VoteTwoCommand:AddParam{ Type = "client"}    
+    	VoteTwoCommand:Help ( "Type the name of the player to place him/her on your team." )
     
 	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , self:hoose( Client , Team ) )
-    	Choose:AddParam{ Type = "client"}    
-    	Choose:Help ( "Type the name of the player to place him/her on your team." )
+    	ChooseCommand:AddParam{ Type = "client"}    
+    	ChooseCommand:Help ( "Type the name of the player to place him/her on your team." )
 
 	--reset pug Startpug
 	--unbockteams
