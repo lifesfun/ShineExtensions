@@ -30,7 +30,7 @@ local GetTeamClients = Shine.GetTeamClients
 local GetClientByID = Shine.GetClientByID
 
 local Plugin = Plugin
-Plugin.Version = "0.99"
+Plugin.Version = "1.0"
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "PugMode.json"
@@ -1059,14 +1059,14 @@ function Plugin:CreateCommands()
 	SetTeamScoresCommand:AddParam{ Type = "number", Min = 0, Max = 255, Round = true, Optional = true, Default = 0 }
 	SetTeamScoresCommand:Help( "<Marine Score> <Alien Score> Sets the score for the marine and alien teams." )
 
-	local VoteOneCommand = self:BindCommand( "sh_vote1" , { "vote1" } , self:VoteOne( Client , PlayerID ) , true )
+	local VoteOneCommand = self:BindCommand( "sh_vote1" , { "vote1" } , self:VoteOne , true )
     	VoteOneCommand:AddParam{ Type = "string" ,  Optional = false , Default = "" }    
 
 
-	local VoteTwoCommand = self:BindCommand( "sh_vote2" , { "vote2" }, self:VoteTwo( Client , PlayerID ) , true )
+	local VoteTwoCommand = self:BindCommand( "sh_vote2" , { "vote2" } , self:VoteTwo , true )
     	VoteTwoCommand:AddParam{ Type = "string" ,  Optional = false , Default = "" }    
     
-	local ChooseCommand = self:BindCommand( "sh_choose" , { "choose" } , self:Choose( Client , PlayerID ) , true )
+	local ChooseCommand = self:BindCommand( "sh_choose" , { "choose" } , self:Choose  , true )
     	ChooseCommand:AddParam{ Type = "string" , Optional = false ,  Default = "" }    
 
 	--reset pug Startpug
