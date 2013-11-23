@@ -1055,17 +1055,17 @@ function Plugin:CreateCommands()
 	SetTeamScoresCommand:AddParam{ Type = "number", Min = 0, Max = 255, Round = true, Optional = true, Default = 0 }
 	SetTeamScoresCommand:Help( "<Marine Score> <Alien Score> Sets the score for the marine and alien teams." )
 
-	local VoteOneCommand = self:BindCommand( "sh_vote1", { "vote1" }, self:VoteOne( Client , PlayerID ) )
-    	VoteOneCommand:AddParam{ Type = "client"}    
+	local VoteOneCommand = self:BindCommand( "sh_vote1", { "vote1" }, self:VoteOne( Client , PlayerID ), true )
+    	VoteOneCommand:AddParam{ Type = "string",  Optional = false, Default = ""}    
     	VoteOneCommand:Help ( "Type the name of the player to place him/her on your team." )
 
 
-	local VoteTwoCommand = self:BindCommand( "sh_vote2", { "vote2" }, self:VoteTwo( Client , PlayerID ) )
-    	VoteTwoCommand:AddParam{ Type = "client"}    
+	local VoteTwoCommand = self:BindCommand( "sh_vote2", { "vote2" }, self:VoteTwo( Client , PlayerID ) , true )
+    	VoteTwoCommand:AddParam{ Type = "string",  Optional = false, Default = ""}    
     	VoteTwoCommand:Help ( "Type the name of the player to place him/her on your team." )
     
-	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , self:hoose( Client , Team ) )
-    	ChooseCommand:AddParam{ Type = "client"}    
+	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , self:hoose( Client , Team ), true )
+    	ChooseCommand:AddParam{ Type = "string", Optional = false,  Default = ""}    
     	ChooseCommand:Help ( "Type the name of the player to place him/her on your team." )
 
 	--reset pug Startpug
