@@ -10,7 +10,7 @@ Pug - Pick Up Games
 
 		All players are blocked from switching teams and joining
 		Commanders will be random to picking teams and for which team they start 
-		Captains then have to decide there players and are limited by the choosetimeout
+		aptains then have to decide there players and are limited by the choosetimeout
 		Players are picked from the ready room and placed on the same side as the commander
 --]]
 
@@ -74,7 +74,7 @@ function Plugin:Initialise()
 	self.Players = {} --player queue for who gets into the pug array is numeric order 
 	self.FirstVote = {} 
 	self.SecondVote = {}
-	self.Captain = {} --If the captain leaves before the teams are chosen the next highist votes player on the team will become captain. 
+	self.Captains = {} --If the captain leaves before the teams are chosen the next highist votes player on the team will become captain. 
 	self.CurrentCaptain = nil
 
 	self.Rounds = nil
@@ -428,7 +428,7 @@ function Plugin:ClientDisconnect( Client )
 
 	elseif self.PugsStarted == true then
 
-		if self.Captain[ 1 ] == ID or self.Captain[ 2 ] == ID then
+		if self.Captains[ 1 ] == ID or self.Captains[ 2 ] == ID then
 
 			self:ReplaceCaptain( ID )
 			
@@ -475,7 +475,7 @@ function Plugin:ReplaceCaptain( ID )
 
 	GameRules:JoinTeam( Client , Team , nil , true ) 
 
-	self.Captain[ Team ] = Captain
+	self.Captains[ Team ] = Captain
 	self:PickPlayer() 
 
 	Shine:Notify( false , nil , "One of the captains has left the game. %s is the new captain." , true , PlayerName )
@@ -583,7 +583,7 @@ function Plugin:StartVote()
 
 	Timer.Simple( self.Config.VoteTimeout , function() 
 
-		self.Captain[ 2 ] = self:NewCaptain( self.SecondVoted )
+		self.Captains[ 2 ] = self:NewCaptain( self.SecondVoted )
 
 	end ) 
 
@@ -663,7 +663,7 @@ function Plugin:NewCaptain( VoteList )
 		local Client = GetClientByID( Key )	
 		local Count = GetCount( Value )
 
-		if Client ~= nil and Key ~= Captain[ 1 ] or Captain[ 2 ] and Count >= TopVoted then 
+		if Client ~= nil and Key ~= self.Captains[ 1 ] or self.Captains[ 2 ] and Count >= TopVoted then 
 
 			TopVoted = Count
 			Captain = Key 
@@ -776,7 +776,7 @@ function Plugin:Choose( Client , PlayerID )
 	local Player = PlayerClient:GetControllingPlayer()  
 	local Team = Player:GetTeamNumber()
 
-	if ID == self.CurrentCaptain() and PlayerClient ~= nil then
+	if ID == self.CurrentCaptain and PlayerClient ~= nil then
 		
 		GameRules:JoinTeam( Player , Team , nil , true ) 
 
