@@ -1064,7 +1064,7 @@ function Plugin:CreateCommands()
     	VoteTwoCommand:AddParam{ Type = "string",  Optional = false, Default = ""}    
     	VoteTwoCommand:Help ( "Type the name of the player to place him/her on your team." )
     
-	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , self:hoose( Client , Team ), true )
+	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , self:hoose( Client , PlayerID ), true )
     	ChooseCommand:AddParam{ Type = "string", Optional = false,  Default = ""}    
     	ChooseCommand:Help ( "Type the name of the player to place him/her on your team." )
 
