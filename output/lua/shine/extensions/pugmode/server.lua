@@ -36,8 +36,6 @@ Plugin.HasConfig = true
 Plugin.ConfigName = "PugMode.json"
 Plugin.DefaultConfig = {
 
-	PugMode = true, -- Enabled Pug Mode	
-	
 	CountdownTime = 15, --How long should the game wait after team are ready to start?
 
 	TeamSize = 6, --Size of Team
@@ -316,6 +314,8 @@ function Plugin:EndGame( GameRules , WinningTeam )
 
 	if RoundsLeft ~= 0 then
 		
+		self.RoundsLeft = RoundsLeft - 1
+
 		for Key , Value in pairs( self.TeamMembers ) do
 			
 			self.TeamMembers[ Key ] = GetOppositeTeam( Value )	
@@ -327,7 +327,7 @@ function Plugin:EndGame( GameRules , WinningTeam )
 			Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ Key ], nil, true )     
 		end
 	
-	elseif RoundsLeft == 0 then 
+	elseif RoundsLeft == 0 then 	
 	
 		for Key , Value in pairs( self.TeamMembers ) do
 			
@@ -336,6 +336,10 @@ function Plugin:EndGame( GameRules , WinningTeam )
 		end
 		
 		 self.TeamMembers = nil
+		 self.PugsStarted = false
+		 self.GameStarted = false
+		 self:StartPug()
+
 	
 	end
 	--changemap? save player queue 
@@ -448,7 +452,7 @@ function Plugin:ReplaceCaptain( ID )
 	local Votes = {}
 	local Captain = nil
 
-	for Key , Value in pairs( self.FirstVoted ) do	
+	for Key , Value in pairs( self.FirstVote ) do	
 		
 		if TeamMembers[ Value ] == Team then 
 
@@ -458,9 +462,9 @@ function Plugin:ReplaceCaptain( ID )
 
 	end
 
-	for Key , Value in pairs( self.SecondVoted ) do	
+	for Key , Value in pairs( self.SecondVote ) do	
 		
-		if TeamMembers[ Value] == Team and Voted[ Key ] == nil then 
+		if TeamMembers[ Value] == Team and Votes[ Key ] == nil then 
 
 			Votes[ Key ] = Value
 
@@ -491,7 +495,7 @@ function Plugin:StartPug()
 
 	if Players >= MatchSize then 
 	
-		self.Rounds = self.Config.Rounds
+		self.RoundsLeft = self.Config.Rounds
 
 		self:CreateTeamMembers() 
 
@@ -574,7 +578,7 @@ function Plugin:StartVote()
 
 	Timer.Simple( self.Config.VoteTimeout , function() 
 
-		self.Captain[ 1 ] = self:NewCaptain( self.FirstVoted ) 
+		self.Captain[ 1 ] = self:NewCaptain( self.FirstVote ) 
 
 	end ) 
 
@@ -583,7 +587,7 @@ function Plugin:StartVote()
 
 	Timer.Simple( self.Config.VoteTimeout , function() 
 
-		self.Captains[ 2 ] = self:NewCaptain( self.SecondVoted )
+		self.Captains[ 2 ] = self:NewCaptain( self.SecondVote )
 
 	end ) 
 
@@ -646,7 +650,7 @@ function Plugin:NewCaptain( VoteList )
 
 			local Count = 0
 
-			if Value == VotedID then 
+			if Value == VoteID then 
 				
 				Count = Count + 1
 
@@ -1055,15 +1059,15 @@ function Plugin:CreateCommands()
 	SetTeamScoresCommand:AddParam{ Type = "number", Min = 0, Max = 255, Round = true, Optional = true, Default = 0 }
 	SetTeamScoresCommand:Help( "<Marine Score> <Alien Score> Sets the score for the marine and alien teams." )
 
-	local VoteOneCommand = self:BindCommand( "sh_vote1", { "vote1" }, self:VoteOne( Client , PlayerID ), true )
-    	VoteOneCommand:AddParam{ Type = "string",  Optional = false, Default = ""}    
+	local VoteOneCommand = self:BindCommand( "sh_vote1" , { "vote1" } , self:VoteOne( Client , PlayerID ) , true )
+    	VoteOneCommand:AddParam{ Type = "string" ,  Optional = false , Default = "" }    
 
 
-	local VoteTwoCommand = self:BindCommand( "sh_vote2", { "vote2" }, self:VoteTwo( Client , PlayerID ) , true )
-    	VoteTwoCommand:AddParam{ Type = "string",  Optional = false, Default = ""}    
+	local VoteTwoCommand = self:BindCommand( "sh_vote2" , { "vote2" }, self:VoteTwo( Client , PlayerID ) , true )
+    	VoteTwoCommand:AddParam{ Type = "string" ,  Optional = false , Default = "" }    
     
-	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , self:Choose( Client , PlayerID ), true )
-    	ChooseCommand:AddParam{ Type = "string", Optional = false,  Default = ""}    
+	local ChooseCommand = self:BindCommand( "sh_choose" , { "choose" } , self:Choose( Client , PlayerID ) , true )
+    	ChooseCommand:AddParam{ Type = "string" , Optional = false ,  Default = "" }    
 
 	--reset pug Startpug
 	--unbockteams
