@@ -1057,16 +1057,13 @@ function Plugin:CreateCommands()
 
 	local VoteOneCommand = self:BindCommand( "sh_vote1", { "vote1" }, self:VoteOne( Client , PlayerID ), true )
     	VoteOneCommand:AddParam{ Type = "string",  Optional = false, Default = ""}    
-    	VoteOneCommand:Help ( "Type the name of the player to place him/her on your team." )
 
 
 	local VoteTwoCommand = self:BindCommand( "sh_vote2", { "vote2" }, self:VoteTwo( Client , PlayerID ) , true )
     	VoteTwoCommand:AddParam{ Type = "string",  Optional = false, Default = ""}    
-    	VoteTwoCommand:Help ( "Type the name of the player to place him/her on your team." )
     
 	local ChooseCommand = self:BindCommand( "sh_choose", { "choose" } , self:Choose( Client , PlayerID ), true )
     	ChooseCommand:AddParam{ Type = "string", Optional = false,  Default = ""}    
-    	ChooseCommand:Help ( "Type the name of the player to place him/her on your team." )
 
 	--reset pug Startpug
 	--unbockteams
