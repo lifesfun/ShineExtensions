@@ -1063,10 +1063,10 @@ function Plugin:CreateCommands()
     	VoteOneCommand:AddParam{ Type = "string" , Default = "" }    
 
 
-	local VoteTwoCommand = self:BindCommand( "sh_vote2" , { "vote2" } , pugemode:VoteTwo , true )
+	local VoteTwoCommand = self:BindCommand( "sh_vote2" , { "vote2" } , self.VoteTwo , true )
     	VoteTwoCommand:AddParam{ Type = "string" ,  Default = "" }    
     
-	local ChooseCommand = self:BindCommand( "sh_choose" , { "choose" } , pugemode:Choose  , true )
+	local ChooseCommand = self:BindCommand( "sh_choose" , { "choose" } , self.Choose  , true )
     	ChooseCommand:AddParam{ Type = "string" ,   Default = "" }    
 
 	--reset pug Startpug
