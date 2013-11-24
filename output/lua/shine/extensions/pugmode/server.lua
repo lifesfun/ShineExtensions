@@ -105,7 +105,7 @@ function Plugin:Initialise()
 
 	self.Enabled = true
 
-	Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Pick Up Game Mode Now Enabled!", 5, 255, 255, 255, 1, 3, 1 ) )
+	Shine:SendText( nil, Shine.BuildScreenMessage( 50 , 0.5, 0.7, "Pick Up Game Mode Now Enabled!", 5, 255, 255, 255, 1, 3, 1 ) )
 
 
 	return true
@@ -116,7 +116,7 @@ function Plugin:GameStatus()
 
 	if Timer.Exists( self.GameStatus ) == true then
 	
-		Shine:RemoveText( nil, { ID = 2 } )
+		Shine:RemoveText( nil, { ID = 50 } )
 		Timer:Destroy( self.GameStatus )
 
 	end
@@ -125,7 +125,7 @@ function Plugin:GameStatus()
 
 		local Num = self.Config.TeamSize 
 
-		Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Waiting for the Pick up Game to begin for a " .. Num .. "V" .. Num .. "Pug" , 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, Shine.BuildScreenMessage( 50, 0.5, 0.7, "Waiting for the Pick up Game to begin for a " .. Num .. "V" .. Num .. "Pug" , 5, 255, 255, 255, 1, 3, 1 ) )
 
 	elseif self.GameStarted == true then
 
@@ -140,12 +140,12 @@ function Plugin:GameStatus()
 
 	elseif self.CurrentCaptain == nil then
 
-		Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, Shine.BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
 
 
 	elseif self.CurrentCaptain ~= nil then
 
-		Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, Shine.BuildScreenMessage( 50 , 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
 
 	end
 
@@ -703,9 +703,6 @@ function Plugin:PickTeams()
 
 	self:GameStatus()
 
-	Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
-
-	
 	while  Count( shine.GetTeamClients( 0 ) ) ~= 0 do
 
 		Shine:Notify( Captain , "", "", "You have %s unitl a player is randomed to your team.", self.Config.VoteTimeout )
