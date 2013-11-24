@@ -127,8 +127,8 @@ function Plugin:GameStatus()
 
 		local TeamSize = self.Config.TeamSize 
 		local Waiting = StringFormat( "Waiting for the Pick up Game to begin for a %s V %s Pug" , TeamSize , TeamSize ) 
-	Shine:Notify( nil , "Pick Up Game Mode Now Enabled!" ) 
 	
+		Shine:SendText( nil ,{ID=50, x=0.5, y=0.7, Message=Waiting, Duration=5, r=255, g=255, b=255, Align=1, Size=3, FadeIn=1}) 
 
 	elseif self.GameStarted == true then
 
@@ -140,9 +140,7 @@ function Plugin:GameStatus()
 
 		self:SendNetworkMessage( nil, "StartNag", { Message = Nag }, true )
 
-		local Waiting = StringFormat( "Waiting for the Pick up Game to begin for a %s V %s Pug" , TeamSize , TeamSize ) 
 
-		Shine:SendText( nil ,{ID=50, x=0.5, y=0.7, Message=Waiting, Duration=5, r=255, g=255, b=255, Align=1, Size=3, FadeIn=1}) 
 	elseif self.CurrentCaptain == nil then
 
 		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
