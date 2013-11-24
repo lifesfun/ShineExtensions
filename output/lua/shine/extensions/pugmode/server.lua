@@ -60,6 +60,7 @@ Plugin.Conflicts = {
 		"readyroom"
 	}
 }
+Plugin.Commands = {}
 
 Plugin.CountdownTimer = "TournamentCountdown"
 Plugin.FiveSecondTimer = "Tournament5SecondCount"
