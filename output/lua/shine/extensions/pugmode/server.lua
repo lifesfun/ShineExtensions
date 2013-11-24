@@ -104,6 +104,7 @@ function Plugin:Initialise()
 	self:StartPug()
 
 
+	Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Pick Up", 5, 255, 255, 255, 1, 3, 1 ) )
 	Timer.Create( self.GameStatusTimer , self.Config.NagInterval , 1 , self:GameStatus() )  
 
 	Shine:Notify( nil , "Pick Up Game Mode Now Enabled!" ) 
@@ -198,7 +199,7 @@ function Plugin:CommLogout( Gamerules )
 
 		self.ReadyStates[ 1 ] = false
 
-		self:Notify( false, nil, "%s is no longer ready. A commander is required.", true, self:GetTeamName( 1 ) )
+		self:Notify( nil, "%s is no longer ready. A commander is required.", true, self:GetTeamName( 1 ) )
 
 		self:CheckStart()
 	end
@@ -207,7 +208,7 @@ function Plugin:CommLogout( Gamerules )
 
 		self.ReadyStates[ 2 ] = false
 
-		self:Notify( false, nil, "%s is no longer ready. A commander is required.", true, self:GetTeamName( 2 ) )
+		self:Notify( nil, "%s is no longer ready. A commander is required.", true, self:GetTeamName( 2 ) )
 
 		self:CheckStart()
 	end
@@ -354,7 +355,7 @@ function Plugin:ClientConnect( Client )
 	
 	if Client:GetIsVirtual() == true then return end
 
-	local ID = Client:GetUserID() 
+	local ID = Client:GetUserId() 
 	local PugsStarted = self.PugsStarted
 	local GameStarted = self.GameStarted
 
@@ -424,7 +425,7 @@ end
 
 function Plugin:ClientDisconnect( Client ) 
 
-	local ID = Client:GetUserID() 
+	local ID = Client:GetUserId() 
 
 	if self.GameStarted == true and self.PugsStarted == true then 
 	
@@ -476,7 +477,7 @@ function Plugin:ReplaceCaptain( ID )
 		
 	Captain = self.NewCaptain( Votes )
 
-	local Client = GetUserByID( Captain ) 	
+	local Client = GetUserById( Captain ) 	
 	local PlayerName = Client:GetControlllingPlayer():GetName() 
 
 	GameRules:JoinTeam( Client , Team , nil , true ) 
@@ -484,7 +485,7 @@ function Plugin:ReplaceCaptain( ID )
 	self.Captains[ Team ] = Captain
 	self:PickPlayer() 
 
-	Shine:Notify( false , nil , "One of the captains has left the game. %s is the new captain." , true , PlayerName )
+	Shine:Notify( nil , "One of the captains has left the game. %s is the new captain." , true , PlayerName )
 
 	return true
 
@@ -605,7 +606,7 @@ function Plugin:VoteOne( Client , Vote )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetUserID()
+	local ID = Client:GetUserId()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
@@ -625,7 +626,7 @@ function Plugin:VoteTwo( Client , Vote )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetUserID()
+	local ID = Client:GetUserId()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
@@ -722,10 +723,10 @@ end
 	
 function Plugin:PickPlayer()
 
-	local Captain = GetUserByID( self.CurrentCaptain ) 
+	local Captain = GetUserById( self.CurrentCaptain ) 
 
 	Shine:Notify( Captain , "It is now your turn to pick!" ) 
-	Shine:Notify( Captain , "", "", "Use sh_choose in console or !choose in chat followed by a players name." ) 
+	Shine:Notify( Captain , "Use sh_choose in console or !choose in chat followed by a players name." ) 
 
 	Timer.Simple( self.Config.VoteTimeout , function() 
 		
@@ -775,7 +776,7 @@ function Plugin:Choose( Client , PlayerID )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetUserID()
+	local ID = Client:GetUserId()
 	local PlayerClient = GetClient( PlayerID ) 
 	local Player = PlayerClient:GetControllingPlayer()  
 	local Team = Player:GetTeamNumber()
@@ -898,7 +899,7 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 
 	if not Client then return end
 
-	local ID = Client:GetUserID()
+	local ID = Client:GetUserId()
 
 	if self.PugsStarted == true then 
 	
