@@ -784,7 +784,7 @@ function Plugin:Choose( Client , PlayerID )
 		
 		GameRules:JoinTeam( Player , Team , nil , true ) 
 
-		Shine:Notify( Client, , "", "Nice choice.. or hopefully it was. Please wait for your next turn." )
+		Shine:Notify( Client , "Nice choice.. or hopefully it was. Please wait for your next turn." )
 
 		self:PickTeams() 
 
