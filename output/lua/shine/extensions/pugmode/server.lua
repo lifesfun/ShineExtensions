@@ -123,8 +123,9 @@ function Plugin:GameStatus()
 
 	if self.PugsStarted == false then
 
-		local Num = self.Config.TeamSize 
-		local Waiting = String.Format( "Waiting for the Pick up Game to begin for a %s V %s Pug" , Num , Num ) 
+		local TeamSize = self.Config.TeamSize 
+		local Waiting = String.Format( "Waiting for the Pick up Game to begin for a %s V %s Pug" , TeamSize , TeamSize) 
+	
 		Shine:SendText( nil, Shine.BuildScreenMessage( 50, 0.5, 0.7, Waiting , 5, 255, 255, 255, 1, 3, 1 ) )
 
 	elseif self.GameStarted == true then
