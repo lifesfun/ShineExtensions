@@ -29,6 +29,7 @@ local Shuffle = table.Shuffle
 local GetTeamClients = Shine.GetTeamClients
 local GetClientByID = Shine.GetClientByID
 local BuildScreenMessage = Shine.BuildScreenMessage
+local GetAllPlayers = Shine.GetAllPlayers
 
 local Plugin = Plugin
 Plugin.Version = "1.0"
@@ -50,6 +51,7 @@ Plugin.DefaultConfig = {
 }
 
 Plugin.CheckConfig = true
+Plugin.DefaultState = true
 
 --Don't allow the afkkick, pregame, mapvote or readyroom plugins to load with us.
 Plugin.Conflicts = {
@@ -118,7 +120,7 @@ function Plugin:GameStatus()
 	if Timer.Exists( self.GameStatusTimer ) == true then
 	
 		Shine:RemoveText( nil, { ID = 50 } )
-		Timer:Destroy( self.GameStatus )
+		Timer.Destroy( self.GameStatusTimer )
 
 	end
 
@@ -127,7 +129,7 @@ function Plugin:GameStatus()
 		local TeamSize = self.Config.TeamSize 
 		local Waiting = StringFormat( "Waiting for the Pick up Game to begin for a %s V %s Pug" , TeamSize , TeamSize ) 
 	
-		Shine:SendText( nil, BuildScreenMessage( 51, 0.5, 0.7, Waiting , 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, BuildScreenMessage( 50, 0.5, 0.7, Waiting , 5, 255, 255, 255, 1, 3, 1 ) )
 
 	elseif self.GameStarted == true then
 
@@ -142,12 +144,12 @@ function Plugin:GameStatus()
 
 	elseif self.CurrentCaptain == nil then
 
-		Shine:SendText( nil, BuildScreenMessage( 53 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
 
 
 	elseif self.CurrentCaptain ~= nil then
 
-		Shine:SendText( nil, BuildScreenMessage( 54 , 0.5, 0.7, "Captains are now picking teams" , 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Captains are now picking teams" , 5, 255, 255, 255, 1, 3, 1 ) )
 
 	end
 
@@ -552,7 +554,7 @@ end
 
 function Plugin:StartVote() 
 
-	local Players = Shine.GetAllPlayers 
+	local Players = GetAllPlayers() 
 	
 	self.PugsStarted = true  
 
@@ -705,7 +707,7 @@ function Plugin:PickTeams()
 
 	self:GameStatus()
 
-	while  Count( shine.GetTeamClients( 0 ) ) ~= 0 do
+	while Count( shine.GetTeamClients( 0 ) ) ~= 0 do
 
 		Shine:Notify( Captain , "", "", "You have %s unitl a player is randomed to your team.", self.Config.VoteTimeout )
 
@@ -801,7 +803,6 @@ function Plugin:Choose( Client , PlayerID )
 end
 
 function Plugin:RemovePlayer( Team )
-
 	
 	for Key , Value in ipairs( self.Players ) do
 
@@ -1078,8 +1079,6 @@ end
 
 function Plugin:Cleanup()
 
-	self.BaseClass.Cleanup( self )
-
 	self.FirstVote = nil 
 	self.SecondVote = nil 
 
@@ -1093,5 +1092,6 @@ function Plugin:Cleanup()
 
 	self.Enabled = false
 
+	self.BaseClass.Cleanup( self )
 end
 
