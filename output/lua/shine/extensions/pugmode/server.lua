@@ -103,7 +103,6 @@ function Plugin:Initialise()
 	self:CreateCommands()
 	self:StartPug()
 
-		Shine:SendText( nil ,{ID=50, x=0.5, y=0.7, Message="Waiting", Duration=5, r=255, g=255, b=255, Align=1, Size=3, FadeIn=1}) 
 
 	Timer.Create( self.GameStatusTimer , self.Config.NagInterval , 1 , self:GameStatus() )  
 
@@ -355,7 +354,7 @@ function Plugin:ClientConnect( Client )
 	
 	if Client:GetIsVirtual() == true then return end
 
-	local ID = Client:GetUserId() 
+	local ID = Client:GetId() 
 	local PugsStarted = self.PugsStarted
 	local GameStarted = self.GameStarted
 
@@ -425,7 +424,7 @@ end
 
 function Plugin:ClientDisconnect( Client ) 
 
-	local ID = Client:GetUserId() 
+	local ID = Client:GetId() 
 
 	if self.GameStarted == true and self.PugsStarted == true then 
 	
@@ -477,7 +476,7 @@ function Plugin:ReplaceCaptain( ID )
 		
 	Captain = self.NewCaptain( Votes )
 
-	local Client = GetUserById( Captain ) 	
+	local Client = GetUserByID( Captain ) 	
 	local PlayerName = Client:GetControlllingPlayer():GetName() 
 
 	GameRules:JoinTeam( Client , Team , nil , true ) 
@@ -606,7 +605,7 @@ function Plugin:VoteOne( Client , Vote )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetUserId()
+	local ID = Client:GetId()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
@@ -626,7 +625,7 @@ function Plugin:VoteTwo( Client , Vote )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetUserId()
+	local ID = Client:GetId()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
@@ -723,7 +722,7 @@ end
 	
 function Plugin:PickPlayer()
 
-	local Captain = GetUserById( self.CurrentCaptain ) 
+	local Captain = GetUserByID( self.CurrentCaptain ) 
 
 	Shine:Notify( Captain , "It is now your turn to pick!" ) 
 	Shine:Notify( Captain , "Use sh_choose in console or !choose in chat followed by a players name." ) 
@@ -776,7 +775,7 @@ function Plugin:Choose( Client , PlayerID )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetUserId()
+	local ID = Client:GetId()
 	local PlayerClient = GetClient( PlayerID ) 
 	local Player = PlayerClient:GetControllingPlayer()  
 	local Team = Player:GetTeamNumber()
@@ -899,7 +898,7 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 
 	if not Client then return end
 
-	local ID = Client:GetUserId()
+	local ID = Client:GetId()
 
 	if self.PugsStarted == true then 
 	
