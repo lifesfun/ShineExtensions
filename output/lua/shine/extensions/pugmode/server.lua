@@ -103,8 +103,8 @@ function Plugin:Initialise()
 	self:CreateCommands()
 	self:StartPug()
 
+		Shine:SendText( nil ,{ID=50, x=0.5, y=0.7, Message="Waiting", Duration=5, r=255, g=255, b=255, Align=1, Size=3, FadeIn=1}) 
 
-	Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Pick Up", 5, 255, 255, 255, 1, 3, 1 ) )
 	Timer.Create( self.GameStatusTimer , self.Config.NagInterval , 1 , self:GameStatus() )  
 
 	Shine:Notify( nil , "Pick Up Game Mode Now Enabled!" ) 
