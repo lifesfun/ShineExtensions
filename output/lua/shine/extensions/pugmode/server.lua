@@ -356,7 +356,7 @@ function Plugin:ClientConnect( Client )
 	
 	if Client:GetIsVirtual() == true then return end
 
-	local ID = Client:GetId() 
+	local ID = Client:GetUserId() 
 	local PugsStarted = self.PugsStarted
 	local GameStarted = self.GameStarted
 
@@ -426,7 +426,7 @@ end
 
 function Plugin:ClientDisconnect( Client ) 
 
-	local ID = Client:GetId() 
+	local ID = Client:GetUserId() 
 
 	if self.GameStarted == true and self.PugsStarted == true then 
 	
@@ -607,7 +607,7 @@ function Plugin:VoteOne( Client , Vote )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetId()
+	local ID = Client:GetUserId()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
@@ -627,7 +627,7 @@ function Plugin:VoteTwo( Client , Vote )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetId()
+	local ID = Client:GetUserId()
 	local PlayerClient = GetClient( Vote ) 
 	local PlayerName = GetClientByName( Vote ) 
 
@@ -777,7 +777,7 @@ function Plugin:Choose( Client , PlayerID )
 	if self.GameStarted == false then return end
 	if not Client then return end	
 
-	local ID = Client:GetId()
+	local ID = Client:GetUserId()
 	local PlayerClient = GetClient( PlayerID ) 
 	local Player = PlayerClient:GetControllingPlayer()  
 	local Team = Player:GetTeamNumber()
@@ -900,7 +900,7 @@ function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 
 	if not Client then return end
 
-	local ID = Client:GetId()
+	local ID = Client:GetUserId()
 
 	if self.PugsStarted == true then 
 	
