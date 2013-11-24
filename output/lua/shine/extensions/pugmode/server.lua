@@ -105,7 +105,7 @@ function Plugin:Initialise()
 
 	self.Enabled = true
 
-	Shine:SendText( nil, self.BuildScreenMessage( 50 , 0.5, 0.7, "Pick Up Game Mode Now Enabled!", 5, 255, 255, 255, 1, 3, 1 ) )
+	Shine:SendText( nil, Shine.BuildScreenMessage( 50 , 0.5, 0.7, "Pick Up Game Mode Now Enabled!", 5, 255, 255, 255, 1, 3, 1 ) )
 
 
 	return true
@@ -126,7 +126,7 @@ function Plugin:GameStatus()
 		local TeamSize = self.Config.TeamSize 
 		local Waiting = StringFormat( "Waiting for the Pick up Game to begin for a %s V %s Pug" , TeamSize , TeamSize) 
 	
-		Shine:SendText( nil, self.BuildScreenMessage( 50, 0.5, 0.7, Waiting , 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, Shine.BuildScreenMessage( 50, 0.5, 0.7, Waiting , 5, 255, 255, 255, 1, 3, 1 ) )
 
 	elseif self.GameStarted == true then
 
@@ -141,12 +141,12 @@ function Plugin:GameStatus()
 
 	elseif self.CurrentCaptain == nil then
 
-		Shine:SendText( nil, self.BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, Shine.BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
 
 
 	elseif self.CurrentCaptain ~= nil then
 
-		Shine:SendText( nil, self.BuildScreenMessage( 50 , 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
+		Shine:SendText( nil, Shine.BuildScreenMessage( 50 , 0.5, 0.7, "Captains are now picking teams"..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
 
 	end
 
