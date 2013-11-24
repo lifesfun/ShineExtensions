@@ -1059,15 +1059,15 @@ function Plugin:CreateCommands()
 	SetTeamScoresCommand:AddParam{ Type = "number", Min = 0, Max = 255, Round = true, Optional = true, Default = 0 }
 	SetTeamScoresCommand:Help( "<Marine Score> <Alien Score> Sets the score for the marine and alien teams." )
 
-	local VoteOneCommand = self:BindCommand( "sh_vote1" , { "vote1" } , self:VoteOne( Client , PlayerId) , true )
-    	VoteOneCommand:AddParam{ Type = "string" ,  Optional = false , Default = "" }    
+	local VoteOneCommand = self:BindCommand( "sh_vote1" , { "vote1" } , self:VoteOne , true )
+    	VoteOneCommand:AddParam{ Type = "string" , Default = "" }    
 
 
-	local VoteTwoCommand = self:BindCommand( "sh_vote2" , { "vote2" } , self:VoteTwo( Client , PlayerId ) , true )
-    	VoteTwoCommand:AddParam{ Type = "string" ,  Optional = false , Default = "" }    
+	local VoteTwoCommand = self:BindCommand( "sh_vote2" , { "vote2" } , self:VoteTwo , true )
+    	VoteTwoCommand:AddParam{ Type = "string" ,  Default = "" }    
     
-	local ChooseCommand = self:BindCommand( "sh_choose" , { "choose" } , self:Choose( Client , PlayerId )  , true )
-    	ChooseCommand:AddParam{ Type = "string" , Optional = false ,  Default = "" }    
+	local ChooseCommand = self:BindCommand( "sh_choose" , { "choose" } , self:Choose  , true )
+    	ChooseCommand:AddParam{ Type = "string" ,   Default = "" }    
 
 	--reset pug Startpug
 	--unbockteams
