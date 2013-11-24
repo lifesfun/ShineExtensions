@@ -491,7 +491,8 @@ end
 function Plugin:StartPug()
 
 	local MatchSize = self.Config.TeamSize * 2
-	local Players = Count( GetallClients() )
+	local Clients = GetAllClients()
+	local Players = Count( Clients )
 
 	if Players >= MatchSize then 
 	
