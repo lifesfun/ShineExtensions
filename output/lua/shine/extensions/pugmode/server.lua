@@ -60,7 +60,7 @@ Plugin.Conflicts = {
 
 Plugin.CountdownTimer = "TournamentCountdown"
 Plugin.FiveSecondTimer = "Tournament5SecondCount"
-Plugin.GameStatus = "GameStatus" 
+Plugin.GameStatusTimer = "GameStatus" 
 
 function Plugin:Initialise()
 
@@ -101,7 +101,7 @@ function Plugin:Initialise()
 	self:StartPug()
 
 
-	Timer.Create( self.GameStatus , self.Config.NagInterval , 1 , self:GameStatus() )  
+	Timer.Create( self.GameStatusTimer , self.Config.NagInterval , 1 , self:GameStatus() )  
 
 	self.Enabled = true
 
@@ -114,7 +114,7 @@ end
 
 function Plugin:GameStatus() 
 
-	if Timer.Exists( self.GameStatus ) == true then
+	if Timer.Exists( self.GameStatusTimer ) == true then
 	
 		Shine:RemoveText( nil, { ID = 50 } )
 		Timer:Destroy( self.GameStatus )
@@ -149,7 +149,7 @@ function Plugin:GameStatus()
 
 	end
 
-	Timer.Create( self.GameStatus , self.Config.NagInterval , 1 , self:GameStatus() )  
+	Timer.Create( self.GameStatusTimer , self.Config.NagInterval , 1 , self:GameStatus() )  
 
 	return true
 		
@@ -215,7 +215,7 @@ end
 function Plugin:StartGame( Gamerules )
 	
 	-- does stats need to be reenabled ? 
-	Timer.Destroy( self.GameStatus ) 
+	Timer.Destroy( self.GameStatusTimer ) 
 
 	Gamerules:ResetGame()
 	Gamerules:SetGameState( kGameState.Countdown )
