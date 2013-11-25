@@ -25,6 +25,7 @@ end
 	Set the insight values when we receive them.
 ]]
 function Plugin:NetworkUpdate( Key, Old, New )
+
 	if Server then return end
 	
 	--Using team1 or team2 resets the other team's name...

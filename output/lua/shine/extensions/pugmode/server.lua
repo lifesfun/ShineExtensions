@@ -871,6 +871,8 @@ function Plugin:StartGame( Gamerules )
 	
 	-- does stats need to be reenabled ? 
 	Timer.Destroy( self.GameStatusTimer ) 
+	Shine:RemoveText( nil, { ID = 50 } )
+
 
 	Gamerules:ResetGame()
 	Gamerules:SetGameState( kGameState.Countdown )
