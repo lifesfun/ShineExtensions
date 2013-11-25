@@ -63,7 +63,7 @@ Plugin.Commands = {}
 
 Plugin.CountdownTimer = "TournamentCountdown"
 Plugin.FiveSecondTimer = "Tournament5SecondCount"
-Plugin.GameStatusTimer = "GameStatus" 
+Plugin.GameStatusTimer = "GameStatusInterval" 
 
 function Plugin:Initialise()
 
@@ -102,251 +102,80 @@ function Plugin:Initialise()
 
 	self:CreateCommands()
 	self:StartPug()
-
-
-	Timer.Create( self.GameStatusTimer , self.Config.NagInterval , 1 , self:GameStatus() )  
-
-	Shine:Notify( nil , "Pick Up Game Mode Now Enabled!" ) 
+	
 	self.Enabled = true
 
 	return true
 
 end
 
-function Plugin:GameStatus() 
+function Plugin:StartPug()
 
-	if Timer.Exists( self.GameStatusTimer ) == true then
-	
-		Shine:RemoveText( nil, { ID = 50 } )
-		Timer.Destroy( self.GameStatusTimer )
+	local MatchSize = self.Config.TeamSize * 2
+	local Clients = GetAllClients()
+	local Players = Count( Clients )
 
-	end
-
-	if self.PugsStarted == false then
-
-		local TeamSize = self.Config.TeamSize 
-		local Waiting = StringFormat( "Waiting for the Pick up Game to begin for a %s V %s Pug" , TeamSize , TeamSize ) 
-	
-		Shine:SendText( nil ,{ID=50, x=0.5, y=0.7, Message=Waiting, Duration=5, r=255, g=255, b=255, Align=1, Size=3, FadeIn=1}) 
-
-	elseif self.GameStarted == true then
-
-		self:CheckCommanders( Gamerules )
-
-		local Nag = self:GetStartNag()
-
-		if not Nag then return false end
-
-		self:SendNetworkMessage( nil, "StartNag", { Message = Nag }, true )
-
-
-	elseif self.CurrentCaptain == nil then
-
-		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
-
-
-	elseif self.CurrentCaptain ~= nil then
-
-		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Captains are now picking teams" , 5, 255, 255, 255, 1, 3, 1 ) )
-
-	end
-
-	Timer.Create( self.GameStatusTimer , self.Config.NagInterval , 1 , self:GameStatus() )  
-
-	return true
+	if Timer.Exists( self.GameStatusTimer ) == false then
 		
-end
+		self:GameStatus()
 
-function Plugin:GetStartNag()
+	end
 
-	local MarinesReady = self.ReadyStates[ 1 ]
-	local AliensReady = self.ReadyStates[ 2 ]
 
-	if MarinesReady and AliensReady then return nil end
+	if Players >= MatchSize then 
 	
-	if MarinesReady and not AliensReady then
+		self.Rounds = self.Config.Rounds
 
-		return StringFormat( "Waiting on %s to start", self:GetTeamName( 2 ) )
+		self:CreateTeamMembers() 
 
-	elseif AliensReady and not MarinesReady then
+		self:StartVote() 
 
-		return StringFormat( "Waiting on %s to start", self:GetTeamName( 1 ) )
-		
-	else
-
-		return StringFormat( "Waiting on both teams to start" )
-
-	end
-
-end
-
-function Plugin:CommLogout( Gamerules )
-
---not sure if this works?
-	if self.GameStarted == false then return end
-
-	local Team1 = Gamerules.team1
-	local Team2 = Gamerules.team2
-
-	local Team1Com = Team1:GetCommander()
-	local Team2Com = Team2:GetCommander()
-
-	local MarinesReady = self.ReadyStates[ 1 ]
-	local AliensReady = self.ReadyStates[ 2 ]
-
-	if MarinesReady and not Team1Com then
-
-		self.ReadyStates[ 1 ] = false
-
-		Shine:Notify( nil, "%s is no longer ready. A commander is required.", true, self:GetTeamName( 1 ) )
-
-		self:CheckStart()
-	end
-
-	if AliensReady and not Team2Com then
-
-		self.ReadyStates[ 2 ] = false
-
-		Shine:Notify( nil, "%s is no longer ready. A commander is required.", true, self:GetTeamName( 2 ) )
-
-		self:CheckStart()
-	end
-
-end
-
-function Plugin:StartGame( Gamerules )
+		return true
 	
-	-- does stats need to be reenabled ? 
-	Timer.Destroy( self.GameStatusTimer ) 
+	end
 
-	Gamerules:ResetGame()
-	Gamerules:SetGameState( kGameState.Countdown )
-	Gamerules.countdownTime = kCountDownLength
-	Gamerules.lastCountdownPlayed = nil
+	return false
 
-	for _, Player in ientitylist( Shared.GetEntitiesWithClassname( "Player" ) ) do
+end
 
-		if Player.ResetScores then
+function Plugin:CreateTeamMembers() 
 
-			Player:ResetScores()
+	local MatchSize = self.Config.TeamSize * 2
+
+	local function MakeMatchPlayer( ID )
+		local Client = GetClientByID( ID ) 
+
+		if Client ~= nil then
+
+			self.TeamMembers[ ID ] = 0 	
+
+			return true 
 
 		end
 
-	end
+		return false
 
-	TableEmpty( self.ReadyStates )
-	TableEmpty( self.Captains )
-	TableEmpty( self.FirstVote ) 
-	TableEmpty( self.SecondVote )
-	self.CurrentCaptain = nil
+	end 
 
-end
-
-function Plugin:GetTeamName( Team )
-
-	if self.TeamNames[ Team ] then
-
-		return self.TeamNames[ Team ]
-
-	end
-
-	return Shine:GetTeamName( Team, true )
-
-end
-
-function Plugin:CheckStart()
-
-	if self.GameStarted == false then return end
-
-	--Both teams are ready, start the countdown.
-	if self.ReadyStates[ 1 ] and self.ReadyStates[ 2 ] then
-
-		local CountdownTime = self.Config.CountdownTime
-
-		local GameStartTime = string.TimeToString( CountdownTime )
-
-		Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Game starts in "..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
-
-		--Game starts in 5 seconds!
-		Timer.Create( self.FiveSecondTimer, CountdownTime - 5, 1, function()
-
-			Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Game starts in %s", 5, 255, 0, 0, 1, 3, 0 ) )
-		end )
-
-		--If we get this far, then we can start.
-		Timer.Create( self.CountdownTimer, self.Config.CountdownTime, 1, function()
-
-			self:StartGame( GetGamerules() )
-
-		end )
-
-		return
-
-
-	--One or both teams are not ready, halt the countdown.
-	elseif Timer.Exists( self.CountdownTimer ) then
-
-		Timer.Destroy( self.FiveSecondTimer )
-		Timer.Destroy( self.CountdownTimer )
-
-		--Remove the countdown text.
-		Shine:RemoveText( nil, { ID = 2 } )
-
-		Shine:Notify( nil, "Game start aborted." )
-
-	end
-
-end
-
-function Plugin:GetReadyState( Team )
-
-	return self.ReadyStates[ Team ]
-
-end
-
-function Plugin:GetOppositeTeam( Team )
-
-	return Team == 1 and 2 or 1
-
-end
-
-function Plugin:EndGame( GameRules , WinningTeam ) 
-
-	local RoundsLeft = self.RoundsLeft
-
-	if RoundsLeft ~= 0 then
-		
-		self.RoundsLeft = RoundsLeft - 1
-
-		for Key , Value in pairs( self.TeamMembers ) do
+	for i , ID in ipairs( self.Players ) do 	
 			
-			self.TeamMembers[ Key ] = GetOppositeTeam( Value )	
+		if Count( self.TeamMembers ) >= MatchSize then 
 
-			local Client = GetClientByID( Key ) 	
+			FixArray( self.Players )  
 
-			if Client ~= nil then return end
-	
-			Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ Key ], nil, true )     
+			return true
+
 		end
-	
-	elseif RoundsLeft == 0 then 	
-	
-		for Key , Value in pairs( self.TeamMembers ) do
-			
-			self.Players[ #Players + 1 ] = Key  
-		
-		end
-		
-		 self.TeamMembers = nil
-		 self.PugsStarted = false
-		 self.GameStarted = false
-		 self:StartPug()
 
-	
+		self:MakeMatchPlayer( ID )
+		self.Players[ i ] = nil
+
 	end
-	--changemap? save player queue 
-	
+
+	return false
+		
 end
+
 --[[
 	Rejoin a reconnected client to their old team.
 ]]
@@ -448,108 +277,6 @@ function Plugin:ClientDisconnect( Client )
 
 end
 
-function Plugin:ReplaceCaptain( ID ) 
-
-	local Team = self.TeamMembers[ ID ] 
-	local Votes = {}
-	local Captain = nil
-
-	for Key , Value in pairs( self.FirstVote ) do	
-		
-		if TeamMembers[ Value ] == Team then 
-
-			Votes[ Key ] = Value
-
-		end
-
-	end
-
-	for Key , Value in pairs( self.SecondVote ) do	
-		
-		if TeamMembers[ Value] == Team and Votes[ Key ] == nil then 
-
-			Votes[ Key ] = Value
-
-		end
-
-	end
-		
-	Captain = self.NewCaptain( Votes )
-
-	local Client = GetUserByID( Captain ) 	
-	local PlayerName = Client:GetControlllingPlayer():GetName() 
-
-	GameRules:JoinTeam( Client , Team , nil , true ) 
-
-	self.Captains[ Team ] = Captain
-	self:PickPlayer() 
-
-	Shine:Notify( nil , "One of the captains has left the game. %s is the new captain." , true , PlayerName )
-
-	return true
-
-end
-
-function Plugin:StartPug()
-
-	local MatchSize = self.Config.TeamSize * 2
-	local Clients = GetAllClients()
-	local Players = Count( Clients )
-
-	if Players >= MatchSize then 
-	
-		self.RoundsLeft = self.Config.Rounds
-
-		self:CreateTeamMembers() 
-
-		self:StartVote() 
-
-		return true
-	
-	end
-
-	return false
-
-end
-
-function Plugin:CreateTeamMembers() 
-
-	local MatchSize = self.Config.TeamSize * 2
-
-	local function MakeMatchPlayer( ID )
-		local Client = GetClientByID( ID ) 
-
-		if Client ~= nil then
-
-			self.TeamMembers[ ID ] = 0 	
-
-			return true 
-
-		end
-
-		return false
-
-	end 
-
-	for i , ID in ipairs( self.Players ) do 	
-			
-		if Count( self.TeamMembers ) >= MatchSize then 
-
-			FixArray( self.Players )  
-
-			return true
-
-		end
-
-		self:MakeMatchPlayer( ID )
-		self.Players[ i ] = nil
-
-	end
-
-	return false
-		
-end
-
 function Plugin:StartVote() 
 
 	local Players = GetAllPlayers() 
@@ -640,7 +367,6 @@ function Plugin:VoteTwo( Client , Vote )
 
 end
 
-
 function Plugin:NewCaptain( VoteList ) 
 
 	local TopVoted = 0
@@ -681,6 +407,87 @@ function Plugin:NewCaptain( VoteList )
 	return Captain
 
 end
+
+function Plugin:ReplaceCaptain( ID ) 
+
+	local Team = self.TeamMembers[ ID ] 
+	local Votes = {}
+	local Captain = nil
+
+	for Key , Value in pairs( self.FirstVote ) do	
+		
+		if TeamMembers[ Value ] == Team then 
+
+			Votes[ Key ] = Value
+
+		end
+
+	end
+
+	for Key , Value in pairs( self.SecondVote ) do	
+		
+		if TeamMembers[ Value] == Team and Votes[ Key ] == nil then 
+
+			Votes[ Key ] = Value
+
+		end
+
+	end
+		
+	Captain = self.NewCaptain( Votes )
+
+	local Client = GetUserByID( Captain ) 	
+	local PlayerName = Client:GetControlllingPlayer():GetName() 
+
+	GameRules:JoinTeam( Client , Team , nil , true ) 
+
+	self.Captains[ Team ] = Captain
+	self:PickPlayer() 
+
+	Shine:Notify( nil , "One of the captains has left the game. %s is the new captain." , true , PlayerName )
+
+	return true
+
+end
+
+function Plugin:JoinTeam( GameRules , Player , NewTeam , Force ) 
+
+	if self.PugsStarted == false then return end
+
+	if PugsStarted == true and GameStarted == false then return false end 
+
+	if NewTeam == 0 or NewTeam == 3 then return end
+
+	return false
+	
+
+end
+
+--[[
+	Record the team that players join.
+]]
+function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
+
+	if PugsStarted == false and GameStarted == false then return end 
+	if PugsStarted == true and GameStarted == false then return false end 
+	
+	if OldTeam == 0 or 3 and NewTeam == 0 or 3 then return end
+	
+	local Client = Server.GetOwner( Player )
+
+	if not Client then return end
+
+	local ID = Client:GetUserId()
+
+	if self.PugsStarted == true then 
+	
+		self.TeamMembers[ ID ] = NewTeam
+
+	end
+
+	return false
+end
+
 
 function Plugin:CaptainsTeams()	
 
@@ -800,6 +607,74 @@ function Plugin:Choose( Client , PlayerID )
 
 end
 
+function Plugin:GetTeamName( Team )
+
+	if self.TeamNames[ Team ] then
+
+		return self.TeamNames[ Team ]
+
+	end
+
+	return Shine:GetTeamName( Team, true )
+
+end
+
+function Plugin:GetReadyState( Team )
+
+	return self.ReadyStates[ Team ]
+
+end
+
+function Plugin:GetOppositeTeam( Team )
+
+	return Team == 1 and 2 or 1
+
+end
+
+function Plugin:CheckStart()
+
+	if self.GameStarted == false then return end
+
+	--Both teams are ready, start the countdown.
+	if self.ReadyStates[ 1 ] and self.ReadyStates[ 2 ] then
+
+		local CountdownTime = self.Config.CountdownTime
+
+		local GameStartTime = string.TimeToString( CountdownTime )
+
+		Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Game starts in "..GameStartTime, 5, 255, 255, 255, 1, 3, 1 ) )
+
+		--Game starts in 5 seconds!
+		Timer.Create( self.FiveSecondTimer, CountdownTime - 5, 1, function()
+
+			Shine:SendText( nil, Shine.BuildScreenMessage( 2, 0.5, 0.7, "Game starts in %s", 5, 255, 0, 0, 1, 3, 0 ) )
+		end )
+
+		--If we get this far, then we can start.
+		Timer.Create( self.CountdownTimer, self.Config.CountdownTime, 1, function()
+
+			self:StartGame( GetGamerules() )
+
+		end )
+
+		return
+
+
+	--One or both teams are not ready, halt the countdown.
+	elseif Timer.Exists( self.CountdownTimer ) then
+
+		Timer.Destroy( self.FiveSecondTimer )
+		Timer.Destroy( self.CountdownTimer )
+
+		--Remove the countdown text.
+		Shine:RemoveText( nil, { ID = 2 } )
+
+		Shine:Notify( nil, "Game start aborted." )
+
+	end
+
+end
+
 function Plugin:RemovePlayer( Team )
 	
 	for Key , Value in ipairs( self.Players ) do
@@ -884,42 +759,172 @@ function Plugin:NeedSub()
 	return true
 end
 
---[[
-	Record the team that players join.
-]]
-function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
+function Plugin:GameStatus() 
 
-	if PugsStarted == false and GameStarted == false then return end 
-	if PugsStarted == true and GameStarted == false then return false end 
+	if Timer.Exists( self.GameStatusTimer ) == true then
 	
-	if OldTeam == 0 or 3 and NewTeam == 0 or 3 then return end
-	
-	local Client = Server.GetOwner( Player )
-
-	if not Client then return end
-
-	local ID = Client:GetUserId()
-
-	if self.PugsStarted == true then 
-	
-		self.TeamMembers[ ID ] = NewTeam
+		Shine:RemoveText( nil, { ID = 50 } )
+		Timer.Destroy( self.GameStatusTimer )
 
 	end
 
-	return false
+	if self.PugsStarted == false then
+
+		local TeamSize = self.Config.TeamSize 
+		local Waiting = StringFormat( "Waiting for the Pick up Game to begin for a %s V %s Pug" , TeamSize , TeamSize ) 
+		Shine:Notify( nil , "Pick Up Game Mode Now Enabled!" ) 
+	
+		Shine:SendText( nil ,{ID=50, x=0.5, y=0.7, Message=Waiting, Duration=5, r=255, g=255, b=255, Align=1, Size=3, FadeIn=1}) 
+
+	elseif self.GameStarted == true then
+
+		self:CheckCommanders( Gamerules )
+
+		local Nag = self:GetStartNag()
+
+		if not Nag then return false end
+
+		self:SendNetworkMessage( nil, "StartNag", { Message = Nag }, true )
+
+
+	elseif self.CurrentCaptain == nil then
+
+		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
+
+
+	elseif self.CurrentCaptain ~= nil then
+
+		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Captains are now picking teams" , 5, 255, 255, 255, 1, 3, 1 ) )
+
+	end
+
+	Timer.Create( self.GameStatusTimer , self.Config.NagInterval , 1 , self:GameStatus() )  
+
+	return true
+		
 end
 
-function Plugin:JoinTeam( GameRules , Player , NewTeam , Force ) 
+function Plugin:GetStartNag()
 
-	if self.PugsStarted == false then return end
+	local MarinesReady = self.ReadyStates[ 1 ]
+	local AliensReady = self.ReadyStates[ 2 ]
 
-	if PugsStarted == true and GameStarted == false then return false end 
-
-	if NewTeam == 0 or NewTeam == 3 then return end
-
-	return false
+	if MarinesReady and AliensReady then return nil end
 	
+	if MarinesReady and not AliensReady then
 
+		return StringFormat( "Waiting on %s to start", self:GetTeamName( 2 ) )
+
+	elseif AliensReady and not MarinesReady then
+
+		return StringFormat( "Waiting on %s to start", self:GetTeamName( 1 ) )
+		
+	else
+
+		return StringFormat( "Waiting on both teams to start" )
+
+	end
+
+end
+
+function Plugin:CommLogout( Gamerules )
+
+--not sure if this works?
+	if self.GameStarted == false then return end
+
+	local Team1 = Gamerules.team1
+	local Team2 = Gamerules.team2
+
+	local Team1Com = Team1:GetCommander()
+	local Team2Com = Team2:GetCommander()
+
+	local MarinesReady = self.ReadyStates[ 1 ]
+	local AliensReady = self.ReadyStates[ 2 ]
+
+	if MarinesReady and not Team1Com then
+
+		self.ReadyStates[ 1 ] = false
+
+		Shine:Notify( nil, "%s is no longer ready. A commander is required.", true, self:GetTeamName( 1 ) )
+
+		self:CheckStart()
+	end
+
+	if AliensReady and not Team2Com then
+
+		self.ReadyStates[ 2 ] = false
+
+		Shine:Notify( nil, "%s is no longer ready. A commander is required.", true, self:GetTeamName( 2 ) )
+
+		self:CheckStart()
+	end
+
+end
+
+function Plugin:StartGame( Gamerules )
+	
+	-- does stats need to be reenabled ? 
+	Timer.Destroy( self.GameStatusTimer ) 
+
+	Gamerules:ResetGame()
+	Gamerules:SetGameState( kGameState.Countdown )
+	Gamerules.countdownTime = kCountDownLength
+	Gamerules.lastCountdownPlayed = nil
+
+	for _, Player in ientitylist( Shared.GetEntitiesWithClassname( "Player" ) ) do
+
+		if Player.ResetScores then
+
+			Player:ResetScores()
+
+		end
+
+	end
+
+	TableEmpty( self.ReadyStates )
+	TableEmpty( self.Captains )
+	TableEmpty( self.FirstVote ) 
+	TableEmpty( self.SecondVote )
+	self.CurrentCaptain = nil
+
+end
+
+function Plugin:EndGame( GameRules , WinningTeam ) 
+
+	local RoundsLeft = self.Rounds
+
+	if RoundsLeft ~= 0 then
+		
+		self.Rounds = RoundsLeft - 1
+
+		for Key , Value in pairs( self.TeamMembers ) do
+			
+			self.TeamMembers[ Key ] = GetOppositeTeam( Value )	
+
+			local Client = GetClientByID( Key ) 	
+
+			if Client ~= nil then return end
+	
+			Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ Key ], nil, true )     
+		end
+	
+	elseif RoundsLeft == 0 then 	
+	
+		for Key , Value in pairs( self.TeamMembers ) do
+			
+			self.Players[ #Players + 1 ] = Key  
+		
+		end
+		
+		 self.TeamMembers = nil
+		 self.PugsStarted = false
+		 self.GameStarted = false
+		 self:StartPug()
+
+	
+	end
+	--changemap? save player queue 
+	
 end
 
 function Plugin:CreateCommands()
