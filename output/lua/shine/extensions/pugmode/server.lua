@@ -18,14 +18,16 @@ local Shine = Shine
 
 local Notify = Shared.Message
 local StringFormat = string.format
+
 local TableEmpty = table.Empty
 local Timer = Shine.Timer
 local FixArray = table.FixArray
+local Shuffle = table.Shuffle
 local Count = table.Count
+local ChooseRandom = table.ChooseRandom
+
 local GetAllClients = Shine.GetAllClients
 local GetClient = Shine.GetClient 
-local ChooseRandom = table.ChooseRandom
-local Shuffle = table.Shuffle
 local GetTeamClients = Shine.GetTeamClients
 local GetClientByID = Shine.GetClientByID
 local BuildScreenMessage = Shine.BuildScreenMessage
@@ -258,7 +260,7 @@ function Plugin:ClientConfirmConnect( Client )
 	local GameStarted = self.GameStarted
 
 	local PlayerExist = function( ID ) 
-
+	
 		for Key, Value in ipairs( self.Players ) do 	
 
 			if Value == ID then
@@ -268,7 +270,7 @@ function Plugin:ClientConfirmConnect( Client )
 
 		end
 
-		Players[ #Players + 1 ] = ID
+		self.Players[ #Players + 1 ] = ID
 		
 		return false
 		
