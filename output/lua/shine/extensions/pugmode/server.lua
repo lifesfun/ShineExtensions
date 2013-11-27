@@ -112,7 +112,7 @@ end
 
 function Plugin:Notify( Player, Message, Format, ... )
 
-        Shine:NotifyDualColour( Player, 255, 255, 0, "[Map Vote]", 255, 255, 255, Message, Format, ... )
+        Shine:NotifyDualColour( Player, 255, 255, 0, "[Pug Mode]", 255, 255, 255, Message, Format, ... )
 
 end
 
@@ -122,10 +122,14 @@ function Plugin:StartPug()
 	local Clients = GetAllClients()
 	local Players = Count( Clients )
 
-	self:GameStatus()
+	Timer.Simple( self.Config.NagInterval , function() 
+
+		self:GameStatus()
+
+	end ) 
+
 
 	if Players >= MatchSize then 
-	
 
 		self:StartVote() 
 
