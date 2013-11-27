@@ -112,7 +112,7 @@ end
 
 function Plugin:Notify( Player, Message, Format, ... )
 
-	Notify( Player, "[Pug Mode]".. Message, Format, ... )
+	Notify( Player, "[Pug Mode]"..Message, Format, ... )
 
 end
 
