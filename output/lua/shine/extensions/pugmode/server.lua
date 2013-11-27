@@ -138,7 +138,9 @@ function Plugin:StartVote()
 
 	local Players = GetAllPlayers() 
 	
-	self.Rounds = self.Config.Rounds
+	local Rounds = self.Config.Rounds
+
+	self.Rounds = Rounds
 	
 	self.PugsStarted = true  
 
