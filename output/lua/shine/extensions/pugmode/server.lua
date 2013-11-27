@@ -791,12 +791,12 @@ function Plugin:GameStatus()
 		self:SendNetworkMessage( nil, "StartNag", { Message = Nag }, true )
 
 
-	elseif self.CurrentCaptain == nil then
+	elseif PugsStarted == true and self.CurrentCaptain == nil then
 
 		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
 
 
-	elseif self.CurrentCaptain ~= nil then
+	elseif PugsStarted == true self.CurrentCaptain ~= nil then
 
 		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Captains are now picking teams" , 5, 255, 255, 255, 1, 3, 1 ) )
 
