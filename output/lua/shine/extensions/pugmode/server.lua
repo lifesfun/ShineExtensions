@@ -122,18 +122,10 @@ function Plugin:StartPug()
 	local Clients = GetAllClients()
 	local Players = Count( Clients )
 
-	if Timer.Exists( self.GameStatusTimer ) == false then
-		
-		self:GameStatus()
-
-	end
-
+	self:GameStatus()
 
 	if Players >= MatchSize then 
 	
-		self.Rounds = self.Config.Rounds
-
-		self:CreateTeamMembers() 
 
 		self:StartVote() 
 
@@ -142,6 +134,60 @@ function Plugin:StartPug()
 	end
 
 	return false
+
+end
+
+function Plugin:StartVote() 
+
+	local Players = GetAllPlayers() 
+	
+	self.Rounds = self.Config.Rounds
+	
+	self.PugsStarted = true  
+
+	self:GameStatus()
+
+	self:CreateTeamMembers() 
+	
+	for Value , Key in pairs( Players ) do
+
+		local Player = Players[ Key ]:GetControllingPlayer()
+
+		GameRules:JoinTeam( Value , 3 , nil , true ) 
+
+	end
+
+	for Value , Key in pairs( self.TeamMembers ) do
+
+		local Client = GetClientByID( Key ) 
+		local Player = Player:GetControllingPlayer() 
+
+		GameRules:JoinTeam( Value , 0 , nil , true ) 
+
+	end
+
+  
+	self:Notify( nil , "Players have %s to vote for the first captain.", true ,  self.Config.VoteTimeout )
+	self:Notify( nil , "Use sh_vote1 in console or !vote1 in chat followed by the player name."  )
+
+	Timer.Simple( self.Config.VoteTimeout , function() 
+
+		self.Captain[ 1 ] = self:NewCaptain( self.FirstVote ) 
+
+	end ) 
+
+	self:Notify( nil , "Players have %s to vote for the first captain.", true ,  self.Config.VoteTimeout )
+	self:Notify( nil , "Use sh_vote2 in console or !vote2 in chat followed by the player name."  )
+
+	Timer.Simple( self.Config.VoteTimeout , function() 
+
+		self.Captains[ 2 ] = self:NewCaptain( self.SecondVote )
+
+	end ) 
+
+	self:CaptainsTeams()
+
+	return true
 
 end
 
@@ -281,56 +327,6 @@ function Plugin:ClientDisconnect( Client )
 	end
 	
 	return false
-
-end
-
-function Plugin:StartVote() 
-
-	local Players = GetAllPlayers() 
-	
-	self.PugsStarted = true  
-
-	self:GameStatus()
-
-	for Value , Key in pairs( Players ) do
-
-		local Player = Players[ Key ]:GetControllingPlayer()
-
-		GameRules:JoinTeam( Value , 3 , nil , true ) 
-
-	end
-
-	for Value , Key in pairs( self.TeamMembers ) do
-
-		local Client = GetClientByID( Key ) 
-		local Player = Player:GetControllingPlayer() 
-
-		GameRules:JoinTeam( Value , 0 , nil , true ) 
-
-	end
-
-  
-	self:Notify( nil , "Players have %s to vote for the first captain.", true ,  self.Config.VoteTimeout )
-	self:Notify( nil , "Use sh_vote1 in console or !vote1 in chat followed by the player name."  )
-
-	Timer.Simple( self.Config.VoteTimeout , function() 
-
-		self.Captain[ 1 ] = self:NewCaptain( self.FirstVote ) 
-
-	end ) 
-
-	self:Notify( nil , "Players have %s to vote for the first captain.", true ,  self.Config.VoteTimeout )
-	self:Notify( nil , "Use sh_vote2 in console or !vote2 in chat followed by the player name."  )
-
-	Timer.Simple( self.Config.VoteTimeout , function() 
-
-		self.Captains[ 2 ] = self:NewCaptain( self.SecondVote )
-
-	end ) 
-
-	self:CaptainsTeams()
-
-	return true
 
 end
 
@@ -659,7 +655,7 @@ function Plugin:CheckStart()
 		--If we get this far, then we can start.
 		Timer.Create( self.CountdownTimer, self.Config.CountdownTime, 1, function()
 
-			self:StartGame( GetGamerules() )
+			self:StartGame()
 
 		end )
 
@@ -867,8 +863,8 @@ function Plugin:CommLogout( Gamerules )
 
 end
 
-function Plugin:StartGame( Gamerules )
-	
+function Plugin:StartGame()
+	local GameRules = GetGameRules() 	
 	-- does stats need to be reenabled ? 
 	Timer.Destroy( self.GameStatusTimer ) 
 	Shine:RemoveText( nil, { ID = 50 } )
@@ -1081,12 +1077,11 @@ function Plugin:CreateCommands()
 	local ChooseCommand = self:BindCommand( "sh_choose" , { "choose" } , self.Choose  , true )
     	ChooseCommand:AddParam{ Type = "string" ,   Default = "" }    
 
-	local StartCommand = self:BindCommand( "sh_start" , { "start" } , self.StartPug, true )
-    	ChooseCommand:AddParam{ Type = "string" ,   Default = "" }    
+	local StartVoteCommand = self:BindCommand( "sh_startvote" , { "startvote" } , self.StartVote )
 
--reset pug Startpug
+	local StartGameCommand = self:BindCommand( "sh_startgame" , { "startgame" } , self.StartGame )
+
 	--unbockteams
-	--pickteams
 
 
 end
