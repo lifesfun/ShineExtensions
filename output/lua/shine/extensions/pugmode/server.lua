@@ -249,7 +249,7 @@ end
 --[[
 	Rejoin a reconnected client to their old team.
 ]]
-function Plugin:ClientConnect( Client )
+function Plugin:ClientConfirmConnect( Client )
 		
 	if Client:GetIsVirtual() == true then return end
 
