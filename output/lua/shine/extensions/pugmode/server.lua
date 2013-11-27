@@ -157,17 +157,15 @@ end
 
 function Plugin:StartVote() 
 
-	local Players = GetAllPlayers() 
-	local Rounds = self.Config.Rounds
-
 	self.PugsStarted = true	
-	self.Rounds = Rounds
-	self:CreateTeamMembers() 
 	self:GameStatus()
+	self:CreateTeamMembers() 
+
+	local Players = GetAllPlayers() 
 
 	for Value , Key in pairs( Players ) do
 
-		local Player = Players[ Key ]:GetControllingPlayer()
+		local Player = Value:GetControllingPlayer()
 
 		Gamerules:JoinTeam( Value , 3 , nil , true ) 
 
@@ -519,6 +517,9 @@ function Plugin:PickTeams()
 
 	end
 
+	local Rounds = self.Config.Rounds
+
+	self.Rounds = Rounds
 	self.GameStarted = true
 	self:GameStatus()
 
@@ -632,6 +633,9 @@ function Plugin:GetOppositeTeam( Team )
 end
 
 function Plugin:CheckStart()
+	
+	self.GameStarted = true
+	self.PugsStarted = true
 
 	--Both teams are ready, start the countdown.
 	if self.ReadyStates[ 1 ] and self.ReadyStates[ 2 ] then
@@ -864,6 +868,7 @@ function Plugin:StartGame()
 	self.CurrentCaptain = nil
 	self.PugsStarted = false
 	self.PickStarted = false
+	self.GameStarted = true
 
 	Gamerules:ResetGame()
 	Gamerules:SetGameState( kGameState.Countdown )
@@ -904,8 +909,11 @@ function Plugin:EndGame( Gamerules , WinningTeam )
 			if Client ~= nil then return end
 	
 			Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ Key ], nil, true )     
+		
 		end
 	
+		self:GameStatus()
+		
 	elseif RoundsLeft == 0 then 	
 	
 		for Key , Value in pairs( self.TeamMembers ) do
