@@ -102,7 +102,6 @@ function Plugin:Initialise()
 	end
 
 	self:CreateCommands()
-	self:StartPug()
 	
 	self.Enabled = true
 
@@ -121,13 +120,6 @@ function Plugin:StartPug()
 	local MatchSize = self.Config.TeamSize * 2
 	local Clients = GetAllClients()
 	local Players = Count( Clients )
-
-	Timer.Simple( self.Config.NagInterval , function() 
-
-		self:GameStatus()
-
-	end ) 
-
 
 	if Players >= MatchSize then 
 
@@ -240,7 +232,7 @@ end
 	Rejoin a reconnected client to their old team.
 ]]
 function Plugin:ClientConnect( Client )
-	
+		
 	if Client:GetIsVirtual() == true then return end
 
 	local ID = Client:GetUserId() 
@@ -299,6 +291,12 @@ function Plugin:ClientConnect( Client )
 		Num = Num - Count( GetAllClients()) 
 
 		self:Notify( nil , "%s more players required to start the Pueegh", true , Num )
+
+		if Timer.Exists( self.GameStatusTimer ) == true then
+
+			self:GameStatus()
+
+		end
 
 		return true
 
@@ -833,11 +831,12 @@ function Plugin:GetStartNag()
 
 end
 
-function Plugin:CommLogout( Gamerules )
+function Plugin:CommLogout()
 
 --not sure if this works?
 	if self.GameStarted == false then return end
 
+	local GameRules = GetGameRules() 	
 	local Team1 = Gamerules.team1
 	local Team2 = Gamerules.team2
 
