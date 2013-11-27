@@ -292,7 +292,7 @@ function Plugin:ClientConnect( Client )
 
 		self:Notify( nil , "%s more players required to start the Pueegh", true , Num )
 
-		if Timer.Exists( self.GameStatusTimer ) == true then
+		if Timer.Exists( self.GameStatusTimer ) == false then
 
 			self:GameStatus()
 
