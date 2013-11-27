@@ -111,7 +111,7 @@ end
 
 function Plugin:Notify( Player, Message, Format, ... )
 
-        Shine:NotifyDualColour( Player, 255, 255, 0, "[Pug Mode]", 255, 255, 255, Message, Format, ... )
+        Shine:Notify( Player, "[Pug Mode]", Message, Format, ... )
 
 end
 
@@ -950,7 +950,7 @@ function Plugin:CreateCommands()
 
 		if not Player:isa( "Commander" ) then
 
-			self:NotifyError( Client, "Only the commander can ready up the team." )
+			self:Notify( Client, "Only the commander can ready up the team." )
 
 			return
 		end
@@ -985,7 +985,7 @@ function Plugin:CreateCommands()
 			self:CheckStart()
 		else
 
-			self:NotifyError( Client, "Your team is already ready! Use !unready to unready your team." )
+			self:Notify( Client, "Your team is already ready! Use !unready to unready your team." )
 
 		end
 
