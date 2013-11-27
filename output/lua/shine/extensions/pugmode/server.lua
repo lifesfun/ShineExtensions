@@ -78,9 +78,9 @@ function Plugin:Initialise()
 	self.FirstVote = {} 
 	self.SecondVote = {}
 	self.Captains = {} --If the captain leaves before the teams are chosen the next highist votes player on the team will become captain. 
-	self.CurrentCaptain = nil
+	self.CurrentCaptain = 0 
 
-	self.Rounds = nil
+	self.Rounds = 0
 	self.TeamMembers = {}
 	self.ReadyStates = { false , false }
 	self.TeamNames = {}
@@ -122,12 +122,25 @@ function Plugin:StartPug()
 	local Clients = GetAllClients()
 	local Players = Count( Clients )
 
+	if Timer.Exists( self.GameStatusTimer ) == false then
+
+			self:GameStatus()
+
+			return true
+
+		end
+
+
 	if Players >= MatchSize then 
 
 		self:StartVote() 
 
 		return true
 	
+	else
+
+		self:Notify( nil , "%s more players required to start the Pueegh", true , Num )
+
 	end
 
 	return false
@@ -293,18 +306,12 @@ function Plugin:ClientComfirmConnect( Client )
 
 		Num = Num - Count( GetAllClients()) 
 
-		self:Notify( nil , "%s more players required to start the Pueegh", true , Num )
-
-		if Timer.Exists( self.GameStatusTimer ) == false then
-
-			self:GameStatus()
-
-		end
 
 		return true
 
 	end
 
+	
 	return false
 
 end
@@ -779,8 +786,6 @@ function Plugin:GameStatus()
 
 		local TeamSize = self.Config.TeamSize 
 		local Waiting = StringFormat( "Waiting for the Pick up Game to begin for a %s V %s Pug" , TeamSize , TeamSize ) 
-		self:Notify( nil , "Pick Up Game Mode Now Enabled!" ) 
-	
 		Shine:SendText( nil ,{ID=50, x=0.5, y=0.7, Message=Waiting, Duration=5, r=255, g=255, b=255, Align=1, Size=3, FadeIn=1}) 
 
 	elseif self.GameStarted == true then
@@ -794,12 +799,12 @@ function Plugin:GameStatus()
 		self:SendNetworkMessage( nil, "StartNag", { Message = Nag }, true )
 
 
-	elseif PugsStarted == true and self.CurrentCaptain == nil then
+	elseif PugsStarted == true and self.CurrentCaptain == 0 then
 
 		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Time to vote for captains", 5, 255, 255, 255, 1, 3, 1 ) )
 
 
-	elseif PugsStarted == true and self.CurrentCaptain ~= nil then
+	elseif PugsStarted == true and self.CurrentCaptain ~= 0 then
 
 		Shine:SendText( nil, BuildScreenMessage( 50 , 0.5, 0.7, "Captains are now picking teams" , 5, 255, 255, 255, 1, 3, 1 ) )
 
