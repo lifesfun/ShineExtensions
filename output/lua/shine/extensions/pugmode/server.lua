@@ -82,7 +82,7 @@ function Plugin:Initialise()
 
 	self.Rounds = nil
 	self.TeamMembers = {}
-	self.ReadyStates = { false, false }
+	self.ReadyStates = { false , false }
 	self.TeamNames = {}
 	self.NextReady = {}
 	self.TeamScores = { 0, 0 }
@@ -112,7 +112,7 @@ end
 
 function Plugin:Notify( Player, Message, Format, ... )
 
-	Notify( Player, "[Pug Mode]", Message, Format, ... )
+	Notify( Player, "[Pug Mode]".. Message, Format, ... )
 
 end
 
