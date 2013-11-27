@@ -36,6 +36,9 @@ Plugin.Version = "1.1"
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "PugMode.json"
+
+Plugin.Commands = {}
+
 Plugin.DefaultConfig = {
 
 	CountdownTime = 15, --How long should the game wait after team are ready to start?
@@ -51,7 +54,6 @@ Plugin.DefaultConfig = {
 }
 
 Plugin.CheckConfig = true
-Plugin.DefaultState = true
 
 --Don't allow the afkkick, pregame, mapvote or readyroom plugins to load with us.
 Plugin.Conflicts = {
@@ -60,7 +62,6 @@ Plugin.Conflicts = {
 		"readyroom"
 	}
 }
-Plugin.Commands = {}
 
 Plugin.CountdownTimer = "TournamentCountdown"
 Plugin.FiveSecondTimer = "Tournament5SecondCount"
@@ -111,7 +112,7 @@ end
 
 function Plugin:Notify( Player, Message, Format, ... )
 
-        Shine:Notify( Player, "[Pug Mode]", Message, Format, ... )
+	Notify( Player, "[Pug Mode]", Message, Format, ... )
 
 end
 
@@ -867,11 +868,15 @@ function Plugin:CommLogout()
 end
 
 function Plugin:StartGame()
-	local GameRules = GetGameRules() 	
-	-- does stats need to be reenabled ? 
-	Timer.Destroy( self.GameStatusTimer ) 
-	Shine:RemoveText( nil, { ID = 50 } )
 
+	local GameRules = GetGameRules() 	
+
+	if Timer.Exists( self.GameStatusTimer ) == false then
+
+		Timer.Destroy( self.GameStatusTimer ) 
+		Shine:RemoveText( nil, { ID = 50 } )
+
+	end
 
 	Gamerules:ResetGame()
 	Gamerules:SetGameState( kGameState.Countdown )
