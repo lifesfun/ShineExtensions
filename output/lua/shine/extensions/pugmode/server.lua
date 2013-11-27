@@ -138,6 +138,11 @@ function Plugin:StartPug()
 		return true
 	
 	else
+	
+		local Num = self.Config.TeamSize * 2 
+
+		Num = Num - Count( GetAllClients()) 
+
 
 		self:Notify( nil , "%s more players required to start the Pueegh", true , Num )
 
@@ -302,11 +307,7 @@ function Plugin:ClientComfirmConnect( Client )
 
 	elseif PugsStarted == false and self:StartPug() == false then 
 		
-		local Num = self.Config.TeamSize * 2 
-
-		Num = Num - Count( GetAllClients()) 
-
-
+		
 		return true
 
 	end
