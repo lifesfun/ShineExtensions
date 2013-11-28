@@ -459,7 +459,7 @@ end
 function Plugin:JoinTeam( Gamerules , Player , NewTeam , Force ) 
 
 	if self.GameStarted == true and NewTeam == 0 then return 0 elseif NewTeam == 3 then return 3 end
-	if PugsStarted == true then return false end 
+	if self.PugsStarted == true then return false end 
 
 	return NewTeam
 
