@@ -161,6 +161,7 @@ function Plugin:StartVote()
 	self:GameStatus()
 	self:CreateTeamMembers() 
 
+	local Gamerules = GetGamerules()
 	local Players = GetAllPlayers() 
 
 	for Value , Key in pairs( Players ) do
@@ -253,6 +254,9 @@ function Plugin:ClientConfirmConnect( Client )
 		
 	if Client:GetIsVirtual() == true then return end
 
+	local Gamerules = GetGamerules()
+	if not Gamerules then return end
+
 	local ID = Client:GetUserId() 
 	local PugsStarted = self.PugsStarted
 	local GameStarted = self.GameStarted
@@ -280,6 +284,7 @@ function Plugin:ClientConfirmConnect( Client )
 
 		if self.TeamMembers[ ID ] then
 
+
 			Gamerules:JoinTeam( Client:GetControllingPlayer(), self.TeamMembers[ ID ], nil, true )     
 
 
@@ -301,7 +306,6 @@ function Plugin:ClientConfirmConnect( Client )
 
 	end
 
-	
 	return false
 
 end
@@ -444,6 +448,7 @@ function Plugin:ReplaceCaptain( ID )
 
 	local Client = GetUserByID( Captain ) 	
 	local PlayerName = Client:GetControlllingPlayer():GetName() 
+	local Gamerules = GetGamerules()
 
 	Gamerules:JoinTeam( Client , Team , nil , true ) 
 
@@ -458,6 +463,10 @@ end
 
 function Plugin:JoinTeam( Gamerules , Player , NewTeam , Force ) 
 
+	local Client = Player:GetClient()
+	if not Client then return end
+
+
 	if self.GameStarted == true and NewTeam == 0 then return 0 elseif NewTeam == 3 then return 3 end
 	if self.PugsStarted == true then return false end 
 
@@ -469,7 +478,7 @@ end
 ]]
 function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force )
 	
-	local Client = Server.GetOwner( Player )
+	local Client = Player:GetClient()
 
 	if not Client then return end
 
@@ -488,6 +497,9 @@ end
 function Plugin:CaptainsTeams()	
 
 	local Player = {}
+	local Gamerules = GetGamerules() 
+	if not Gamerules then return end
+
 	local CaptainOne = GetClientByID( self.Captains[ 1 ] )
 	local CaptainTwo = GetClientByID( self.Captains[ 2 ] )
 
@@ -509,7 +521,7 @@ function Plugin:PickTeams()
 	self.PickStarted = true
 	self:GameStatus()
 
-	while Count( shine.GetTeamClients( 0 ) ) ~= 0 do
+	while Count( GetTeamClients( 0 ) ) ~= 0 do
 
 		self:Notify( Captain , "You have %s unitl a player is randomed to your team.", true , self.Config.VoteTimeout )
 
@@ -590,6 +602,7 @@ function Plugin:Choose( Client , PlayerID )
 
 	if ID == self.CurrentCaptain and PlayerClient ~= nil then
 		
+		local Gamerules = GetGamerules()
 		Gamerules:JoinTeam( Player , Team , nil , true ) 
 
 		self:Notify( Client , "Nice choice.. or hopefully it was. Please wait for your next turn." )
@@ -635,6 +648,7 @@ end
 function Plugin:CheckStart()
 	
 	self.GameStarted = true
+	self.PickStarted = true
 	self.PugsStarted = true
 
 	--Both teams are ready, start the countdown.
@@ -687,6 +701,7 @@ function Plugin:RemovePlayer( Team )
 
 		if Player:GetTeamNumber() == Team then
 
+			local Gamerules = GetGamerules()
 			Gamerules:JoinTeam( Player , 3 , nil , true ) 
 			self:Notify( nil , "A team member has joined the game. The sub %s is being moved to spectator.", true ,  PlayerName )
 
@@ -712,6 +727,7 @@ function Plugin:AddPlayer( Team )
 
 		if Player:GetTeamNumber() == 0 or 3 then
 
+			local Gamerules = GetGamerules()
 			Gamerules:JoinTeam( Player , Team , nil , true ) 
 
 			self:Notify( nil , "A team member has left the game. The sub %s is the being substituted.", true , PlayerName )
@@ -1105,4 +1121,3 @@ function Plugin:Cleanup()
 
 	self.BaseClass.Cleanup( self )
 end
-
