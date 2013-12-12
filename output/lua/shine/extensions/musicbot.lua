@@ -92,7 +92,7 @@ function Plugin:CreateCommands()
 	end
 
 	Commands.SetRadioCommand = self:BindCommand( "sh_musicbot" , { "musicbot" } , SetRadio , true) 
-	Commands.SetRadioCommand:AddPara( Type = "boolean" , Optional = True , Default = true ) 
+	Commands.SetRadioCommand:AddPara( Type = "boolean" , Optional = true , Default = true ) 
 	Commands.SetRadioCommand:Help( "<true/false> Enables or disables the MusicBot." )
 
 end
