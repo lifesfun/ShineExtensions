@@ -14,6 +14,7 @@ Plugin.DefaultConfig = {
 
 	Delay = 5,
 	AdminChat = true
+	self.Config.Admins = {} 
 
 }
 
@@ -24,8 +25,6 @@ Plugin.Commands = {}
 function Plugin:Initialize()
 
 	self:CreateCommands()
-		
-	self.Admins = {} 
 
 	self.Enabled = true
 
@@ -45,18 +44,21 @@ function Plugin:ClientConfirmConnect( Client )
 
 	local ID = Client:GetClientId() 
 
-	Shine.Timer.Simple( self.Config.Delay , function() 
+	if self.Config.AdminVoice == true and Shine:HasAccess( Client , "sh_adminvoice" )  then
 
-		if self.Config.AdminVoice == true and Shine:HasAccess( Client , "sh_adminvoice" )  then
-			
-			self.Admins[ ID ] = true 
+		if self.Admins[ ID ] == nil then 
 
-			self:Notify( Client, "AdminVoice enabled. To enable or disable[!adminvoice true/false]"  ) 
+			self.Config.Admins[ ID ] = true 
 
 		end
 
+		Shine.Timer.Simple( self.Config.Delay , function() 
 
-	end )
+			self:Notify( Client, "AdminVoice enabled. To enable or disable[!adminvoice true/false]"  ) 
+
+		end )
+
+	end
 
 end 
 
@@ -67,7 +69,7 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 	local ListenerID = ListenerClient:GetClientId()
 	local SpeakerID = SpeakerClient:GetClientId()
 	
-	if self.Config.AdminVoice == true and self.Admins[ SpeakerID ] == true and self.Admins[ ListnerID ] == true then 
+	if self.Config.AdminVoice == true and self.Config.Admins[ SpeakerID ] == true and self.Config.Admins[ ListnerID ] == true then 
 		
 		return true
 
@@ -87,13 +89,17 @@ function Plugin:CreateCommands()
 		local ID = Client:GetUserId()  
 		if Command == true then
 
-			self.Admins[ ID ] = true 	
+			self.Config.Admins[ ID ] = true 	
+			self:SaveConfig()
 			self:Notify( Client , "You have enabled adminvoice for yourself."  ) 
 
 		elseif Command == false then 
 
-			self.Admins[ ID ] = false 
+			self.Config.Admins[ ID ] = false 
+			self:SaveConfig()
+
 			self:Notify( Client , "You have disabled adminvoice for yourself."  ) 
+
 		end
 
 
