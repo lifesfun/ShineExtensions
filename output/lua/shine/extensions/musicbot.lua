@@ -160,7 +160,6 @@ function Plugin:Cleanup()
 
 	self.BaseClass.Cleanup( self ) 
 
-	Table.Empty( self.Clients )
 	self.Enable = false
 
 end
