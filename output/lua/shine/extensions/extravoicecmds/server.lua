@@ -13,8 +13,8 @@ Plugin.ConfigName = "ExtraVoiceCmds.json"
 Plugin.DefaultConfig = { 
 
 	Delay = 5,
-	AdminChat = true
-	self.Config.Admins = {} 
+	AdminChat = true,
+	Admins = {} 
 
 }
 
@@ -62,6 +62,12 @@ function Plugin:ClientConfirmConnect( Client )
 
 end 
 
+function Plugin:ReceiveAdminVoice( Client , Data ) 
+
+		self:CanPlayerHearPlayer() 
+
+end
+
 function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
 
 	local ListenerClient = GetOwner( Listener )
@@ -69,7 +75,7 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 	local ListenerID = ListenerClient:GetClientId()
 	local SpeakerID = SpeakerClient:GetClientId()
 	
-	if self.Config.AdminVoice == true and self.Config.Admins[ SpeakerID ] == true and self.Config.Admins[ ListnerID ] == true then 
+	if self.Config.AdminVoice == true and self.Config.Admins[ SpeakerID ] == true and self.Config.Admins[ ListenerID ] == true then 
 		
 		return true
 
@@ -87,21 +93,22 @@ function Plugin:CreateCommands()
 		if not Client then return end 
 
 		local ID = Client:GetUserId()  
+
 		if Command == true then
 
 			self.Config.Admins[ ID ] = true 	
-			self:SaveConfig()
+
 			self:Notify( Client , "You have enabled adminvoice for yourself."  ) 
 
 		elseif Command == false then 
 
 			self.Config.Admins[ ID ] = false 
-			self:SaveConfig()
 
 			self:Notify( Client , "You have disabled adminvoice for yourself."  ) 
 
 		end
 
+		self:SaveConfig()
 
 	end
 
@@ -126,6 +133,7 @@ function Plugin:CreateCommands()
 			self:Notify( Client , "AdminVoice disabled for server"  ) 
 		end
 
+		self:SaveConfig()
 
 	end
 
