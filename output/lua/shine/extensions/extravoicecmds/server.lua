@@ -77,12 +77,11 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 	
 	if self.Config.AdminVoice == true and self.Config.Admins[ SpeakerID ] == true and self.Config.Admins[ ListenerID ] == true then 
 		
-		return true
+		return 
 
 	end
 
 end
-
 
 function Plugin:CreateCommands()
  
@@ -112,7 +111,7 @@ function Plugin:CreateCommands()
 
 	end
 
-	Commands.AdminVoiceCommand = self:BindCommand( "sh_adminvoice" , { "adminvoice" } , AdminVoice , true) 
+	Commands.AdminVoiceCommand = self:BindCommand( "sh_adminvoice" , { "adminvoice" } , AdminVoice , false ) 
 	Commands.AdminVoiceCommand:AddPara( Type = "boolean" , Optional = True , Default = true ) 
 	Commands.AdminVoiceCommand:Help( "<true/false> Enables or disables admin voice locally." )
 
