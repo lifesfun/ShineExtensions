@@ -21,8 +21,8 @@ Plugin.Commands = {}
 
 function Plugin:Initialize()
 
-	self.ActiveAdminTalk = {}
 	self:CreateCommands()
+	self.ActiveAdminTalk = {}
 	self.Enabled = true
 
 	return true
@@ -41,10 +41,10 @@ function Plugin:ClientConfirmConnect( Client )
 	local ID = Client:GetClientId() 
 	
 	if self.Config.AdminTalk[ ID ] then 
+
+		self.ActiveAdminTalk[ Client ] = false 
 	
-		self.ActiveAdminTalk[ Client ] = true 
-		
-	self.SimpleTimer( self.Config.Delay , function() 
+		self.SimpleTimer( self.Config.Delay , function() 
 
 			self:Notify( Client, "The Admin Channel is enabled for you. To enable or disable[!adminchannel true/false]"  ) 
 		end )
@@ -58,17 +58,23 @@ function Plugin:ClientConfirmConnect( Client )
 	end
 end 
 
-function Plugin:ClientDisconnect( Client ) 
+function Plugin:ClientDisconnect( Client )
 
-	if not Client then return end 
+	self.ActiveAdminTalk[ Client ] = nil 
+end
 
-	self.ActiveAdminTalk[ Client ] = nil
+function Plugin:ReceiveActiveAdminTalk( Client , ActiveAdminTalk ) 
+	
+		self.ActiveAdminTalk[ Client ] = ActiveAdminTalk 
 end
 
 function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
+	
+	local SpeakerClient= GetOwner( Speaker )
+	local ListenerClient = GetOwner( Listener )
+	local ListenerID = Client:GetUserId() 
 
-	local SpeakerClient= GetOwner( Listener )
-	if ActiveAdminTalk[ SpeakerClient ] == true then return end
+	if self.Config.AdminTalk[ ListenerID ] == true and self.ActiveAdminTalk[ SpeakerClient ] == true then return end
 end
 
 function Plugin:CreateCommands()
@@ -83,14 +89,14 @@ function Plugin:CreateCommands()
 		if Command == true then
 
 			self.Config.AdminTalk[ ID ] = true 	
-			self.ActiveAdminTalk[ Client ] = false
+			self.ActiveAdminTalk[ Client ] = false 
 			self:Notify( Client , "You have enabled Admin Channel for yourself." ) 
 
 		elseif Command == false then 
 
-			self.Config.ActiveAdminTalk[ ID ] = nil 
-			self:Notify( Client , "You have disabled Admin Channel for yourself." ) 
+			self.Config.AdminTalk[ ID ] = nil 
 			self.ActiveAdminTalk[ Client ] = nil 
+			self:Notify( Client , "You have disabled Admin Channel for yourself." ) 
 		end
 
 		self:SaveConfig()
