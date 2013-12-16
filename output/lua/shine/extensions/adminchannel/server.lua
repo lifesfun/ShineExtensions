@@ -22,7 +22,9 @@ Plugin.Commands = {}
 function Plugin:Initialize()
 
 	self:CreateCommands()
+
 	self.ActiveAdminTalk = {}
+
 	self.Enabled = true
 
 	return true
