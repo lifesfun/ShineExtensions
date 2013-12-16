@@ -46,14 +46,14 @@ function Plugin:ClientConfirmConnect( Client )
 
 		self.ActiveAdminTalk[ Client ] = false 
 	
-		self.SimpleTimer( self.Config.Delay , function() 
+		self:SimpleTimer( self.Config.Delay , function() 
 
 			self:Notify( Client, "The Admin Channel is enabled for you. To enable or disable[!adminchannel true/false]"  ) 
 		end )
 
 	elseif Shine:HasAccess( Client , "sh_adminchannel" ) then 
 
-		self.SimpleTimer( self.Config.Delay , function() 
+		self:SimpleTimer( self.Config.Delay , function() 
 
 			self:Notify( Client, "An Admin Channel is disable for you. To enable or disable[!adminchannel true/false]"  ) 
 		end )
@@ -76,7 +76,9 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 	local ListenerClient = GetOwner( Listener )
 	local ListenerID = Client:GetUserId() 
 
-	if self.Config.AdminTalk[ ListenerID ] == true and self.ActiveAdminTalk[ SpeakerClient ] == true then return end
+	if self.Config.AdminTalk[ ListenerID ] == true and self.ActiveAdminTalk[ SpeakerClient ] == true then 
+		return true 
+	end
 end
 
 function Plugin:CreateCommands()
@@ -103,14 +105,14 @@ function Plugin:CreateCommands()
 
 		self:SaveConfig()
 	end
-	Commands.AdminTalkCommand = self:BindCommand( "sh_admintalk" , { "admintalk" } , AdminTalk, false ) 
-	Commands.AdminTalkCommand:AddPara( Type = "boolean" , Optional = true , Default = true ) 
+	Commands.AdminTalkCommand = self:BindCommand( "sh_adminchannel" , { "adminchannel" } , AdminTalk, false ) 
+	Commands.AdminTalkCommand:AddParam( Type = "boolean" , Optional = true , Default = true ) 
 	Commands.AdminTalkCommand:Help( "<true/false> Enables or disables admin voice locally." )
 end
 
 function Plugin:Cleanup()
 
-	self.BaseClass.Cleanup( self ) 
+	self.BaseClass( self ) 
 	self.Enable = false
 end
 

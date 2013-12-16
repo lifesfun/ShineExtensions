@@ -6,5 +6,3 @@ function Plugin:SetupDataTable()
 end
 
 Shine:RegisterExtension( "adminchannel" , Plugin )
-
-if Server then return end 
