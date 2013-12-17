@@ -1,11 +1,11 @@
 local Shine = Shine
 
-local Notify = Shard.Message
+local Notify = Shared.Message
 
-local GetOwner = Sever.GetOwner
+local GetOwner = Server.GetOwner
 
 local Plugin = Plugin
-local Plugin.Version = "0.8"
+Plugin.Version = "1.0"
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "AdminChannel.json"
@@ -30,7 +30,7 @@ function Plugin:Initialize()
 	return true
 end
 
-function Plugin:Notify( Player , String Format , ... ) 
+function Plugin:Notify( Player , String , Format , ... ) 
 
 	Shine:NotifyDualColour( Player , 0 , 100 , 255 , "AdminChannel" , 255 ,  255 , 255 , String , Format , ... ) 
 end
@@ -106,7 +106,7 @@ function Plugin:CreateCommands()
 		self:SaveConfig()
 	end
 	Commands.AdminTalkCommand = self:BindCommand( "sh_adminchannel" , { "adminchannel" } , AdminTalk, false ) 
-	Commands.AdminTalkCommand:AddParam( Type = "boolean" , Optional = true , Default = true ) 
+	Commands.AdminTalkCommand:AddParam{ Type = "boolean" , Optional = true , Default = true } 
 	Commands.AdminTalkCommand:Help( "<true/false> Enables or disables admin voice locally." )
 end
 
