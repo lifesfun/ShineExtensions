@@ -1,13 +1,14 @@
 local Plugin = Plugin 
 
 Plugin.HasConfig = true
-Plugin.DefaultConfig = "AdminTalkKey.json"
+Plugin.ConfigName = "AdminTalkKey.json"
 Plugin.DefaultConfig = { 	
 
-	AdminTalkKey = "j"
+	AdminTalkKey = "J"
 }
 
 Plugin.CheckConfig = true
+Plugin.SilentConfigSave = true
 
 Plugin.Commands = {} 
 
@@ -33,13 +34,14 @@ function Plugin:CreateCommands()
 
 	local Commands = self.Commands
 
-	local function SetAdminTalkKey( Client , Value )
+	local function SetAdminKey( Client , Value )
 
 		self.Config.AdminTalkKey = Value
 		self.SaveConfig()
 	end
-	Commands.AdminTalkKeyCommand = self:BindCommand( "sh_admintalkkey" , SetAdminTalkKey ) 
-	Commands.AdminTalkKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false } 
+	Commands.AdminKeyCommand = self:BindCommand( "sh_setadminkey" , SetAdminKey ) 
+	Commands.AdminKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false } 
+	Commands.AdminKeyCommand:Help( "Sets Admin Key." )
 end
 
 function Plugin:Cleanup()

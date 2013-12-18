@@ -40,7 +40,7 @@ function Plugin:ClientConfirmConnect( Client )
 	if Client:GetIsVirtual() then return end 
 	if not Client then return end 
 
-	local ID = Client:GetClientId() 
+	local ID = Client:GetUserId() 
 	
 	if self.Config.AdminTalk[ ID ] then 
 
@@ -48,20 +48,23 @@ function Plugin:ClientConfirmConnect( Client )
 	
 		self:SimpleTimer( self.Config.Delay , function() 
 
-			self:Notify( Client, "The Admin Channel is enabled for you. To enable or disable[!adminchannel true/false]"  ) 
+			self:Notify( Client, "The Admin Channel is enabled for you."  ) 
+			self:Notify( Client, "To enable or disable[!adminchannel true/false]"  ) 
 		end )
 
 	elseif Shine:HasAccess( Client , "sh_adminchannel" ) then 
-
+		
 		self:SimpleTimer( self.Config.Delay , function() 
 
-			self:Notify( Client, "An Admin Channel is disable for you. To enable or disable[!adminchannel true/false]"  ) 
+			self:Notify( Client, "An Admin Channel is disable for you."  ) 
+			self:Notify( Client, "To enable or disable[!adminchannel true/false]"  ) 
 		end )
 	end
 end 
 
 function Plugin:ClientDisconnect( Client )
 
+     if not Client then return end 
 	self.ActiveAdminTalk[ Client ] = nil 
 end
 
@@ -95,19 +98,21 @@ function Plugin:CreateCommands()
 			self.Config.AdminTalk[ ID ] = true 	
 			self.ActiveAdminTalk[ Client ] = false 
 			self:Notify( Client , "You have enabled Admin Channel for yourself." ) 
+			self:Notify( Client, "To enable or disable[!adminchannel true/false]"  ) 
 
 		elseif Command == false then 
 
 			self.Config.AdminTalk[ ID ] = nil 
 			self.ActiveAdminTalk[ Client ] = nil 
 			self:Notify( Client , "You have disabled Admin Channel for yourself." ) 
+			self:Notify( Client, "To enable or disable[!adminchannel true/false]"  ) 
 		end
 
 		self:SaveConfig()
 	end
-	Commands.AdminTalkCommand = self:BindCommand( "sh_adminchannel" , { "adminchannel" } , AdminTalk, false ) 
+	Commands.AdminTalkCommand = self:BindCommand( "sh_adminchannel" , "adminchannel"  , AdminTalk ) 
 	Commands.AdminTalkCommand:AddParam{ Type = "boolean" , Optional = true , Default = true } 
-	Commands.AdminTalkCommand:Help( "<true/false> Enables or disables admin voice locally." )
+	Commands.AdminTalkCommand:Help( "<true/false> Enables or disables admin locally." )
 end
 
 function Plugin:Cleanup()
