@@ -1,4 +1,4 @@
-local Plugin = Plugin 
+local Plugin = {} 
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "AdminTalkKey.json"
@@ -13,6 +13,8 @@ Plugin.SilentConfigSave = true
 Plugin.Commands = {} 
 
 function Plugin:Initialise()
+	
+	self:CreateCommands()
 
 	self.Enabled = true
 

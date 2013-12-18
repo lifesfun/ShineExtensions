@@ -1,4 +1,4 @@
-local Plugin = {} 
+local Plugin = {}
 
 function Plugin:SetupDataTable()
 
