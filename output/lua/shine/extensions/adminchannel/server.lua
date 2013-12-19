@@ -62,8 +62,6 @@ function Plugin:ClientConfirmConnect( Client )
 end 
 
 function Plugin:ClientDisconnect( Client )
-
-	if not Shine:IsValidClient( Client ) then return end 
 	
 	if Shine:HasAccess( Client , "sh_adminchannel" ) then
 	
@@ -103,7 +101,7 @@ function Plugin:CreateCommands()
 			self:Notify( Client , "You have disabled Admin Channel for yourself." ) 
 		end
 		
-	    self:Notify( Client, "To activate use [!adminchannel true/false]"  ) 
+	    self:Notify( Client, "To activate or deactivate use [!adminchannel true/false]"  ) 
 		
 	end
 	local SetAdminTalkCommand = self:BindCommand( "sh_adminchannel" , "!adminchannel"  , EnableAdminChannel  ) 
