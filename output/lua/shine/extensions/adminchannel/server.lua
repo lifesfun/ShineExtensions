@@ -85,13 +85,13 @@ function Plugin:CreateCommands()
 		if not Shine:IsValidClient( Client ) then return end 
 		local ID = tostring( Client:GetUserId() )
 
-		if Boolean == true then
+		if Boolean == false then
 
 			self.Config.AdminTalk[ ID ] = true
 			self:SaveConfig()			
 			self:Notify( Client , "You have enabled Admin Channel for yourself." ) 
 
-		elseif Boolean == false then 
+		else
 
 			self.Config.AdminTalk[ ID ] = false
 			self:SaveConfig()
@@ -102,7 +102,7 @@ function Plugin:CreateCommands()
 		
 	end
 	local EnableAdminChannelCommand = self:BindCommand( "sh_adminchannel" , "!adminchannel"  , EnableAdminChannel ) 
-	EnableAdminChannelCommand:AddParam{ Type = "boolean"  , Optional = true , Default = true } 
+	EnableAdminChannelCommand:AddParam{Type = "boolean"} 
 	EnableAdminChannelCommand:Help("Enables admin channel for the current player")
 
 
