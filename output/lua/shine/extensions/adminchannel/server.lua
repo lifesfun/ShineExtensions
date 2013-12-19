@@ -25,7 +25,7 @@ Plugin.ActiveAdminTalk = {}
 
 function Plugin:Initialize()
 	
-	self:CreateCommands()
+	Plugin:CreateCommands()
 	self.Enabled = true
 
 	return true
