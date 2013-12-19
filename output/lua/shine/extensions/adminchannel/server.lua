@@ -87,15 +87,15 @@ function Plugin:CreateCommands()
 
 		if Boolean == false then
 
-			self.Config.AdminTalk[ ID ] = true
+			self.Config.AdminTalk[ ID ] = false
 			self:SaveConfig()			
 			self:Notify( Client , "You have enabled Admin Channel for yourself." ) 
 
 		else
 
-			self.Config.AdminTalk[ ID ] = false
+			self.Config.AdminTalk[ ID ] = true
 			self:SaveConfig()
-			self:Notify( Client , "You have disabled Admin Channel for yourself." ) 
+			self:Notify( Client , "You have enabled Admin Channel for yourself." ) 
 		end
 		
 	    self:Notify( Client, "To activate or deactivate use [!adminchannel true/false]"  ) 
