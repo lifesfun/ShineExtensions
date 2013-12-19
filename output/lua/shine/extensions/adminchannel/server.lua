@@ -1,8 +1,10 @@
 local Shine = Shine
 
 local Notify = Shared.Message
+local Encode, Decode = json.encode, json.decode
 
 local GetOwner = Server.GetOwner
+local tostring = tostring
 
 local Plugin = Plugin
 Plugin.Version = "1.0"
@@ -13,18 +15,17 @@ Plugin.ConfigName = "AdminChannel.json"
 Plugin.DefaultConfig = { 
 
 	Delay = 5,
+	Delay = 5,
 	AdminTalk= {} 
 }
 
 Plugin.CheckConfig = true
-Plugin.Commands = {}
+
+Plugin.ActiveAdminTalk = {}
 
 function Plugin:Initialize()
-
+	
 	self:CreateCommands()
-
-	self.ActiveAdminTalk = {}
-
 	self.Enabled = true
 
 	return true
@@ -35,49 +36,47 @@ function Plugin:Notify( Player , String , Format , ... )
 	Shine:NotifyDualColour( Player , 0 , 100 , 255 , "AdminChannel" , 255 ,  255 , 255 , String , Format , ... ) 
 end
 
-function Plugin:ClientConfirmConnect( Client ) 
+function Plugin:ClientConfirmConnect( Client )
 
-	if Client:GetIsVirtual() then return end 
-	if not Client then return end 
-
-	local ID = Client:GetUserId() 
+   if not Shine:IsValidClient( Client ) then return end 
+   
 	
-	if self.Config.AdminTalk[ ID ] then 
-
+	local ID = tostring( Client:GetUserId() )
+	
+	if Shine:HasAccess( Client , "sh_adminchannel" ) then
+	
 		self.ActiveAdminTalk[ Client ] = false 
-	
-		self:SimpleTimer( self.Config.Delay , function() 
-
-			self:Notify( Client, "The Admin Channel is enabled for you."  ) 
-			self:Notify( Client, "To enable or disable[!adminchannel true/false]"  ) 
-		end )
-
-	elseif Shine:HasAccess( Client , "sh_adminchannel" ) then 
+		
+		if not self.Config.AdminTalk[ ID ] then  
+			
+			self.Config.AdminTalk[ ID ] = false
+			self:SaveConfig()
+		end
 		
 		self:SimpleTimer( self.Config.Delay , function() 
-
-			self:Notify( Client, "An Admin Channel is disable for you."  ) 
-			self:Notify( Client, "To enable or disable[!adminchannel true/false]"  ) 
+			self:Notify( Client, "The Admin Channel is enabled."  ) 
+			self:Notify( Client, "To activate use [!adminchannel true/false]"  ) 
 		end )
+		
 	end
 end 
 
 function Plugin:ClientDisconnect( Client )
 
-     if not Client then return end 
-	self.ActiveAdminTalk[ Client ] = nil 
-end
-
-function Plugin:ReceiveActiveAdminTalk( Client , ActiveAdminTalk ) 
+	if not Shine:IsValidClient( Client ) then return end 
 	
-		self.ActiveAdminTalk[ Client ] = ActiveAdminTalk 
+	if Shine:HasAccess( Client , "sh_adminchannel" ) then
+	
+		self.ActiveAdminTalk[ Client ] = nil
+	end
+	
 end
 
 function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
 	
 	local SpeakerClient= GetOwner( Speaker )
 	local ListenerClient = GetOwner( Listener )
-	local ListenerID = Client:GetUserId() 
+	local ListenerID = tostring( ListenerClient:GetUserId() )
 
 	if self.Config.AdminTalk[ ListenerID ] == true and self.ActiveAdminTalk[ SpeakerClient ] == true then 
 		return true 
@@ -85,39 +84,36 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 end
 
 function Plugin:CreateCommands()
- 
- 	local Commands = self.Commands
 
-	local function AdminTalk( Client , Command ) 
+	local function EnableAdminChannel( Client , Boolean ) 
 
-		if not Client then return end 
-		local ID = Client:GetUserId()  
+		if not Shine:IsValidClient( Client ) then return end 
+		local ID = tostring( Client:GetUserId() )
 
-		if Command == true then
+		if Boolean == true then
 
-			self.Config.AdminTalk[ ID ] = true 	
-			self.ActiveAdminTalk[ Client ] = false 
+			self.Config.AdminTalk[ ID ] = true
+			self:SaveConfig()			
 			self:Notify( Client , "You have enabled Admin Channel for yourself." ) 
-			self:Notify( Client, "To enable or disable[!adminchannel true/false]"  ) 
 
-		elseif Command == false then 
+		elseif Boolean == false then 
 
-			self.Config.AdminTalk[ ID ] = nil 
-			self.ActiveAdminTalk[ Client ] = nil 
+			self.Config.AdminTalk[ ID ] = false
+			self:SaveConfig()
 			self:Notify( Client , "You have disabled Admin Channel for yourself." ) 
-			self:Notify( Client, "To enable or disable[!adminchannel true/false]"  ) 
 		end
-
-		self:SaveConfig()
+		
+	    self:Notify( Client, "To activate use [!adminchannel true/false]"  ) 
+		
 	end
-	Commands.AdminTalkCommand = self:BindCommand( "sh_adminchannel" , "adminchannel"  , AdminTalk ) 
-	Commands.AdminTalkCommand:AddParam{ Type = "boolean" , Optional = true , Default = true } 
-	Commands.AdminTalkCommand:Help( "<true/false> Enables or disables admin locally." )
+	local SetAdminTalkCommand = self:BindCommand( "sh_adminchannel" , "!adminchannel"  , EnableAdminChannel  ) 
+	SetAdminTalkCommand:AddParam{ Type = "boolean"  } 
+
 end
 
 function Plugin:Cleanup()
 
-	self.BaseClass( self ) 
+	self.BaseClass.Cleanup( self ) 
 	self.Enable = false
 end
 
