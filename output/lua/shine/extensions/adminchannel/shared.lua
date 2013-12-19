@@ -5,28 +5,27 @@ function Plugin:SetupDataTable()
 	self:AddNetworkMessage( "ActiveAdminTalk" , {} , "Server" ) 
 end
 
-Shine:RegisterExtension( "adminchannel" , Plugin )
-
 if Server then
 
 	function Plugin:ReceiveActiveAdminTalk( Client , Message ) 
-
-		if self.Config.AdminTalk[ tostring( ID ) ] == nil then return end
-		
-		if self.ActiveAdminTalk[ Client ] == false then 
-		
-			self:Notify( Client, "Admin Talk Active" ) 
-			self.ActiveAdminTalk[ Client ] = true
-		else
-		
-			self.ActiveAdminTalk[ Client ] = false
-			self:Notify( Client, "Admin Talk has been unactivated" ) 
-		end
-		
-	end
 	
-	return 
+		if Shine:HasAccess( Client , "sh_adminchannel" ) then
+	
+			local ID = tostring( Client:GetUserId() )
+	
+			if self.ActiveAdminTalk[ Client ] == false then 
+		
+				self:Notify( Client, "Admin Talk Active" ) 
+				self.ActiveAdminTalk[ Client ] = true
+			else
+		
+				self.ActiveAdminTalk[ Client ] = false
+				self:Notify( Client, "Admin Talk has been unactivated" ) 
+		end
+	end
 end
+
+Shine:RegisterExtension( "adminchannel" , Plugin )
 
 if Server then return end
 
@@ -55,9 +54,7 @@ function PlayerKeyPress( Key , Down , Amount )
 
 	if Key == self.Config.AdminTalkKey then
 
-		self:SendNetworkMessage( "ActiveAdminTalk" , {} , true )
-		local Message = StringFormat( "AdminChat enabled using %s", Key  ) 
-		 Shine:AddMessageToQueue( 1, 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
+		self:SendNetworkMessage(  "ActiveAdminTalk" , {} , true )
 		
 		return true
 	end
@@ -72,8 +69,8 @@ function Plugin:CreateCommands()
 		local Message = StringFormat( "You have set your admin channel key to %s", String  ) 
 		 Shine:AddMessageToQueue( 1, 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
 	end
-	local AdminKeyCommand = Shine:RegisterClientCommand( "sh_setadminkey" , SetAdminKey ) 
-	AdminKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false } 
+	local SetAdminKeyCommand = self:BindCommand( "sh_setadminkey" , SetAdminKey ) 
+	SetAdminKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false } 
 end
 
 function Plugin:Cleanup()

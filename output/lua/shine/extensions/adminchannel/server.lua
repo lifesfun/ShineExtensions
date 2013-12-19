@@ -37,14 +37,10 @@ function Plugin:Notify( Player , String , Format , ... )
 end
 
 function Plugin:ClientConfirmConnect( Client )
-
-   if not Shine:IsValidClient( Client ) then return end 
-   
-	
-	local ID = tostring( Client:GetUserId() )
 	
 	if Shine:HasAccess( Client , "sh_adminchannel" ) then
-	
+		
+		local ID = tostring( Client:GetUserId() )
 		self.ActiveAdminTalk[ Client ] = false 
 		
 		if not self.Config.AdminTalk[ ID ] then  
@@ -54,6 +50,7 @@ function Plugin:ClientConfirmConnect( Client )
 		end
 		
 		self:SimpleTimer( self.Config.Delay , function() 
+		
 			self:Notify( Client, "The Admin Channel is enabled."  ) 
 			self:Notify( Client, "To activate use [!adminchannel true/false]"  ) 
 		end )
@@ -105,7 +102,7 @@ function Plugin:CreateCommands()
 		
 	end
 	local SetAdminTalkCommand = self:BindCommand( "sh_adminchannel" , "!adminchannel"  , EnableAdminChannel  ) 
-	SetAdminTalkCommand:AddParam{ Type = "boolean"  } 
+	SetAdminTalkCommand:AddParam{ Type = "boolean"  , Optional = true , Default = true } 
 
 end
 
