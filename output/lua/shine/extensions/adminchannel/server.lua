@@ -101,7 +101,7 @@ function Plugin:CreateCommands()
 	    self:Notify( Client, "To activate or deactivate use [!adminchannel true/false]"  ) 
 		
 	end
-	local EnableAdminChannelCommand = self:BindCommand( "sh_adminchannel" , "!adminchannel"  , EnableAdminChannel ) 
+	local EnableAdminChannelCommand = self:BindCommand( "sh_adminchannel" , "adminchannel"  , EnableAdminChannel ) 
 	EnableAdminChannelCommand:AddParam{Type = "boolean"} 
 	EnableAdminChannelCommand:Help("Enables admin channel for the current player")
 
