@@ -1,31 +1,17 @@
 local Shine = Shine
 
 local Notify = Shared.Message
-local Encode, Decode = json.encode, json.decode
-
 local GetOwner = Server.GetOwner
-local tostring = tostring
 
 local Plugin = Plugin
-Plugin.Version = "1.0"
-
-Plugin.HasConfig = true
-Plugin.ConfigName = "AdminChannel.json"
-
-Plugin.DefaultConfig = { 
-
-	Delay = 5,
-	Delay = 5,
-	AdminTalk= {} 
-}
-
-Plugin.CheckConfig = true
-
-Plugin.ActiveAdminTalk = {}
+Plugin.Version = "1.5"
 
 function Plugin:Initialize()
+
+	self.Active = {} 
+	self.Channel = {} 
 	
-	Plugin:CreateCommands()
+	self:CreateCommands()
 	self.Enabled = true
 
 	return true
@@ -33,79 +19,41 @@ end
 
 function Plugin:Notify( Player , String , Format , ... ) 
 
-	Shine:NotifyDualColour( Player , 0 , 100 , 255 , "AdminChannel" , 255 ,  255 , 255 , String , Format , ... ) 
+	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "ChannelBot" , 255 ,  255 , 255 , String , Format , ... ) 
 end
 
-function Plugin:ClientConfirmConnect( Client )
+function Plugin:ClientConnect( Client )
+
+	self.Channel[ Client ] = Client 
+	self.Active[ Client ] = false	
 	
-	if Shine:HasAccess( Client , "sh_adminchannel" ) then
-	
-		self.ActiveAdminTalk[ Client ] = false 
-		local ID = tostring( Client:GetUserId() )
-	
-		if not self.Config.AdminTalk[ ID ] then  
-			
-			self.Config.AdminTalk[ ID ] = false
-			self:SaveConfig()
-		end
-		
-		self:SimpleTimer( self.Config.Delay , function() 
-		
-			self:Notify( Client, "The Admin Channel is enabled."  ) 
-			self:Notify( Client, "To activate use [!adminchannel true/false]"  ) 
+	if Shine:HasAccess( Client , "sh_channel" ) then
+
+		self:SendNetworkMessage( Client , "CurrentChannel" , {} , true ) 
+
+		self:SimpleTimer( 2 , function() 
+
+			self:Notify( Client, "Channels are enabled." ) 
+			self:Notify( Client, "[sh_channel 'ChannelName/options/off']" ) 
 		end )
-		
 	end
 end 
 
-function Plugin:ClientDisconnect( Client )
-	
-	if Shine:HasAccess( Client , "sh_adminchannel" ) then
-	
-		self.ActiveAdminTalk[ Client ] = nil
-	end
-	
+function Plugin:ClientDisconnect( Client ) 
+
+	self.Channel[ Client ] = nil 
+	self.Active[ Client ] = nil
 end
 
 function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
-	
-	local SpeakerClient= GetOwner( Speaker )
+
 	local ListenerClient = GetOwner( Listener )
-	local ListenerID = tostring( ListenerClient:GetUserId() )
+	local SpeakerClient = GetOwner( Speaker ) 
+	local CanHear = Shine:HasAccess( ListenerClient , self.Channel[ ListenerClient ] ) 
+	local CanTalk = Shine:HasAccess( SpeakerClient , self.Channel[ SpeakerClient ] )
+	local Active = self.Active[ SpeakerClient ]
 
-	if self.Config.AdminTalk[ ListenerID ] == true and self.ActiveAdminTalk[ SpeakerClient ] == true then 
-		return true 
-	end
-end
-
-function Plugin:CreateCommands()
-
-	local function EnableAdminChannel( Client , Boolean ) 
-
-		if not Shine:IsValidClient( Client ) then return end 
-		local ID = tostring( Client:GetUserId() )
-
-		if Boolean == false then
-
-			self.Config.AdminTalk[ ID ] = false
-			self:SaveConfig()			
-			self:Notify( Client , "You have enabled Admin Channel for yourself." ) 
-
-		else
-
-			self.Config.AdminTalk[ ID ] = true
-			self:SaveConfig()
-			self:Notify( Client , "You have enabled Admin Channel for yourself." ) 
-		end
-		
-	    self:Notify( Client, "To activate or deactivate use [!adminchannel true/false]"  ) 
-		
-	end
-	local EnableAdminChannelCommand = self:BindCommand( "sh_adminchannel" , "adminchannel"  , EnableAdminChannel ) 
-	EnableAdminChannelCommand:AddParam{Type = "boolean"} 
-	EnableAdminChannelCommand:Help("Enables admin channel for the current player")
-
-
+	if CanTalk  == true and CanHear == true and Active == true then return true end
 end
 
 function Plugin:Cleanup()
