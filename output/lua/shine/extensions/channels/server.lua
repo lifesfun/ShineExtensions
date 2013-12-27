@@ -96,6 +96,7 @@ function Plugin:CreateCommands()
 	local function Options()
 	
 		self.CurrentChannel[ Client ] = "options"
+		self.SendOptions()
 	end
 
 	local function AddToChannel( Client , Channel )
@@ -141,7 +142,7 @@ function Plugin:CreateCommands()
 	local function CreateChannel( Client , Channel , Password )  
 
 		if self.TempChannels == false then return end
-		if self.TempCreate == false and Shine:UserHasAcess( Client , "sh_channel" ) then return end
+		if self.TempCreate == false and Shine:HasAcess( Client , "sh_channel" ) then return end
 		if Channel == "options" then Options() return end 
 
 		if self.Channels[ Channel ] == nil then

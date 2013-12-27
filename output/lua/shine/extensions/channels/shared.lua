@@ -1,6 +1,7 @@
 local Plugin = {}
 
 local StringExplode = string.Explode
+
 local ClientChannel = { 
 
 	Name = "string (25)",
@@ -21,8 +22,31 @@ if Server then
 
 		 self.Active[ Client ] = Active 
 	end
+	
+	function Plugin:SendOptions( Client )
 
-	function UpdateChannel( Channel ) 
+		local Options = "( Public Channels do not require a pass )" 
+
+		for Key , Value in pairs( self.Channels ) do
+
+			if string.sub( Key , 1 , 2 ) ~= '.' or Shine:HasAccess( Client , "sh_channel" ) then  
+				
+				Options =..","..Key
+
+				if Value.Password == 'PUBLIC' then 
+
+					Options =.."Public" 	
+				end
+
+			end
+		end
+			
+		ClientChannel.Name = Options 
+		ClientChannel.Contents = Options 
+		self:SendNetworkMessage( Client , "Channel" , ClientChannel , false  ) 
+	end
+
+	function Plugin:UpdateChannel( Channel ) 
 
 		local Content = self.Channels[ Channel ] 
 		Content.Password = nil
