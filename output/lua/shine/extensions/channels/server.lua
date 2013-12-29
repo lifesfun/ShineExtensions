@@ -12,28 +12,27 @@ Plugin.HasConfig = true
 Plugin.ConfigName = "Channels.json"
 Plugin.DefaultConfig = { 
 
-	DefaultChannel= "options",
-
+    DefaultChannel = "options",
 	TempChannels = true, --#channename creates a channel if it does not exist
 	TempCreate = true, --all players can create temp channels
 
-	Channels = '.admin', 'AllTalk' --creates permanent channels '.' hidden from public 
+	Channels = "hello" --creates permanent channels '.' hidden from public 
 }
 
 Plugin.CheckConfig = true
 Plugin.DefaultState = true 
 	
 function Plugin:Initialize()
+    self:CreateCommands()
 	
-	self.DefaultChannel = self.Config.DefaultChannel or "options"
-	self.TempChannels = self.Config.TempChannels or false
-
+	self.DefaultChannel = self.Confg.DefaultChannel
+	self.CurrentChannel = {}
+	self.Active = {}
+	
+	self.TempChannels = self.Config.TempChannels
 	self.Channels =  self.Config.Channels 
 
-	self.CurrentChannel = nil
-	self.Active = nil 
 	
-	self:CreateCommands()
 	self.Enabled = true
 
 	return true
@@ -44,10 +43,14 @@ function Plugin:Notify( Player , String , Format , ... )
 	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "ChannelBot" , 255 ,  255 , 255 , String , Format , ... ) 
 end
 
-function Plugin:ClientConnect( Client )
- 
- 	self.CurrentChannel[ Client ] = self.DefaultChannel 
-	self.Active[ Client ] = false	
+function Plugin:ClientConfirmConnect( Client )
+
+	if not Client then return end
+	if Client:GetIsVirtual() then return end
+	
+    self.Active[ Client ] = false	
+ 	self.CurrentChannel[ Client ] = self.DefaultChannel
+	self.Channel[ self.CurrentChannel ][ Client ] = Client:GetControllingPlayer():GetName()  
 
 	self:SimpleTimer( 4 , function() 
 
@@ -63,6 +66,7 @@ function Plugin:ClientDisconnect( Client )
 
 	local Channel = self.CurrentChannel[ Client ]
 	self.Channels[ Channel ][ Client ] = nil
+	
 	if TableCount( self.Channels[ Channel ] ) <=1 then  
 
 		TableEmpty( self.Channels[ Channel ] )
@@ -72,11 +76,12 @@ function Plugin:ClientDisconnect( Client )
 end
 
 function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
-
+    local SpeakerClient = GetOwner( Speaker ) 
 	local Active = self.Active[ SpeakerClient ]
 
-	if self.InChannel( Listener , Speaker ) and Active == true then return true end
+	if self:InChannel( Listener , Speaker ) == true and Active == true then return true end
 end 
+
 
 function Plugin:InChannel( Listener , Speaker )
 
@@ -87,16 +92,14 @@ function Plugin:InChannel( Listener , Speaker )
 
 	if ListenerChannel == "options" or SpeakerChannel == "options" then return false end
 	if ListenerChannel == SpeakerChannel then return true end
-
-	return false 
 end 
 
 function Plugin:CreateCommands()
 
-	local function Options()
+	local function Options( Client )
 	
 		self.CurrentChannel[ Client ] = "options"
-		self.SendOptions()
+		self:SendOptions( Client )
 	end
 
 	local function AddToChannel( Client , Channel )
@@ -159,6 +162,8 @@ function Plugin:CreateCommands()
 	CreateChannelCommand:AddParam{ Type = "string" }  
 	CreateChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
 	CreateChannelCommand:Help( "[ +# ChanneName Password ] Change create" )
+	
+	end
 
 
 function Plugin:Cleanup()

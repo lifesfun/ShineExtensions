@@ -44,7 +44,7 @@ function Plugin:Activate()
 	else
 		self.Active = true
 	end
-	Shine:AddMessageToQueue( 11 , 0.95, 0.2, "Channel Active", self.Active , 255, 0, 0, 2 )
+	Shine:AddMessageToQueue( 11 , 0.95, 0.2, "Channel Active", 5  , 255, 0, 0, 2 )
 	self.SendNetworkMessage( "Activate" , { Boolean = self.Active } , true )  
 end
 
@@ -52,10 +52,9 @@ function ReceiveCurrentChannel( Data )
 
 	if Data.Name ~= nil then 
 		
-		Shine:AddMessageToQueue( 7 , 0.95, 0.2, Data.Name  , true , 255, 0, 0, 2 )
+		Shine:AddMessageToQueue( 7 , 0.95, 0.2, Data.Name  , 5  , 255, 0, 0, 2 )
 	
-		local Content = Data.Contents 
-		Shine:AddMessageToQueue( 7 , 0.95, 0.2, Data.Content , true , 255, 0, 0, 2 )
+		Shine:AddMessageToQueue( 7 , 0.95, 0.2, Data.Content , 5 , 255, 0, 0, 2 )
 	end	
 end
 
@@ -63,16 +62,16 @@ function Plugin:CreateCommands()
 
 	local function ChannelKey( String )
 
-		self.Config.ToggleKey( String )
+		self.Config.ToggleKey =  String 
 		self.ToggleKey = String
 		self:SaveConfig()
 
 		local Message = StringFormat( "You have set your toggle channel key to '%s'", String  ) 
-		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , self.Active , 255, 0, 0, 2 )
+		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
 	end
-	local ChannelKeyCommand = self:BindCommand( "sh_channelkey" , ChangeToggleKey ) 
+	local ChannelKeyCommand = self:BindCommand( "sh_channelkey" , ChannelKey ) 
 	ChannelKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false , Default = "P" } 
-	ChannelKeyCommand:Help("[sh_channelKey 'Key'] Format KeyName as a ns2 Bind; the key toggles channel.")
+
 end
 
 function Plugin:Cleanup()

@@ -1,6 +1,7 @@
-name        = "AdminChannel[Shine] Alpha"
+name        = "VoiceChannels[ Shine , Alpha ] "
 source_dir  = "source"
 output_dir  = "output"
-description = [=[An admin channel voice chat in game ]=]
+description = [=[Requires Shine
+Allows players to create voice temporay voice channels ]=]
 image       = "preview.jpg"
-publish_id = "c31f363"
+publish_id = "c7f97e8"

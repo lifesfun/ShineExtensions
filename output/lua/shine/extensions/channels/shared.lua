@@ -1,7 +1,6 @@
 local Plugin = {}
 
-local StringExplode = string.Explode
-
+local concat = table.concat
 local ClientChannel = { 
 
 	Name = "string (25)",
@@ -31,11 +30,11 @@ if Server then
 
 			if string.sub( Key , 1 , 2 ) ~= '.' or Shine:HasAccess( Client , "sh_channel" ) then  
 				
-				Options =..","..Key
+				Options = Options..","..Key
 
 				if Value.Password == 'PUBLIC' then 
 
-					Options =.."Public" 	
+					Options = Options.."Public" 	
 				end
 
 			end
@@ -52,7 +51,7 @@ if Server then
 		Content.Password = nil
 
 		ClientChannel.Name = Channel 
-		ClientChannel.Contents = Concat( Content , "," ) 
+		ClientChannel.Contents = concat( Content , "," ) 
 		
 		for Key , Value in pairs( Content )do
 
