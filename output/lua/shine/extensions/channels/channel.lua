@@ -1,28 +1,53 @@
-local Channel = {} 
+Channel = { 
 
-Channel.Clients = { {}  , {} } 
+	self.Name = nil, 
+	self.Password = nil, 
+	self.Clients = {  
 
-function Channel:AddClient( Client ) 
+		self.Name = nil,
+		self.Active = nil 
+	}
+}
 
-	self.Clients[ Client ] = { Client , Client:GetControllingPlayer():GetName() } 
+function Channel:SetName( Name ) 
+	
+	self.Name = Name
+end
+
+function Channel:SetPassword( Password ) 
+
+	self.Password = Password 
+end
+
+function Channel:Activate( Client , Active = false )
+
+	self.Clients[ Client ] = Active 
+end
+
+function Channel:CanAccess( Password )
+
+	if self.Password = Password then return true end
+end
+
+function Channel:AddToChannel( Client , ChannelClient )
+	
+	self.Clients[ Client ] = ChannelClient 	
 end
 
 function Channel:RemoveClient( Client )
 
-	self.Clients[ Client ] = nil  
-end
+	local ChannelClient = self.Clients[ Client ]
 
-function Channel:GetClients()
-
-	return self.Clients[ 1 ] 
-end
-
-function Channel:GetNames()
+	if ChannelClient then 
 	
-	return self.Clients[ 2 ]
+		self.Clients[ Client ] = nil  
+		return ChannelClient
+	end
 end
 
-		
-
+function Channels:GetChannelClients() 
+	
+	return self.Clients
+end	
 
 

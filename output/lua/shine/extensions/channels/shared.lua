@@ -19,41 +19,24 @@ if Server then
 
 	function Plugin:ReceiveActive( Client , Active) 
 
-		 self.Active[ Client ] = Active 
+		 Channel = self:GetClientChannel( Client )  
+		 Channel:Activate( Client , Active )
 	end
 	
 	function Plugin:SendOptions( Client )
 
-		local Options = "( Public Channels do not require a pass )" 
+		ClientChannel.Name = "( Public Channels do not require a pass )" 
 
-		for Key , Value in pairs( self.Channels ) do
+		ClientChannel.Contents = concat( Channel.Name , "," ) 
 
-			if string.sub( Key , 1 , 2 ) ~= '.' or Shine:HasAccess( Client , "sh_channel" ) then  
-				
-				Options = Options..","..Key
-
-				if Value.Password == 'PUBLIC' then 
-
-					Options = Options.."Public" 	
-				end
-
-			end
-		end
-			
-		ClientChannel.Name = Options 
-		ClientChannel.Contents = Options 
 		self:SendNetworkMessage( Client , "Channel" , ClientChannel , false  ) 
 	end
 
 	function Plugin:UpdateChannel( Channel ) 
 
-		local Content = self.Channels[ Channel ] 
-		Content.Password = nil
-
-		ClientChannel.Name = Channel 
-		ClientChannel.Contents = concat( Content , "," ) 
+		ClientChannel.Contents = concat( Channel.Clients.Name , "," ) 
 		
-		for Key , Value in pairs( Content )do
+		for Key , Value in pairs( Channel.Clients ) do
 
 			self:SendNetworkMessage( Key , "Channel" , ClientChannel , false  ) 
 		end
