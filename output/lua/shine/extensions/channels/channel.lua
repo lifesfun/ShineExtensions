@@ -9,14 +9,17 @@ Channel = {
 	}
 }
 
-function Channel:SetName( Name ) 
-	
-	self.Name = Name
+function Channel:new ( 0 )
+
+	o = o or {}
+	setmetable( o , self ) 
+	self._index = self
+	return 0
 end
 
-function Channel:SetPassword( Password ) 
+function Channel:GetName()
 
-	self.Password = Password 
+	return self.Name
 end
 
 function Channel:Activate( Client , Active = false )
@@ -41,11 +44,12 @@ function Channel:RemoveClient( Client )
 	if ChannelClient then 
 	
 		self.Clients[ Client ] = nil  
+		if not self.GetChannelClients() then self.Channel = nil end
 		return ChannelClient
 	end
 end
 
-function Channels:GetChannelClients() 
+function Channel:GetChannelClients() 
 	
 	return self.Clients
 end	

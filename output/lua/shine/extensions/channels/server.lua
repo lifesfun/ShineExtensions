@@ -4,6 +4,7 @@ local Shine = Shine
 
 local Notify = Shared.Message
 local GetOwner = Server.GetOwner
+local FixArray = table.FixArray
 
 local Plugin = Plugin
 Plugin.Version = "1.7"
@@ -23,14 +24,8 @@ function Plugin:Initialize()
 	self:CreateCommands()	
 
 	self.Clients = {} 
-	self.Channels = {} 
-
-	local Channel = new Channel
-
-	Channel:SetName( "none" )
-	Channel:SetPassword( "PUBLIC" ) 
-
-	self.AddChannel( Channel )
+	self.Channels = {}
+	self.CreateChannel( "none" , "PUBLIC" ) 
 	
 	self.Enabled = true
 
@@ -47,8 +42,8 @@ function Plugin:ClientConfirmConnect( Client )
 	if not Client then return end
 	if Client:GetIsVirtual() then return end
 
-	local ChannelClient =  { Client:GetControllingPlayer:GetName , false } 
-	local Channel = self.GetChannelByName( "none" ) 
+	local ChannelClient = { Client:GetControllingPlayer():GetName() , false } 
+	local Channel = self:GetChannelByName( "none" ) 
 
 	Channel:AddToChannel( Client , ChannelClient ) 	
 	self.Clients[ Client ] = Channel
@@ -59,30 +54,20 @@ function Plugin:ClientConfirmConnect( Client )
 		self:Notify( Client, "To switch channels type  [ !# 'ChannelName/options/off' Password]" ) 
 		self:Notify( Client, "To create type [ !#+ 'ChannelName Password ]" ) 
 		self:Notify( Client, "Leave to the password blank for public channels." )
-
 	end )
 end 
 
 function Plugin:ClientDisconnect( Client )
 	
 	self.GetClientChannel( Client ):RemoveClient( Client ) 	
+	FixArray( self.Channels )
 end
 
 function Plugin:CreateChannel( ChannelName , Password = "PUBLIC" )
 
 	if self.GetChannelByName( ChannelName ) then return end
 
-	local Channel = new Channel
-
-	Channel:SetPassword( Password )  
-	Channel:SetName( ChannelName )  
-
-	self.AddChannel( Channel )
-end
-
-function Plugin:AddChannel( Channel )	
-
-	self.Channels[ #self.Channels + 1 ]  = new Channel 
+	self.Channels[ #self.Channels + 1 ] =  Channel:new( ChannelName , Password ) 
 end
 
 function Plugin:GetClientChannel( Client ) 
@@ -92,34 +77,25 @@ end
 
 function Plugin:GetChannelByName( ChannelName )
 
-	for Key , Value in pairs( self.Channels ) do 
+	for Key , Value in ipairs( self.Channels ) do 
 		
-		if Value.Name == ChannelName then return Value end
+		if Value:GetName() == ChannelName then return Value end
 	end
 end
 
 function Plugin:MoveToChannel( Client , ChannelName , Password )
 
-	NewChannel = self.GetChannelByName( ChannelName ) 
-	
-	if not NewChannel then return end
+	local NewChannel = self.GetChannelByName( ChannelName ) 
+	local OldChannel = self.GetClientChannel( Client )
 
+	if not NewChannel or not OldChannel then return end
 	if not NewChannel:HasAccess( Password ) == true then return end 
 
-	OldChannel = self.GetClientChannel( Client )
-
-	local ChannelClient = OldChannel:RemoveClient( Client ) 	
-		
-	NewChannel:AddToChannel( Client , ChannelClient ) 	
+	NewChannel:AddToChannel( Client , OldChannel:RemoveClient( Client ) ) 	
 
 	self.Clients[ Client ] = NewChannel
-
-	if OldChannel.Name == "none" then return end	
-
-	if not OldChannel:GetChannelClients() then 
-
-		OldChannel = nil 
-	end
+	self.UpdateChannel( NewChannel )
+	FixArray( self.Channels )
 end
 
 function Plugin:CanHear( Listener , Speaker ) 
@@ -145,8 +121,9 @@ function Plugin:CreateCommands()
 
 	local function CreateChannel( Client , Channel , Password ) 
 
-		if self.TempCreate == false and Shine:HasAcess( Client , "sh_channel" ) then return end
+		if self.TempCreate == false and not Shine:HasAcess( Client , "sh_channel" ) then return end
 		Channel:CreateChannel( Client , Channel , Password )
+		Channel:MoveToChannel( Client , Channel , Password )
 	end
 	local CreateChannelCommand = self:BindCommand( "sh_+#" , "+#" , CreateChannel , true )
 	CreateChannelCommand:AddParam{ Type = "string" }  
