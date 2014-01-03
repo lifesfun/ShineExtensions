@@ -1,3 +1,5 @@
+require "channel.lua"
+
 local Shine = Shine
 
 local Notify = Shared.Message
@@ -80,7 +82,7 @@ end
 
 function Plugin:AddChannel( Channel )	
 
-	self.Channels[ self.Channels# + 1 ]  = new Channel 
+	self.Channels[ #self.Channels + 1 ]  = new Channel 
 end
 
 function Plugin:GetClientChannel( Client ) 
