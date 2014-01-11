@@ -74,7 +74,8 @@ function Plugin:GetClientChannel( Client )
 end
 
 function Plugin:GetChannelByName( ChannelName )
-for Key , Value in ipairs( self.Channels ) do 
+
+	for Key , Value in pairs( self.Channels ) do 
 		
 		if Value:GetName() == ChannelName then return Value end
 	end
