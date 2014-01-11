@@ -1,4 +1,3 @@
-Script.Load( "lua/shine/extensions/channels/channel.lua" )
 local Shine = Shine
 
 local Notify = Shared.Message
@@ -19,6 +18,8 @@ Plugin.CheckConfig = true
 Plugin.DefaultState = true 
 
 function Plugin:Initialize()
+
+	Script.Load( "lua/shine/extensions/channels/channel.lua" )
 
 	self:CreateCommands()	
 	self.Clients = {} 
