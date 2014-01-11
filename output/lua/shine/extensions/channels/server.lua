@@ -1,5 +1,3 @@
-require "channel.lua"
-
 local Shine = Shine
 
 local Notify = Shared.Message
@@ -19,10 +17,20 @@ Plugin.DefaultConfig = {
 Plugin.CheckConfig = true
 Plugin.DefaultState = true 
 
+Channel = { 
+
+		Name = nil, 
+		Password = nil, 
+		Clients = {  
+
+			Name = nil,
+			Active = nil 
+		}
+	}
+
 function Plugin:Initialize()
 
 	self:CreateCommands()	
-
 	self.Clients = {} 
 	self.Channels = {}
 	self.CreateChannel( "none" , "PUBLIC" ) 
@@ -31,6 +39,51 @@ function Plugin:Initialize()
 
 	return true
 end
+
+function Channel:new ( o )
+
+	o = o or {}
+	setmetable( o , self ) 
+	self._index = self
+	return 0
+end
+
+function Channel:GetName()
+
+	return self.Name
+end
+
+function Channel:Activate( Client , Active )
+
+	self.Clients[ Client ] = Active 
+end
+
+function Channel:CanAccess( Password )
+
+	if self.Password == Password then return true end
+end
+
+function Channel:AddToChannel( Client , ChannelClient )
+	
+	self.Clients[ Client ] = ChannelClient 	
+end
+
+function Channel:RemoveClient( Client )
+
+	local ChannelClient = self.Clients[ Client ]
+
+	if ChannelClient then 
+	
+		self.Clients[ Client ] = nil  
+		if not self.GetChannelClients() then self.Channel = nil end
+		return ChannelClient
+	end
+end
+
+function Channel:GetChannelClients() 
+	
+	return self.Clients
+end	
 
 function Plugin:Notify( Player , String , Format , ... ) 
 
@@ -63,7 +116,7 @@ function Plugin:ClientDisconnect( Client )
 	FixArray( self.Channels )
 end
 
-function Plugin:CreateChannel( ChannelName , Password = "PUBLIC" )
+function Plugin:CreateChannel( ChannelName , Password )
 
 	if self.GetChannelByName( ChannelName ) then return end
 
@@ -76,8 +129,7 @@ function Plugin:GetClientChannel( Client )
 end
 
 function Plugin:GetChannelByName( ChannelName )
-
-	for Key , Value in ipairs( self.Channels ) do 
+for Key , Value in ipairs( self.Channels ) do 
 		
 		if Value:GetName() == ChannelName then return Value end
 	end
@@ -138,4 +190,3 @@ function Plugin:Cleanup()
 	self.BaseClass.Cleanup( self ) 
 	self.Enable = false
 end
-
