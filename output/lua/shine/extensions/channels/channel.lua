@@ -14,7 +14,7 @@ function Channel:new( o )
 	o = o or {}
 	setmetable( o , self ) 
 	self._index = self 
-	return 0
+	return o 
 end
 
 function Channel:GetName()
