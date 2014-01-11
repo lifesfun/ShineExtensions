@@ -1,7 +1,7 @@
 name        = "VoiceChannels[ Shine , Alpha ] "
 source_dir  = "source"
 output_dir  = "output"
-description = [=[Requires Shine
-Allows players to create voice temporay voice channels ]=]
+description = [=[Requires Shine
+Allows players to create voice temporary voice channels ]=]
 image       = "preview.jpg"
 publish_id = "c7f97e8"
