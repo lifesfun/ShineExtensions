@@ -9,11 +9,11 @@ Channel = {
 	}
 }
 
-function Channel:new ( o )
-
+function Channe:new( o )
+	
 	o = o or {}
 	setmetable( o , self ) 
-	self._index = self
+	self._index = self 
 	return 0
 end
 

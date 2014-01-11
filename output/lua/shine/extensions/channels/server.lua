@@ -65,7 +65,13 @@ function Plugin:CreateChannel( ChannelName , Password )
 
 	if self.GetChannelByName( ChannelName ) then return end
 
-	self.Channels[ #self.Channels + 1 ] =  Channel:new{ Name = ChannelName , Password } 
+	local Channel = Channel:new() 
+	Channel.Name = ChannelName
+	Channel.Password = Password 
+
+	self.Channels[ #self.Channels + 1 ] = Channel 
+	Shared.Message( ChannelName )
+
 end
 
 function Plugin:GetClientChannel( Client ) 
