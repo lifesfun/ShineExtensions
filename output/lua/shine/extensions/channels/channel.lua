@@ -9,7 +9,7 @@ Channel = {
 	}
 }
 
-function Channel:new ( 0 )
+function Channel:new ( o )
 
 	o = o or {}
 	setmetable( o , self ) 
