@@ -1,3 +1,4 @@
+Script.Load( "lua/shine/extensions/channels/channel.lua" )
 local Shine = Shine
 
 local Notify = Shared.Message
@@ -5,7 +6,7 @@ local GetOwner = Server.GetOwner
 local FixArray = table.FixArray
 
 local Plugin = Plugin
-Plugin.Version = "1.7"
+Plugin.Version = "2.0"
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "Channels.json"
@@ -16,17 +17,6 @@ Plugin.DefaultConfig = {
 
 Plugin.CheckConfig = true
 Plugin.DefaultState = true 
-
-Channel = { 
-
-		Name = nil, 
-		Password = nil, 
-		Clients = {  
-
-			Name = nil,
-			Active = nil 
-		}
-	}
 
 function Plugin:Initialize()
 
@@ -39,52 +29,6 @@ function Plugin:Initialize()
 
 	return true
 end
-
-function Channel:new ( o )
-
-	o = o or {}
-	setmetable( o , self ) 
-	self._index = self
-	return 0
-end
-
-function Channel:GetName()
-
-	return self.Name
-end
-
-function Channel:Activate( Client , Active )
-
-	self.Clients[ Client ] = Active 
-end
-
-function Channel:CanAccess( Password )
-
-	if self.Password == Password then return true end
-end
-
-function Channel:AddToChannel( Client , ChannelClient )
-	
-	self.Clients[ Client ] = ChannelClient 	
-end
-
-function Channel:RemoveClient( Client )
-
-	local ChannelClient = self.Clients[ Client ]
-
-	if ChannelClient then 
-	
-		self.Clients[ Client ] = nil  
-		if not self.GetChannelClients() then self.Channel = nil end
-		return ChannelClient
-	end
-end
-
-function Channel:GetChannelClients() 
-	
-	return self.Clients
-end	
-
 function Plugin:Notify( Player , String , Format , ... ) 
 
 	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "ChannelBot" , 255 ,  255 , 255 , String , Format , ... ) 
