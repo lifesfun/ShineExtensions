@@ -19,23 +19,27 @@ if Server then
 
 	function Plugin:ReceiveActive( Client , Active) 
 
-		 local Channel = self:GetClientChannel( Client )  
-		 Channel:Activate( Client , Active )
+		self.Active[ Client ] = Active
 	end
 	
 	function Plugin:SendOptions( Client )
 
-		ClientChannel.Name = "( Public Channels do not require a pass )" 
-		ClientChannel.Contents = concat( Channels.Name , "," ) 
+		ClientChannel.Name = "Channel Options" 
 
+		local Names = self:GetChannelNames() 
+		ClientChannel.Contents = concat( Names , "," )  
+
+	
 		self:SendNetworkMessage( Client , "Channel" , ClientChannel , false  ) 
 	end
 
 	function Plugin:UpdateChannel( Channel ) 
 
-		ClientChannel = Channel.Name
-		ClientChannel.Contents = concat( Channel.Clients.Name , "," ) 
-		
+		ClientChannel.Name = Channel:GetName()
+
+		local Names = Channel:GetClientNames()
+		ClientChannel.Contents = concat( Names , "," ) 
+
 		for Key , Value in pairs( Channel.Clients ) do
 
 			self:SendNetworkMessage( Key , "Channel" , ClientChannel , false  ) 

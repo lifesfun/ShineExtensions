@@ -1,56 +1,53 @@
-Channel = { 
+Obj.Channel = { 
 
-	self.Name = nil, 
-	self.Password = nil, 
-	self.Clients = {  
-
-		self.Name = nil,
-		self.Active = nil 
-	}
+	Name = nil, 
+	Password = "PUBLIC", 
+	Clients = {}
 }
 
-function Channel:new( o )
+function Obj.Channel:new( o )
 	
 	o = o or {}
 	setmetable( o , self ) 
 	self._index = self 
-	Shine:Notify( nil , "NEW" )
 	return o 
 end
 
-function Channel:GetName()
-
+function Obj.Channel:GetName()
+	
 	return self.Name
 end
 
-function Channel:Activate( Client , Active = false )
+function Obj.Channel:CanAccess( Password )
 
-	self.Clients[ Client ] = Active 
+	if self.Password == Password then return true end
 end
 
-function Channel:CanAccess( Password )
-
-	if self.Password = Password then return true end
-end
-
-function Channel:AddToChannel( Client , ChannelClient )
+function Obj.Channel:AddClient( Client , Name )
 	
-	self.Clients[ Client ] = ChannelClient 	
+	self.Clients[ Client ] = Name
 end
 
-function Channel:RemoveClient( Client )
-
-	local ChannelClient = self.Clients[ Client ]
-
-	if ChannelClient then 
+function Obj.Channel:RemoveClient( Client )
 	
-		self.Clients[ Client ] = nil  
-		if not self.GetChannelClients() then self.Channel = nil end
-		return ChannelClient
+	local ClientName = self.Clients[ Client ]   
+	if not ClientName then return end
+		
+	self.Clients[ Client ] = nil  
+end
+
+function Obj.Channel:GetClientNames() 
+	
+	local Names = {} 
+	for Key , Value in pairs( self.Clients ) do
+
+		ChannelClients[ Client ] = Value
 	end
+
+	return Names
 end
 
-function Channel:GetChannelClients() 
+function Obj.Channel:GetClients() 
 	
 	return self.Clients
 end	

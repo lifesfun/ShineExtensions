@@ -2,6 +2,7 @@ local Shine = Shine
 
 local Notify = Shared.Message
 local GetOwner = Server.GetOwner
+local ObjChannel = Obj.Channel 
 local FixArray = table.FixArray
 
 local Plugin = Plugin
@@ -22,18 +23,17 @@ function Plugin:Initialize()
 	Script.Load( "lua/shine/extensions/channels/channel.lua" )
 
 	self:CreateCommands()	
+	self.Active = {} 
 	self.Clients = {} 
+	self.Channels = {} 
 
-	local Chan = Channel:new()
-	Chan.Name = "none"
-	Chan.Password = "PUBLIC" 
-
-	self.Channels = { Chan } 
-
+	self.CreateChannel( "none" )
+	self.CreateChannel( "admin" , "admin" )
 	self.Enabled = true
 
 	return true
 end
+
 function Plugin:Notify( Player , String , Format , ... ) 
 
 	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "ChannelBot" , 255 ,  255 , 255 , String , Format , ... ) 
@@ -44,12 +44,14 @@ function Plugin:ClientConfirmConnect( Client )
 	if not Client then return end
 	if Client:GetIsVirtual() then return end
 
-	local ChannelClient = { Client:GetControllingPlayer():GetName() , false } 
 	local Channel = self:GetChannelByName( "none" ) 
-	self:Notify( nil , "Channels are enabled." ) 
+	if not Channel then return end
 
-	Channel:AddToChannel( Client , ChannelClient ) 	
-	self.Clients[ Client ] = Channel
+	self.Clients[ Client ] = Channel 
+	self.Active[ Client ] = false
+
+	local ClientName = Client:GetControllingPlayer():GetName()  
+	Channel:AddToChannel( Client , ClientName ) 	
 	
 	self:SimpleTimer( 4 , function() 
 
@@ -62,30 +64,33 @@ end
 
 function Plugin:ClientDisconnect( Client )
 	
-	self.GetClientChannel( Client ):RemoveClient( Client ) 	
-	FixArray( self.Channels )
+	self.Clients[ Client ] = nil
+	self.Active[ Client ] = nil
+
+	local Channel = self.GetClientChannel( Client )
+	if not Channel then return end	
+	Channel:RemoveClient( Client ) 	
 end
 
 function Plugin:CreateChannel( ChannelName , Password )
 
-	self:Notify( nil , "Channels are being created." ) 
 	if GetChannelByName( ChannelName ) then return end
 
-	local Chan = Channel:new() 
-	Chan.Name = ChannelName
-	Chan.Password = Password 
-
-	self.Channels[ #self.Channels + 1 ] = Channel 
+	self:Notify( nil , "Channel is being created." ) 
+	
+	self.Channels[ #self.Channels + 1 ] = ObjChannel:new{ Name = ChannelName , Password = Password } 
 end
 
-function Plugin:GetClientChannel( Client ) 
+function Plugin:GetChannelByClient( Client ) 
 
 	return self.Clients[ Client ]  	
 end
 
 function Plugin:GetChannelByName( ChannelName )
 
-	self:Notify( nil , "looking for channel." ) 
+	if not self.Channels then return end
+
+	self:Notify( nil , "looking for channel.." ) 
 
 	for Key , Value in ipairs( self.Channels ) do 
 		
@@ -93,29 +98,48 @@ function Plugin:GetChannelByName( ChannelName )
 	end
 end
 
+function Plugin:GetChannelNames()
+
+	local Names = {} 
+	for Key , Value in ipairs( self.Channels ) do 
+		
+		Names[ #Names + 1 ] = Value:GetName() 
+	end
+	return Names
+end
+
 function Plugin:MoveToChannel( Client , ChannelName , Password )
 
 	local NewChannel = self.GetChannelByName( ChannelName ) 
-	local OldChannel = self.GetClientChannel( Client )
-
-	if not NewChannel or not OldChannel then return end
+	if not NewChannel then return end
 	if not NewChannel:HasAccess( Password ) == true then return end 
 
-	NewChannel:AddToChannel( Client , OldChannel:RemoveClient( Client ) ) 	
+	local OldChannel = self.GetClientChannel( Client )
+	if OldChannel then OldChannel:RemoveClient( Client ) end
+
+	self:Notify( nil , "moving to channel.." ) 
+	NewChannel:AddToChannel( Client , Client:GetControllingPlayer():GetName() ) 	
 
 	self.Clients[ Client ] = NewChannel
 	self.UpdateChannel( NewChannel )
-	FixArray( self.Channels )
 end
 
-function Plugin:CanHear( Listener , Speaker ) 
+function Plugin:SameChannel( ListenerClient , SpeakerClient ) 
 
-	if self.GetChannel( Listener ) == self.GetChannel( Speaker ) then return true end
+	local ListenerChannel = self.GetChannelByClient( Listener ):GetName() 
+	local SpeakerChannel = self.GetChannelByClient( Speaker ):GetName() 
+	
+	if ListenerChannel == SpeakerChannel then return true end
 end
 
 function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
 
-	if Plugin:CanHear( GetOwner( Listener ) , GetOwner( Speaker ) ) then return true end
+	local SpeakerClient = GetOwner( Speaker ) 
+	local ListenerClient = GetOwner( Speaker ) 
+	local Active = self.Active[ SpeakerClient ] 
+	local SameChannel = self:SameChannel( ListenerClient , SpeakerClient )  
+
+	if Active == true and SameChannel == true then return true end
 end 
 
 function Plugin:CreateCommands()
@@ -125,9 +149,9 @@ function Plugin:CreateCommands()
 		Channel:MoveToChannel( Client , Channel , Password )
 	end
 	local ChangeChannelCommand = self:BindCommand( "sh_change" , "change" , ChangeChannel , true )
-	ChangeChannelCommand:AddParam{ Type = "string" }  
+	ChangeChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "none" }  
 	ChangeChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
-	ChangeChannelCommand:Help( "[ # ChanneName Password ] Change channels" )
+	ChangeChannelCommand:Help( "[ change ChanneName Password ] Change channels" )
 
 	local function CreateChannel( Client , Channel , Password ) 
 
@@ -138,7 +162,7 @@ function Plugin:CreateCommands()
 	local CreateChannelCommand = self:BindCommand( "sh_add" , "add", CreateChannel , true )
 	CreateChannelCommand:AddParam{ Type = "string" }  
 	CreateChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
-	CreateChannelCommand:Help( "[ +# ChanneName Password ] Change create" )
+	CreateChannelCommand:Help( "[ add ChanneName Password ] Change create" )
 	
 	end
 
