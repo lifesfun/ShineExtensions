@@ -37,6 +37,7 @@ end
 
 function Plugin:ClientConfirmConnect( Client )
 
+	self:Notify( nil , "Channels are enabled." ) 
 	if not Client then return end
 	if Client:GetIsVirtual() then return end
 
