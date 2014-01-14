@@ -29,7 +29,7 @@ end
 
 function Plugin:PlayerKeyPress( Key , Down , Amount )
 
-	if Key == self.ToggleKey and Down then
+	if Key == self.ToggleKey then
 
 		self:Activate()
 		return true
