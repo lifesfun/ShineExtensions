@@ -21,13 +21,14 @@ Plugin.DefaultConfig = {
 Plugin.CheckConfig = true
 Plugin.DefaultState = true 
 
+Plugin.Active = {} 
+Plugin.Clients = {} 
+Plugin.Channels = {} 
+
+
 function Plugin:Initialize()
 
 	self:CreateCommands()	
-	self.Active = {} 
-	self.Clients = {} 
-	self.Channels = {} 
-
 	self.CreateChannel( "none" )
 	self.CreateChannel( "admin" , "admin" )
 	self.Enabled = true
