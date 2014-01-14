@@ -1,11 +1,11 @@
-Obj.Channel = { 
+ObjChannel = { 
 
 	Name = nil, 
 	Password = "PUBLIC", 
 	Clients = {}
 }
 
-function Obj.Channel:new( o )
+function ObjChannel:new( o )
 	
 	o = o or {}
 	setmetable( o , self ) 
@@ -13,22 +13,22 @@ function Obj.Channel:new( o )
 	return o 
 end
 
-function Obj.Channel:GetName()
+function ObjChannel:GetName()
 	
 	return self.Name
 end
 
-function Obj.Channel:CanAccess( Password )
+function ObjChannel:CanAccess( Password )
 
 	if self.Password == Password then return true end
 end
 
-function Obj.Channel:AddClient( Client , Name )
+function ObjChannel:AddClient( Client , Name )
 	
 	self.Clients[ Client ] = Name
 end
 
-function Obj.Channel:RemoveClient( Client )
+function ObjChannel:RemoveClient( Client )
 	
 	local ClientName = self.Clients[ Client ]   
 	if not ClientName then return end
@@ -36,7 +36,7 @@ function Obj.Channel:RemoveClient( Client )
 	self.Clients[ Client ] = nil  
 end
 
-function Obj.Channel:GetClientNames() 
+function ObjChannel:GetClientNames() 
 	
 	local Names = {} 
 	for Key , Value in pairs( self.Clients ) do
@@ -47,7 +47,7 @@ function Obj.Channel:GetClientNames()
 	return Names
 end
 
-function Obj.Channel:GetClients() 
+function ObjChannel:GetClients() 
 	
 	return self.Clients
 end	

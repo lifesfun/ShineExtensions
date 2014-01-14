@@ -2,7 +2,6 @@ local Shine = Shine
 
 local Notify = Shared.Message
 local GetOwner = Server.GetOwner
-local ObjChannel = Obj.Channel 
 local FixArray = table.FixArray
 
 local Plugin = Plugin
@@ -18,9 +17,9 @@ Plugin.DefaultConfig = {
 Plugin.CheckConfig = true
 Plugin.DefaultState = true 
 
-function Plugin:Initialize()
-
 	Script.Load( "lua/shine/extensions/channels/channel.lua" )
+	local ObjChannel = ObjChannel 
+function Plugin:Initialize()
 
 	self:CreateCommands()	
 	self.Active = {} 
