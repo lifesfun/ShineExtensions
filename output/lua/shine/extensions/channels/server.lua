@@ -37,12 +37,13 @@ end
 
 function Plugin:ClientConfirmConnect( Client )
 
-	self:Notify( nil , "Channels are enabled." ) 
 	if not Client then return end
 	if Client:GetIsVirtual() then return end
 
+	self:Notify( nil , "Channels are enabled." ) 
 	local ChannelClient = { Client:GetControllingPlayer():GetName() , false } 
 	local Channel = self:GetChannelByName( "none" ) 
+	self:Notify( nil , "Channels are enabled." ) 
 
 	Channel:AddToChannel( Client , ChannelClient ) 	
 	self.Clients[ Client ] = Channel
@@ -64,9 +65,10 @@ end
 
 function Plugin:CreateChannel( ChannelName , Password )
 
+	self:Notify( nil , "Channels are being created." ) 
 	if not self.Channels then return end
+	if GetChannelByName( ChannelName ) then return end
 
-	self:Notify( nil , "Channels are enabled." ) 
 	local Channel = Channel:new() 
 	Channel.Name = ChannelName
 	Channel.Password = Password 
@@ -81,6 +83,8 @@ function Plugin:GetClientChannel( Client )
 end
 
 function Plugin:GetChannelByName( ChannelName )
+
+	self:Notify( nil , "looking for channel." ) 
 
 	for Key , Value in ipairs( self.Channels ) do 
 		
