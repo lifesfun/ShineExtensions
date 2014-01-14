@@ -27,7 +27,7 @@ function Plugin:Initialise()
 	return true
 end
 
-function PlayerKeyPress( Key , Down , Amount )
+function Plugin:PlayerKeyPress( Key , Down , Amount )
 
 	if Key == self.ToggleKey and Down then
 
@@ -49,7 +49,7 @@ function Plugin:Activate()
 	self.SendNetworkMessage( "Activate" , { Boolean = self.Active } , true )  
 end
 
-function ReceiveCurrentChannel( Data )
+function Plugin:ReceiveCurrentChannel( Data )
 
 	if Data.Name ~= nil then 
 		
