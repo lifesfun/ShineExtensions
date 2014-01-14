@@ -43,11 +43,12 @@ function Plugin:ClientConfirmConnect( Client )
 	if not Client then return end
 	if Client:GetIsVirtual() then return end
 
-	local Channel = self:GetChannelByName( "none" ) 
-	if not Channel then return end
-
-	self.Clients[ Client ] = Channel 
 	self.Active[ Client ] = false
+
+	local Channel = self:GetChannelByName( "none" ) 
+
+	if not Channel then return end
+	self.Clients[ Client ] = Channel 
 
 	local ClientName = Client:GetControllingPlayer():GetName()  
 	Channel:AddToChannel( Client , ClientName ) 	
