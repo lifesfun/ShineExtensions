@@ -66,7 +66,7 @@ function Plugin:CreateChannel( ChannelName , Password )
 	if not self.Channels then return end
 	if self.GetChannelByName( ChannelName ) then return end
 
-	Shared.Message( ChannelName )
+	self:Notify( nil , "Channels are enabled." ) 
 	local Channel = Channel:new() 
 	Channel.Name = ChannelName
 	Channel.Password = Password 
