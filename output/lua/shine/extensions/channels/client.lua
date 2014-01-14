@@ -29,7 +29,7 @@ end
 
 function Plugin:PlayerKeyPress( Key , Down , Amount )
 
-	print( tostring( Key ) )
+	Shared.Message( tostring( Key ) )
 	if Key == self.ToggleKey then
 
 		if self.Active == true then
