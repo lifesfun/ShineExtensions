@@ -65,6 +65,7 @@ function Plugin:CreateCommands()
 		self.ToggleKey = String
 		self:SaveConfig()
 
+		self:PlayerKeyPress( )
 		local Message = StringFormat( "You have set your toggle channel key to '%s'", String  ) 
 		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
 	end
