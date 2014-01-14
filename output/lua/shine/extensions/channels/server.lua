@@ -4,6 +4,10 @@ local Notify = Shared.Message
 local GetOwner = Server.GetOwner
 local FixArray = table.FixArray
 
+Script.Load( "lua/shine/extensions/channels/channel.lua" )
+local ObjChannel = ObjChannel 
+
+
 local Plugin = Plugin
 Plugin.Version = "0.8"
 
@@ -11,14 +15,12 @@ Plugin.HasConfig = true
 Plugin.ConfigName = "Channels.json"
 Plugin.DefaultConfig = { 
 
-	TempCreate = true, --all players can create temp channels
+	TempCreate = true --all players can create temp channels
 }
 
 Plugin.CheckConfig = true
 Plugin.DefaultState = true 
 
-	Script.Load( "lua/shine/extensions/channels/channel.lua" )
-	local ObjChannel = ObjChannel 
 function Plugin:Initialize()
 
 	self:CreateCommands()	
