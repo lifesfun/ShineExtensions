@@ -23,9 +23,13 @@ function Plugin:Initialize()
 
 	self:CreateCommands()	
 	self.Clients = {} 
-	self.Channels = {}
-	self.CreateChannel( "none" , "PUBLIC" ) 
-	
+
+	local Chan = Channel:new()
+	Chan.Name = "none"
+	Chan.Password = "PUBLIC" 
+
+	self.Channels = { Channel:new() } 
+
 	self.Enabled = true
 
 	return true
@@ -68,9 +72,9 @@ function Plugin:CreateChannel( ChannelName , Password )
 	if not self.Channels then return end
 	if GetChannelByName( ChannelName ) then return end
 
-	local Channel = Channel:new() 
-	Channel.Name = ChannelName
-	Channel.Password = Password 
+	local Chan = Channel:new() 
+	Chan.Name = ChannelName
+	Chan.Password = Password 
 
 	self.Channels[ #self.Channels + 1 ] = Channel 
 
