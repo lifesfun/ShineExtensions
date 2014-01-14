@@ -40,10 +40,9 @@ function Plugin:ClientConfirmConnect( Client )
 	if not Client then return end
 	if Client:GetIsVirtual() then return end
 
-	self:Notify( nil , "Channels are enabled." ) 
 	local ChannelClient = { Client:GetControllingPlayer():GetName() , false } 
-	local Channel = self:GetChannelByName( "none" ) 
 	self:Notify( nil , "Channels are enabled." ) 
+	local Channel = self:GetChannelByName( "none" ) 
 
 	Channel:AddToChannel( Client , ChannelClient ) 	
 	self.Clients[ Client ] = Channel
