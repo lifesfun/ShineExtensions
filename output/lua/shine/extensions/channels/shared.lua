@@ -19,7 +19,7 @@ if Server then
 
 	function Plugin:ReceiveActive( Client , Active) 
 
-		self.Active[ Client ] = Active
+		self.Active[ Client ] = Active.Boolean
 	end
 	
 	function Plugin:SendOptions( Client )

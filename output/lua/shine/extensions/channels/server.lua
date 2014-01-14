@@ -64,14 +64,14 @@ function Plugin:ClientDisconnect( Client )
 	self.Clients[ Client ] = nil
 	self.Active[ Client ] = nil
 
-	local Channel = self.GetClientChannel( Client )
+	local Channel = self:GetClientChannel( Client )
 	if not Channel then return end	
 	Channel:RemoveClient( Client ) 	
 end
 
 function Plugin:CreateChannel( ChannelName , Password )
 
-	if GetChannelByName( ChannelName ) then return end
+	if self:GetChannelByName( ChannelName ) then return end
 
 	self:Notify( nil , "Channel is being created." ) 
 	
@@ -107,24 +107,24 @@ end
 
 function Plugin:MoveToChannel( Client , ChannelName , Password )
 
-	local NewChannel = self.GetChannelByName( ChannelName ) 
+	local NewChannel = self:GetChannelByName( ChannelName ) 
 	if not NewChannel then return end
 	if not NewChannel:HasAccess( Password ) == true then return end 
 
-	local OldChannel = self.GetClientChannel( Client )
+	local OldChannel = self:GetClientChannel( Client )
 	if OldChannel then OldChannel:RemoveClient( Client ) end
 
 	self:Notify( nil , "moving to channel.." ) 
 	NewChannel:AddToChannel( Client , Client:GetControllingPlayer():GetName() ) 	
 
 	self.Clients[ Client ] = NewChannel
-	self.UpdateChannel( NewChannel )
+	self:UpdateChannel( NewChannel )
 end
 
 function Plugin:SameChannel( ListenerClient , SpeakerClient ) 
 
-	local ListenerChannel = self.GetChannelByClient( Listener ):GetName() 
-	local SpeakerChannel = self.GetChannelByClient( Speaker ):GetName() 
+	local ListenerChannel = self:GetChannelByClient( Listener ):GetName() 
+	local SpeakerChannel = self:GetChannelByClient( Speaker ):GetName() 
 	
 	if ListenerChannel == SpeakerChannel then return true end
 end

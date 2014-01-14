@@ -39,8 +39,9 @@ function Plugin:PlayerKeyPress( Key , Down , Amount )
 		end
 
 		local Message = StringFormat( "ChannelActive:'%s'", self.Active  ) 
-		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
-		self.SendNetworkMessage( "Activate" , { Boolean = self.Active } , true )  
+		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 1 , 255, 0, 0, 2 )
+
+		self:SendNetworkMessage( "Activate" , { Boolean = self.Active } , true )  
 
 		return true
 	end
