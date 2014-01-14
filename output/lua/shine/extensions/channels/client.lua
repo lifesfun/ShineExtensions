@@ -29,7 +29,7 @@ end
 
 function PlayerKeyPress( Key , Down , Amount )
 
-	if Key == self.ToggleKey then
+	if Key == self.ToggleKey and Down then
 
 		self:Activate()
 		return true
@@ -44,7 +44,8 @@ function Plugin:Activate()
 	else
 		self.Active = true
 	end
-	Shine:AddMessageToQueue( 11 , 0.95, 0.2, "Channel Active", 5  , 255, 0, 0, 2 )
+	local Message = StringFormat( "ChannelActive:'%s'", self.Active  ) 
+	Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
 	self.SendNetworkMessage( "Activate" , { Boolean = self.Active } , true )  
 end
 
