@@ -29,8 +29,8 @@ Plugin.Channels = {}
 function Plugin:Initialize()
 
 	self:CreateCommands()	
-	self.CreateChannel( "none" )
-	self.CreateChannel( "admin" , "admin" )
+	self:CreateChannel( "none" )
+	self:CreateChannel( "admin" , "admin" )
 	self.Enabled = true
 
 	return true
