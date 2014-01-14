@@ -28,7 +28,7 @@ function Plugin:Initialize()
 	Chan.Name = "none"
 	Chan.Password = "PUBLIC" 
 
-	self.Channels = { Channel:new() } 
+	self.Channels = { Chan } 
 
 	self.Enabled = true
 
@@ -69,7 +69,6 @@ end
 function Plugin:CreateChannel( ChannelName , Password )
 
 	self:Notify( nil , "Channels are being created." ) 
-	if not self.Channels then return end
 	if GetChannelByName( ChannelName ) then return end
 
 	local Chan = Channel:new() 
@@ -77,7 +76,6 @@ function Plugin:CreateChannel( ChannelName , Password )
 	Chan.Password = Password 
 
 	self.Channels[ #self.Channels + 1 ] = Channel 
-
 end
 
 function Plugin:GetClientChannel( Client ) 

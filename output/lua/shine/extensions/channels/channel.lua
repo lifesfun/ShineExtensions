@@ -14,6 +14,7 @@ function Channel:new( o )
 	o = o or {}
 	setmetable( o , self ) 
 	self._index = self 
+	Shine:Notify( nil , "NEW" )
 	return o 
 end
 
