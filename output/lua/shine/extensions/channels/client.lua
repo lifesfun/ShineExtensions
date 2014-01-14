@@ -29,24 +29,22 @@ end
 
 function Plugin:PlayerKeyPress( Key , Down , Amount )
 
+	print( tostring( Key ) )
 	if Key == self.ToggleKey then
 
-		self:Activate()
+		if self.Active == true then
+
+			self.Active = false
+		else
+			self.Active = true
+		end
+
+		local Message = StringFormat( "ChannelActive:'%s'", self.Active  ) 
+		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
+		self.SendNetworkMessage( "Activate" , { Boolean = self.Active } , true )  
+
 		return true
 	end
-end
-
-function Plugin:Activate()
-	
-	if self.Active == true then
-
-		self.Active = false
-	else
-		self.Active = true
-	end
-	local Message = StringFormat( "ChannelActive:'%s'", self.Active  ) 
-	Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
-	self.SendNetworkMessage( "Activate" , { Boolean = self.Active } , true )  
 end
 
 function Plugin:ReceiveCurrentChannel( Data )
