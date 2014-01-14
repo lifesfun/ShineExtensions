@@ -63,6 +63,7 @@ end
 
 function Plugin:CreateChannel( ChannelName , Password )
 
+	if not self.Channels then return end
 	if self.GetChannelByName( ChannelName ) then return end
 
 	Shared.Message( ChannelName )
@@ -80,8 +81,6 @@ function Plugin:GetClientChannel( Client )
 end
 
 function Plugin:GetChannelByName( ChannelName )
-
-	if not self.Channels then return end
 
 	for Key , Value in ipairs( self.Channels ) do 
 		
