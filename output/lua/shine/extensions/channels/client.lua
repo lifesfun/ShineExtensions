@@ -16,7 +16,7 @@ Plugin.CheckConfig = true
 
 function Plugin:Initialise()
 
-	self.ToggleKey = self.Config.ToggleKey or "P"  
+	self.ToggleKey = self.Config.ToggleKey or "p"  
 
 	self.Active = false	
 
@@ -29,8 +29,7 @@ end
 
 function Plugin:PlayerKeyPress( Key , Down , Amount )
 
-	Shared.Message( tostring( Key ) )
-	if Key == self.ToggleKey then
+	if Key == InputKey[ self.ToggleKey ] then
 
 		if self.Active == true then
 
@@ -65,12 +64,11 @@ function Plugin:CreateCommands()
 		self.ToggleKey = String
 		self:SaveConfig()
 
-		self:PlayerKeyPress( )
 		local Message = StringFormat( "You have set your toggle channel key to '%s'", String  ) 
 		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
 	end
 	local ChannelKeyCommand = self:BindCommand( "channelkey" , ChannelKey ) 
-	ChannelKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false , Default = "P" } 
+	ChannelKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false , Default = "p" } 
 
 end
 
