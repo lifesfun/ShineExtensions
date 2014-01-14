@@ -5,7 +5,7 @@ local GetOwner = Server.GetOwner
 local FixArray = table.FixArray
 
 local Plugin = Plugin
-Plugin.Version = "2.0"
+Plugin.Version = "0.8"
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "Channels.json"
