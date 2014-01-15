@@ -73,7 +73,7 @@ function Plugin:CreateChannel( ChannelName , Password )
 
 	if self:GetChannelByName( ChannelName ) then return end
 
-	self:Notify( nil , "Channel is being created." ) 
+	self:Notify( nil , "Channel %s is being created.", true , ChannelName ) 
 	
 	self.Channels[ #self.Channels + 1 ] = ObjChannel:new{ Name = ChannelName , Password = Password } 
 end
@@ -86,8 +86,6 @@ end
 function Plugin:GetChannelByName( ChannelName )
 
 	if not self.Channels then return end
-
-	self:Notify( nil , "looking for channel.." ) 
 
 	for Key , Value in ipairs( self.Channels ) do 
 		
@@ -114,11 +112,42 @@ function Plugin:MoveToChannel( Client , ChannelName , Password )
 	local OldChannel = self:GetClientChannel( Client )
 	if OldChannel then OldChannel:RemoveClient( Client ) end
 
-	self:Notify( nil , "moving to channel.." ) 
 	NewChannel:AddToChannel( Client , Client:GetControllingPlayer():GetName() ) 	
 
 	self.Clients[ Client ] = NewChannel
+	self:Notify( Client , "moving to channel... %s" , true , ChannelName ) 
 	self:UpdateChannel( NewChannel )
+end
+
+function Plugin:ReceiveActive( Client , Active) 
+
+	self.Active[ Client ] = Active.Boolean
+end
+
+function Plugin:SendOptions( Client )
+
+	local ChannelNames = self:GetChannelNames() 
+
+	self.Notify( Client , "Channel Options" )
+	for Key , Value in pairs( ChannelNames ) do
+
+		self.Notify( Client , Value )
+	end
+end
+
+function Plugin:UpdateChannel( Channel ) 
+
+	local ChannelName = Channel:GetName()
+	local ClientNames = Channel:GetClientNames()
+
+	for Key , Value in pairs( ClientNames ) do
+		local Client = Key
+		
+		for Key , Value in pairs( ClientNames ) do
+
+			self.Notify( Client , Value )
+		end
+	end
 end
 
 function Plugin:SameChannel( ListenerClient , SpeakerClient ) 
@@ -133,8 +162,9 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 
 	local SpeakerClient = GetOwner( Speaker ) 
 	local ListenerClient = GetOwner( Speaker ) 
-	local Active = self.Active[ SpeakerClient ] 
 	local SameChannel = self:SameChannel( ListenerClient , SpeakerClient )  
+
+	local Active = self.Active[ SpeakerClient ] 
 
 	if Active == true and SameChannel == true then return true end
 end 
@@ -169,3 +199,4 @@ function Plugin:Cleanup()
 	self.BaseClass.Cleanup( self ) 
 	self.Enable = false
 end
+

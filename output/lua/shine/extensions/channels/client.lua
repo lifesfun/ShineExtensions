@@ -47,16 +47,6 @@ function Plugin:PlayerKeyPress( Key , Down , Amount )
 	end
 end
 
-function Plugin:ReceiveCurrentChannel( Data )
-
-	if Data.Name ~= nil then 
-		
-		Shine:AddMessageToQueue( 7 , 0.95, 0.2, Data.Name , 5  , 255, 0, 0, 2 )
-	
-		Shine:AddMessageToQueue( 7 , 0.95, 0.2, Data.Content , 5 , 255, 0, 0, 2 )
-	end	
-end
-
 function Plugin:CreateCommands()
 
 	local function ChannelKey( String )
