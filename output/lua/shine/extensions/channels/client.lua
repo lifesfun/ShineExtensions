@@ -56,4 +56,3 @@ function Plugin:Cleanup()
 	self.Enabled = false
 end
 
-Shine:RegisterExtension( "TalkKey" , Plugin )
