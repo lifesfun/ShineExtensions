@@ -8,7 +8,7 @@ ObjChannel = {
 function ObjChannel:new( o )
 	
 	o = o or {}
-	setmetable( o , self ) 
+	setmetatable( o , self ) 
 	self._index = self 
 	return o 
 end
