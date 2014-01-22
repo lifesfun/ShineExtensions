@@ -118,12 +118,11 @@ function Plugin:MoveToChannel( Client , ChannelName , Password )
 	self:UpdateChannel( NewChannel )
 end
 
-
 function Plugin:ReceiveActive( Client ) 
  
 	if self:Timer.Exist( "Active" ) then return end
 	
-	self:Timer.Create( "Active" , 0.1 , 1 ,  function() 
+	self:Timer.Create( "Active" , "0.1" , 1 ,  function() 
 
 		local Active =	self.Active[ Client ]
 		if self.Active[ Client ] == true then 
@@ -135,7 +134,6 @@ function Plugin:ReceiveActive( Client )
 			self.Active[ Client ] = true 
 			self:Notify( Client , "Active" )
 		end
-			
 	end )
 end
 
@@ -197,7 +195,6 @@ function Plugin:CreateCommands()
 	CreateChannelCommand:AddParam{ Type = "string" }  
 	CreateChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
 	CreateChannelCommand:Help( "[ add ChanneName Password ] Change create" )
-	
 end
 
 function Plugin:Cleanup()
