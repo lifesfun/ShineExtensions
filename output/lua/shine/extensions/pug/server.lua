@@ -1,33 +1,41 @@
 local Shine = Shine
 
 local StringFormat = string.format
+
 local FixArray = table.FixArray
 local Count = table.Count
+local ChooseRandom = table.ChooseRandom
 local TableEmpty = table.Empty
 
 local GetAllClients = Shine.GetAllClients
-local GetClient = Shine.GetClient
 
 local CreateVote = Shine.CreateVote
+
 local Plugin = Plugin
 
---todo vote capt
 --todo client menu for options
+--todo vote 
+--command functions
+--
+--check get owner and client functions 
+--save queue on and teams on mapchange
+--
 --todo pause
 --todo sub vote + process
---save queue on and teams on mapchange
---check get owner and client functions 
---reset game + start game +captains etc
---1.0
--- 
---multirounds
---check if works with anti - teamstack mod
---hooks for start round and disabling of readyroom
---status bar of gamestate
+	---1.0
+	
+--tournamentmode
+	--status bar of gamestate
 --pregame mods and ff on pregame tournamentmode ready options
+--
+--multirounds
 --add native afking and other plugins
+--address conflicting mods
+--
+--check if works with anti - teamstack mod
+--active configuration of server
 
-Plugin.Version = "1.0"
+Plugin.Version = "0.8"
 Plugin.HasConfig = true
 Plugin.ConfigName = "Pug.json"
 
@@ -63,8 +71,6 @@ function Plugin:Notify( Player , Message ,Format , ... )
 end
 
 ---------Game does Force players until Teams are Picked
---Useful AddOns:  afkkick , pregame( plus , tournamentmode , shine/mode )
---Possible Confilics: readyroom?   
 function Plugin:StartGame()
 
 	local GameRules = GetGamerules()
@@ -77,7 +83,7 @@ function Plugin:StartGame()
 	--resetgamestate
 	for Key , Value in pairs( Clients ) do 
 
-		local Team = self.Teams[ Value ] 		
+		local Team = self.Teams[ Key ] 		
 		if not Team then Team = 0 end
 
 		local Player = Value:GetControllingPlayer() 
@@ -91,9 +97,10 @@ function Plugin:JoinTeam( Gamerules , Player , NewTeam , Force )
 	if self.Pug == true then return NewTeam end
 	if Force == true then return NewTeam end	
 	
-	--can joint kpec or readyroom if not a match player
+	--can join spec or readyroom if not a match player
 	local Client = Player:GetOwner()
 	local Team = self.Teams[ Client ]
+
 	if NewTeam == 0 or 3 and not Team then return NewTeam end 
 	return false
 end
@@ -116,7 +123,41 @@ function Plugin:ClientDisconnect( Client )
 	self:OnGameLeave( Client )  
 end
 
---todo add queue status?
+--------------------------------Queuefunctions 
+function Plugin:AddToQueue( Client ) 
+
+	local Position = #self.Queue + 1  
+
+	self.Queue[ Position ] = Client
+	self:QueueStatus( Client , Position )
+end
+
+function Plugin:RemoveFromQueue( Client ) 
+
+	for Position, Value in pairs( self.Queue ) do
+
+		if Value == Client then 
+		
+			self.Queue[ Position ] = nil
+			FixArray( self.Queue )
+			self:NotifyQueue()
+		end
+	end
+end
+
+function Plugin:NotifyQueue()
+
+	for Position , Client in pairs( self.Queue ) do
+
+		self:QueueStatus( Client , Position )
+	end
+end
+
+function Plugin:QueueStatus( Client , Position  )
+
+	self:Notify( Client , "You are %s in for the queue for the next round." , true , Position )	
+end
+
 -----------------------------Connect Functions 
 function Plugin:OnPug( Client )	
 
@@ -127,14 +168,25 @@ function Plugin:OnPug( Client )
 
 	if not TeamSize or TeamSize < MatchSize then
 
-		local Size = MatchSize - TeamSize 
-		self:AddPlayer( Client ) 
-		self:Notify( nil , "%s more people needed to start the pug" , true ,  Size )
-	
-	elseif self.pug == true and self.Captains == nil and TeamSize >= MatchSize and self.Vote = nil then 
+		self:AddNextPlayer( Client ) 
+		self:PugStatus()
 
-		self:StartVote()
+	elseif TeamSize >= MatchSize and self.Vote = nil and self.Captains == nil then 
+
+		self:CaptainsVote()
 	end
+end
+
+function Plugin:PugStatus()
+
+	local MatchSize =  self.Config.TeamSize * 2
+	local TeamSize = Count( self.Teams ) 
+
+	if not TeamSize or TeamSize >= MatchSize then return end
+
+	local Size = MatchSize - TeamSize 
+
+	self:Notify( nil , "%s more people needed for the pug" , true ,  Size )
 end
 
 function Plugin:OnGame( Client )
@@ -167,23 +219,19 @@ function Plugin:OnPugLeave( Client )
 	if self.Captain[ Client ] then
 			
 		self.Teams[ Client ] = nil 
-		self:AddPlayer()
-		self:ClearCaptains()
-		self:ClearTeams()
-
-		self.CaptainsVote()
+		self:AddNextPlayer()
+		self:PugStatus()
 
 	elseif self.Teams[ Client ] then 
 	
 		self:Teams[ Client ] = nil 
-		self:AddPlayer()
-		self:ClearTeams()
-
-		self:PickTeams()
+		self:AddNextPlayer()
+		self:PugStatus()
 	else
 		self:RemoveFromQueue( Client )	
 	end
 end
+
 	--if player then pause game and call sub vote
 function Plugin:OnGameLeave( Client )
 
@@ -201,7 +249,7 @@ function Plugin:OnGameLeave( Client )
 	end
 end
 
-function Plugin:AddPlayer()
+function Plugin:AddNextPlayer()
 
 	local Client = self.Queue[ 1 ]   
 	if not Client then return end
@@ -209,6 +257,27 @@ function Plugin:AddPlayer()
 	self:Teams[ Client ] = 0
 	self.Queue[ 1 ] = nil
 	FixArray( self.Queue )
+end
+
+----------Pick up game progression for team formation 
+function Plugin:CaptainsVote()
+
+	if not Count( self.Captains ) >= 4 then self:PickTeam() return end
+
+	if self:HavePlayers == false then return end
+
+	self:ClearCaptains()
+	self:ClearTeams()
+
+	self:StartVote()
+end
+
+function Plugin:HavePlayers()
+
+	local TeamSize = Count( self.Teams ) 
+	local MatchSize =  self.Config.TeamSize * 2
+	if TeamSize and TeamSize >= MatchSize then return end
+	return false
 end
 
 function Plugin:ClearCaptains()
@@ -221,31 +290,7 @@ function Plugin:ClearTeams()
 	for Key , Value in pairs( self.Teams ) do self.Teams[ Key ] = 0 end
 end
 
-
---------------------------------Queuefunctions 
-function Plugin:AddToQueue( Client ) 
-
-	self.Queue[ #self.Queue + 1 ] = Client
-end
-
-function Plugin:RemoveFromQueue( Client ) 
-
-	for Key , Value in pairs( self.Queue ) do
-
-		if Value == Client then 
-		
-			self.Queue[ Key ] = nil
-			FixArray( self.Queue )
-		end
-	end
-end
-
-
-----------Pick up game progression for team formation 
-function Plugin:CaptainsVote()
-
-	self:ClearCaptains()
-	self:ClearTeams()
+function Plugin:StartVote()
 
 	self:Notify( nil , "Captains Vote has begun!" )
 
@@ -257,57 +302,100 @@ function Plugin:CaptainsVote()
 	end
 
 	--setup a vote for each player 
-	--local Vote = CreateVote( nil , nil , nil ) 
-	--self.Config.VoteTimeout 
-	--function for timeout
-	--
 	--networkvar players  to clients 
+	--local Vote = CreateVote( nil , nil , nil ) 
 	
-	--if no votes then random players to captains
-	
-	--get captain results
-	--random 2 winners to team 
-	--self.Teams[ Client ] = 1
-	--self.Teams[ Client ] = 2
-	--
-	--set first pick 
-	--self.Captain[ Client ] = 0
-	--self.Captain[ Client ] = 2
-	
-	for Key , Value in pairs( self.Queue ) do
-
-		self:Notify( Value , "You are %s in for the queue" , true , Key )	
-	end
+	self:SimpleTimer( self.Config.VoteTimeout , self:SetCaptains )
 end
 
-function Plugin:PickTeams()
+function Plugin:SetCaptains() 
 
-	self:ClearTeams()
+	local CaptainOne , local CaptainTwo = self:GetCaptains() 
+	if not CaptainOne then CaptainOne , CaptainTwo = self:GetRandomCaptain() end
+	if not CaptainTwo then CaptainOne , CaptainTwo = self:GetRandomCaptain() end
 
-	self:Notify( Value , "You are the current captian" )	
-	self:Notify( Value , "It is time to pick your team" )	
-	self:Notify( Value , "Open your menu to vote" )	
+	self.SetFirstPick( CaptainOne , CaptainTwo )
+	self.NotifyCaptains()
+end
 
---add seperate function for loop	
+function Plugin:GetRandomCaptain()
+	
+	local Clients = self.Teams
+	local CurrentCaptain = self.Captain[ 1 ] 
+	local OtherCaptain = self.Captain[ 2 ] 
+
+	--if captain cannot be randomed
+	if CurrentCaptain then self.Clients[ CurrentCaptain  ] = nil end
+	if OtherCaptain then self.Clients[ OtherCaptain ] = nil end
+
+	local Client , local Team = ChooseRandom( Clients ) 
+	return Client 
+end
+			
+function Plugin:SetFirstPick( CaptainOne , CaptainTwo )
+
+	--set aliens to first pick
+	self.Teams[ CaptainOne ] = 2
+	self.Teams[ CapatinTwo ] = 1
+		
+	--give one pick to alien captain
+	self.Captains[ CaptainOne ] = 1
+	self.Captains[ CaptainOne ] = 0
+end
+
+function Plugin:NotifyCaptain()
+
 	local Team = self:GetTeam( 0 )	
 	--networkvar Clients 
-	
-	--check team size  and other == then startgame 
-	--algo 2211
-	--if self.captain > 0 then
-	
-		--prompt self.captain >  0
-		--self.Capatin = self.Captain - 1 
-	
-	--elseif self.captain ==  0
-		--other self.Captain == 2
-		--prompt 
-	--end
 	--
-	--set timeout furnction 
-	--if no choice then random player 
+	local Captain = self.Captains[ 1 ] 
+
+	self:Notify( Captain , "You are the current captain" )	
+	self:Notify( Captain , "It is time to pick your team" )	
+	self:Notify( Captain , "Open your menu to vote" )	
+
+	self:SimpleTimer( self.Config.PickTimeout , function() 
+	
+		--if no choice then 
+		local Team = self.Teams[ Client ]  
+
+		local GameRules = GetGamerules()
+
+		local Client = ChooseRandom( Team )
+		local Player = Client:GetControllingPlayer()
+
+		GameRules:JoinTeam( Player , Team , true )
+		self:CaptainPicked()
+	end )
 end
 
+function Plugin:CaptainPicked()
+
+	local CurrentCaptain = self.Captains[ 1 ]
+	local OtherCaptain = self.Captains[ 2 ]
+	
+	self.Captains[ CurrentCaptain ] = self.Captains[ CurrentCaptain ] - 1
+	if self.Captains[ Client ] <= 0 then self:ChangeCaptains( OtherCaptain , CurrentCaptain ) end
+
+	local TeamSize = self.Config.TeamSize
+
+	if self:CountTeam( 1 ) >= TeamSize and self:CountTeam( 2 ) >= TeamSize then self:StartGame()return end
+
+	self:NotifyCaptain() 
+end
+
+function Plugin:ChangeCaptains( CurrentCaptain , OtherCaptain )
+
+	--set captain Current and Other 
+	self.Captains[ 1 ] = CurrentCaptain 
+	self.Captains[ 2 ] = OtherCaptain
+
+	--give two turns
+	self.Captains[ CaptainOne] = 2
+	self.Captains[ CaptainTwo] = 0
+end
+
+-----------------subing function
 function Plugin:GetSub()
 	--add a delay option 
 	--setup a vote for each player 
