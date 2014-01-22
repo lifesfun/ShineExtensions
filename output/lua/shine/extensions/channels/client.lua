@@ -2,14 +2,13 @@ local Plugin = Plugin
 
 local Encode, Decode = json.encode, json.decode
 local StringFormat = string.format
-local StringExplode = string.Explode 
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "AdminTalkKey.json"
 
 Plugin.DefaultConfig = { 	
 
-	ToggleKey= "P"
+	ToggleKey= "p"
 }
 
 Plugin.CheckConfig = true
@@ -41,7 +40,7 @@ function Plugin:PlayerKeyPress( Key , Down , Amount )
 		local Message = StringFormat( "ChannelActive:'%s'", self.Active  ) 
 		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 1 , 255, 0, 0, 2 )
 
-		self:SendNetworkMessage( "Activate" , { Boolean = self.Active } , true )  
+		self:SendNetworkMessage( "Active" , { Boolean = self.Active } , true )  
 
 		return true
 	end
@@ -60,7 +59,6 @@ function Plugin:CreateCommands()
 	end
 	local ChannelKeyCommand = self:BindCommand( "channelkey" , ChannelKey ) 
 	ChannelKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false , Default = "p" } 
-
 end
 
 function Plugin:Cleanup()

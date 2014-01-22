@@ -109,7 +109,7 @@ function Plugin:MoveToChannel( Client , ChannelName , Password )
 	if not NewChannel then return end
 	if not NewChannel:HasAccess( Password ) == true then return end 
 
-	local OldChannel = self:GetClientChannel( Client )
+	local OldChannel = self:GetChannelByClient( Client )
 	if OldChannel then OldChannel:RemoveClient( Client ) end
 
 	NewChannel:AddToChannel( Client , Client:GetControllingPlayer():GetName() ) 	
