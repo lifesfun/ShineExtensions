@@ -118,9 +118,25 @@ function Plugin:MoveToChannel( Client , ChannelName , Password )
 	self:UpdateChannel( NewChannel )
 end
 
-function Plugin:ReceiveActive( Client , Active) 
 
-	self.Active[ Client ] = Active.Boolean
+function Plugin:ReceiveActive( Client ) 
+ 
+	if self:Timer.Exist( "Active" ) then return end
+	
+	self:Timer.Create( "Active" , 0.1 , 1 ,  function() 
+
+		local Active =	self.Active[ Client ]
+		if self.Active[ Client ] == true then 
+		
+			self.Active [ Client ] = false 
+			self:Notify( Client , "UnActive" )
+		else 
+
+			self.Active[ Client ] = true 
+			self:Notify( Client , "Active" )
+		end
+			
+	end )
 end
 
 function Plugin:UpdateChannel( Channel ) 

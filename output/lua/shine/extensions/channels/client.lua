@@ -17,8 +17,6 @@ function Plugin:Initialise()
 
 	self.ToggleKey = self.Config.ToggleKey or "p"  
 
-	self.Active = false	
-
 	self:CreateCommands()
 
 	self.Enabled = true
@@ -30,15 +28,7 @@ function Plugin:PlayerKeyPress( Key , Down , Amount )
 
 	if Key == InputKey[ self.ToggleKey ] then
 
-		if self.Active == true then
-
-			self.Active = false
-		else
-			self.Active = true
-			Shine:AddMessageToQueue( 11 , 0.95, 0.2, "Active" , 1 , 255, 0, 0, 2 )
-		end
-
-		self:SendNetworkMessage( "Active" , { Boolean = self.Active } , true )  
+		self:SendNetworkMessage( "Active" , {} , true )  
 
 		return true
 	end
