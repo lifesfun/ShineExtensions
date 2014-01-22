@@ -4,15 +4,13 @@ local Notify = Shared.Message
 local GetOwner = Server.GetOwner
 local FixArray = table.FixArray
 
-Script.Load( "lua/shine/extensions/channels/channel.lua" )
-local ObjChannel = ObjChannel 
-
-
 local Plugin = Plugin
 
 Plugin.Version = "0.8"
 
 Plugin.DefaultState = true 
+
+Script.Load( "lua/shine/extensions/channels/channel.lua" )
 
 Plugin.Active = {} 
 Plugin.Clients = {} 
@@ -81,16 +79,19 @@ function Plugin:GetChannelByName( ChannelName )
 	if not self.Channels then return end
 
 	for Key , Value in ipairs( self.Channels ) do 
-		local Name = self.Channels[ Key ]:GetName() 
+
+		local Channel  = self.Channels[ Key ]
+		local Name = Channel:GetName() 
+
 		self:Notify( nil , "Player being moved to %s", true , ChannelName ) 
-		if ChannelName == Name then return self.Channels[ Key ] end
+		if ChannelName == Name then return Channel end
 	end
 end
 
 function Plugin:CreateChannel( ChannelName , Password )
 
-	self:Notify( nil , "Channel %s is being created.", true , ChannelName ) 
 	if self:GetChannelByName( ChannelName ) then return end
+	self:Notify( nil , "Channel %s is being created.", true , ChannelName ) 
 	
 	self.Channels[ #self.Channels + 1 ] = ObjChannel:new{ Name = ChannelName , Password = Password } 
 end
