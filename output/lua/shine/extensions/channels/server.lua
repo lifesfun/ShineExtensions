@@ -12,6 +12,7 @@ Plugin.DefaultState = true
 
 Script.Load( "lua/shine/extensions/channels/channel.lua" )
 
+
 Plugin.Active = {} 
 Plugin.Clients = {} 
 Plugin.Channels = {} 
@@ -61,7 +62,7 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 	if not Listener or not Speaker then return end
 
 	local SpeakerClient = GetOwner( Speaker ) 
-	local ListenerClient = GetOwner( Speaker ) 
+	local ListenerClient = GetOwner(  Listener ) 
 	local ListenerChannel = self:GetChannelByClient( ListenerClient ):GetName() 
 	local SpeakerChannel = self:GetChannelByClient( SpeakerClient ):GetName() 
 	local Active = self.Active[ SpeakerClient ] 
@@ -177,7 +178,6 @@ function Plugin:CreateCommands()
 	CreateChannelCommand:Help( "[ add ChanneName Password ] Change create" )
 	
 end
-
 
 function Plugin:Cleanup()
 
