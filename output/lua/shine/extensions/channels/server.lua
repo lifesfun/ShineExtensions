@@ -179,23 +179,23 @@ function Plugin:CreateCommands()
 
 	local function ChangeChannel( Client , Channel , Password ) 
 
-		Channel:MoveToChannel( Client , Channel , Password )
+		self:MoveToChannel( Client , Channel , Password )
 	end
 
-	local ChangeChannelCommand = self:BindCommand( "sh_change" , "change" , ChangeChannel , true )
-	ChangeChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "none" }  
-	ChangeChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
+	local ChangeChannelCommand = self:BindCommand( "sh_changechannel" , "changechannel" , ChangeChannel , true )
+	ChangeChannelCommand:AddParam{ Type = "string" }  
+	ChangeChannelCommand:AddParam{ Type = "string" } 
 	ChangeChannelCommand:Help( "[ change ChanneName Password ] Change channels" )
 
 	local function CreateChannel( Client , Channel , Password ) 
 
-		Channel:CreateChannel( Client , Channel , Password )
-		Channel:MoveToChannel( Client , Channel , Password )
+		self:CreateChannel( Client , Channel , Password )
+		self:MoveToChannel( Client , Channel , Password )
 	end
 
-	local CreateChannelCommand = self:BindCommand( "sh_add" , "add", CreateChannel )
+	local CreateChannelCommand = self:BindCommand( "sh_createchannel" , "createchannel", CreateChannel )
 	CreateChannelCommand:AddParam{ Type = "string" }  
-	CreateChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
+	CreateChannelCommand:AddParam{ Type = "string" }  
 	CreateChannelCommand:Help( "[ add ChanneName Password ] Change create" )
 end
 
