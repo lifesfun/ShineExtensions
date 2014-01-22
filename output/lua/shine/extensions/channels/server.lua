@@ -11,20 +11,11 @@ local ObjChannel = ObjChannel
 local Plugin = Plugin
 Plugin.Version = "0.8"
 
-Plugin.HasConfig = true
-Plugin.ConfigName = "Channels.json"
-Plugin.DefaultConfig = { 
-
-	TempCreate = true --all players can create temp channels
-}
-
-Plugin.CheckConfig = true
 Plugin.DefaultState = true 
 
 Plugin.Active = {} 
 Plugin.Clients = {} 
 Plugin.Channels = {} 
-
 
 function Plugin:Initialize()
 
@@ -175,6 +166,7 @@ function Plugin:CreateCommands()
 
 		Channel:MoveToChannel( Client , Channel , Password )
 	end
+
 	local ChangeChannelCommand = self:BindCommand( "sh_change" , "change" , ChangeChannel , true )
 	ChangeChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "none" }  
 	ChangeChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
@@ -182,11 +174,11 @@ function Plugin:CreateCommands()
 
 	local function CreateChannel( Client , Channel , Password ) 
 
-		if self.TempCreate == false and not Shine:HasAcess( Client , "sh_channel" ) then return end
 		Channel:CreateChannel( Client , Channel , Password )
 		Channel:MoveToChannel( Client , Channel , Password )
 	end
-	local CreateChannelCommand = self:BindCommand( "sh_add" , "add", CreateChannel , true )
+
+	local CreateChannelCommand = self:BindCommand( "sh_add" , "add", CreateChannel )
 	CreateChannelCommand:AddParam{ Type = "string" }  
 	CreateChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
 	CreateChannelCommand:Help( "[ add ChanneName Password ] Change create" )
