@@ -45,9 +45,8 @@ function Plugin:ClientConfirmConnect( Client )
 	self:SimpleTimer( 4 , function() 
 
 		self:Notify( Client, "Channels are enabled." ) 
-		self:Notify( Client, "To switch channels type  [ !# 'ChannelName/options/off' Password]" ) 
-		self:Notify( Client, "To create type [ !#+ 'ChannelName Password ]" ) 
-		self:Notify( Client, "Leave to the password blank for public channels." )
+		self:Notify( Client, "To switch channels type  [ !changechannel 'ChannelName/options/off' Password]" ) 
+		self:Notify( Client, "To create type [ !createchannel 'ChannelName Password ]" ) 
 	end )
 end 
 
