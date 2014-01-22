@@ -81,8 +81,9 @@ function Plugin:GetChannelByName( ChannelName )
 	if not self.Channels then return end
 
 	for Key , Value in ipairs( self.Channels ) do 
-		
-		if self.Channels[ Key ]:GetName() == ChannelName then return self.Channels[ Key ] end
+		local Name = self.Channels[ Key ]:GetName() 
+		self:Notify( nil , "Player being moved to %s", true , ChannelName ) 
+		if ChannelName == Name then return self.Channels[ Key ] end
 	end
 end
 
