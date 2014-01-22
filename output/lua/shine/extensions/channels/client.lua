@@ -4,7 +4,8 @@ local Encode, Decode = json.encode, json.decode
 local StringFormat = string.format
 
 Plugin.HasConfig = true
-Plugin.ConfigName = "AdminTalkKey.json"
+Plugin.ConfigName = "TalkKey.json"
+Plugin.DefaultState = true
 
 Plugin.DefaultConfig = { 	
 
@@ -55,4 +56,4 @@ function Plugin:Cleanup()
 	self.Enabled = false
 end
 
-Shine:RegisterExtension( "Channels" , Plugin )
+Shine:RegisterExtension( "TalkKey" , Plugin )
