@@ -181,6 +181,8 @@ end
 
 function Plugin:CreateCommands()
 
+	local Commands = Plugin.Commands
+
 	local function ChangeChannel( Client , Channel , Password ) 
 
 		self:MoveToChannel( Client , Channel , Password )
@@ -206,6 +208,5 @@ end
 function Plugin:Cleanup()
 
 	self.BaseClass.Cleanup( self ) 
-	self.Enable = false
 end
 

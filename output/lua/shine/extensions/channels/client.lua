@@ -50,3 +50,7 @@ function Plugin:CreateCommands()
 	ChannelKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false , Default = "p" } 
 end
 
+function Plugin:Cleanup()
+	
+	self.BaseClass.Cleanup( self )
+end
