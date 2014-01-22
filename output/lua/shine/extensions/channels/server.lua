@@ -11,13 +11,15 @@ Plugin.Version = "0.8"
 Plugin.DefaultState = true 
 
 Script.Load( "lua/shine/extensions/channels/channel.lua" )
-local ChannelObj =  ObjChannel
+ChannelObj = ObjChannel
 
 Plugin.Active = {} 
 Plugin.Clients = {} 
 Plugin.Channels = {} 
 
 function Plugin:Initialize()
+
+	self:CreateCommands()
 
 	self.Enabled = true
 
@@ -62,9 +64,11 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 	if not Listener or not Speaker then return end
 
 	local SpeakerClient = GetOwner( Speaker ) 
-	local ListenerClient = GetOwner(  Listener ) 
-	local ListenerChannel = self:GetChannelByClient( ListenerClient ):GetName() 
 	local SpeakerChannel = self:GetChannelByClient( SpeakerClient ):GetName() 
+
+	local ListenerClient = GetOwner( Listener ) 
+	local ListenerChannel = self:GetChannelByClient( ListenerClient ):GetName() 
+
 	local Active = self.Active[ SpeakerClient ] 
 	
 	if SpeakerChannel == ListenrChannel and Active == true then return true end
