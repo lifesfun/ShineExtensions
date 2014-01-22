@@ -181,7 +181,7 @@ end
 
 function Plugin:CreateCommands()
 
-	local Commands = Plugin.Commands
+	local Commands = self.Commands
 
 	local function ChangeChannel( Client , Channel , Password ) 
 
