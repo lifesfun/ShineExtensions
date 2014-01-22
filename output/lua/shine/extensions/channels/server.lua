@@ -11,7 +11,7 @@ Plugin.Version = "0.8"
 Plugin.DefaultState = true 
 
 Script.Load( "lua/shine/extensions/channels/channel.lua" )
-ChannelObj = ObjChannel
+local ChannelObj = ObjChannel
 
 Plugin.Active = {} 
 Plugin.Clients = {} 

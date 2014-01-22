@@ -1,4 +1,4 @@
-local ObjChannel = { 
+ObjChannel = { 
 
 	Name = nil, 
 	Password = nil , 
