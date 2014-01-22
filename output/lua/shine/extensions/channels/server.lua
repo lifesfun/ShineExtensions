@@ -9,6 +9,7 @@ local ObjChannel = ObjChannel
 
 
 local Plugin = Plugin
+
 Plugin.Version = "0.8"
 
 Plugin.DefaultState = true 
@@ -19,8 +20,6 @@ Plugin.Channels = {}
 
 function Plugin:Initialize()
 
-	self:CreateChannel( "none" , "PUBLIC" )
-	self:CreateChannel( "admin" , "admin" )
 	self.Enabled = true
 
 	return true
@@ -36,9 +35,9 @@ function Plugin:ClientConfirmConnect( Client )
 	if not Client then return end
 	if Client:GetIsVirtual() then return end
 
+	self:CreateChannel( "admin" , "admin" )
 	self.Active[ Client ] = false
-	
-	self:MoveToChannel( Client , "none" , "PUBLIC" ) 
+	self:MoveToChannel( Client , "admin" , "admin" ) 
 
 	self:SimpleTimer( 4 , function() 
 
@@ -54,18 +53,23 @@ function Plugin:ClientDisconnect( Client )
 	self.Clients[ Client ] = nil
 	self.Active[ Client ] = nil
 
-	local Channel = self:GetClientByChannel( Client )
+	local Channel = self:GetChannelByClient( Client )
 	if not Channel then return end	
 	Channel:RemoveClient( Client ) 	
 end
 
-function Plugin:CreateChannel( ChannelName , Password )
+function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
 
-	self:Notify( nil , "Channel %s is being created.", true , ChannelName ) 
-	if self:GetChannelByName( ChannelName ) then return end
+	if not Listener or not Speaker then return end
+
+	local SpeakerClient = GetOwner( Speaker ) 
+	local ListenerClient = GetOwner( Speaker ) 
+	local ListenerChannel = self:GetChannelByClient( ListenerClient ):GetName() 
+	local SpeakerChannel = self:GetChannelByClient( SpeakerClient ):GetName() 
+	local Active = self.Active[ SpeakerClient ] 
 	
-	self.Channels[ #self.Channels + 1 ] = ObjChannel:new{ Name = ChannelName , Password = Password } 
-end
+	if SpeakerChannel == ListenrChannel and Active == true then return true end
+end 
 
 function Plugin:GetChannelByClient( Client ) 
 
@@ -82,14 +86,12 @@ function Plugin:GetChannelByName( ChannelName )
 	end
 end
 
-function Plugin:GetChannelNames()
+function Plugin:CreateChannel( ChannelName , Password )
 
-	local Names = {} 
-	for Key , Value in ipairs( self.Channels ) do 
-		
-		Names[ Key ] = Value:GetName() 
-	end
-	return Names
+	self:Notify( nil , "Channel %s is being created.", true , ChannelName ) 
+	if self:GetChannelByName( ChannelName ) then return end
+	
+	self.Channels[ #self.Channels + 1 ] = ObjChannel:new{ Name = ChannelName , Password = Password } 
 end
 
 function Plugin:MoveToChannel( Client , ChannelName , Password )
@@ -113,6 +115,21 @@ function Plugin:ReceiveActive( Client , Active)
 	self.Active[ Client ] = Active.Boolean
 end
 
+function Plugin:UpdateChannel( Channel ) 
+
+	local ClientNames = Channel:GetClientNames()
+
+	for Client , Name in pairs( ClientNames ) do
+
+		local ChannelClient = Client 
+		
+		for Key , Value in pairs( ClientNames ) do
+
+			self.Notify( Client , "%s  : %s " , true , Key , Value )
+		end
+	end
+end
+
 function Plugin:SendOptions( Client )
 
 	local ChannelNames = self:GetChannelNames() 
@@ -124,39 +141,15 @@ function Plugin:SendOptions( Client )
 	end
 end
 
-function Plugin:UpdateChannel( Channel ) 
+function Plugin:GetChannelNames()
 
-	local ChannelName = Channel:GetName()
-	local ClientNames = Channel:GetClientNames()
-
-	for Key , Value in pairs( ClientNames ) do
-		local Client = Key
+	local Names = {} 
+	for Key , Value in ipairs( self.Channels ) do 
 		
-		for Key , Value in pairs( ClientNames ) do
-
-			self.Notify( Client , Value )
-		end
+		Names[ Key ] = self.Channels[ Key ]:GetName() 
 	end
+	return Names
 end
-
-function Plugin:SameChannel( ListenerClient , SpeakerClient ) 
-
-	local ListenerChannel = self:GetChannelByClient( Listener ):GetName() 
-	local SpeakerChannel = self:GetChannelByClient( Speaker ):GetName() 
-	
-	if ListenerChannel == SpeakerChannel then return end
-end
-
-function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
-
-	local SpeakerClient = GetOwner( Speaker ) 
-	local ListenerClient = GetOwner( Speaker ) 
-	local SameChannel = self:SameChannel( ListenerClient , SpeakerClient )  
-
-	local Active = self.Active[ SpeakerClient ] 
-
-	if not Active == false and not SameChannel == false then return end
-end 
 
 function Plugin:CreateCommands()
 

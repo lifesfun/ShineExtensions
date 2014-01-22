@@ -1,7 +1,7 @@
 ObjChannel = { 
 
 	Name = nil, 
-	Password = "PUBLIC", 
+	Password = nil , 
 	Clients = {}
 }
 
@@ -25,7 +25,7 @@ end
 
 function ObjChannel:AddClient( Client , Name )
 	
-	self.Clients[ Client ] = Name
+	self.Clients[ Client ] = Name 
 end
 
 function ObjChannel:RemoveClient( Client )
@@ -37,14 +37,16 @@ function ObjChannel:RemoveClient( Client )
 end
 
 function ObjChannel:GetClientNames() 
-	
-	local Names = {} 
-	for Key , Value in pairs( self.Clients ) do
 
-		ChannelClients[ Client ] = Value
+	Names = {}
+
+	for Client , Name in pairs( self.Clients ) do
+		
+		Names[ Client ] = Name 
 	end
 
-	return Names
+	return Names 
+
 end
 
 function ObjChannel:GetClients() 
