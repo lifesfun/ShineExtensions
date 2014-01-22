@@ -83,7 +83,7 @@ function Plugin:GetChannelByName( ChannelName )
 
 	if not self.Channels then return end
 
-	for Key , Value in ipairs( self.Channels ) do 
+	for Key , Value in pairs( self.Channels ) do 
 
 		local Channel  = self.Channels[ Key ]
 		local Name = Channel:GetName() 
