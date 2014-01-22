@@ -120,9 +120,9 @@ end
 
 function Plugin:ReceiveActive( Client ) 
  
-	if self:Timer.Exist( "Active" ) then return end
+	if self:TimerExists( "Active" ) then return end
 	
-	self:Timer.Create( "Active" , "0.1" , 1 ,  function() 
+	self:TimerCreate( "Active" , 0.1 , 1 ,  function() 
 
 		local Active =	self.Active[ Client ]
 		if self.Active[ Client ] == true then 
