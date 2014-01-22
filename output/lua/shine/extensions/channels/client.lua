@@ -1,4 +1,4 @@
-local Plugin = {} 
+local Plugin = Plugin
 
 local Encode, Decode = json.encode, json.decode
 local StringFormat = string.format
