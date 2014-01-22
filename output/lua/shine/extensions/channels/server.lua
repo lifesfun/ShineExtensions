@@ -188,7 +188,7 @@ function Plugin:CreateCommands()
 		self:MoveToChannel( Client , Channel , Password )
 	end
 
-	local Commands.ChangeChannelCommand = self:BindCommand( "sh_changechannel" , "changechannel" , ChangeChannel , true )
+	local ChangeChannelCommand = self:BindCommand( "sh_changechannel" , "changechannel" , ChangeChannel , true )
 	ChangeChannelCommand:AddParam{ Type = "string" }  
 	ChangeChannelCommand:AddParam{ Type = "string" } 
 	ChangeChannelCommand:Help( "[ change ChanneName Password ] Change channels" )
