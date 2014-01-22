@@ -87,11 +87,17 @@ function Plugin:GetChannelByName( ChannelName )
 
 	for Key , Value in pairs( self.Channels ) do 
 
-		local Channel  = self.Channels[ Key ]
-		local Name = Channel:GetName() 
+		if Value ~= nil then
+			local Channel  = self.Channels[ Key ]
+			local Name = Channel:GetName() 
 
-		self:Notify( nil , "Player being moved to %s", true , ChannelName ) 
-		if ChannelName == Name then return Channel end
+			if ChannelName == Name then 
+			
+				self:Notify( nil , "Player being moved to %s", true , ChannelName ) 
+			
+				return Channel 
+			end
+		end
 	end
 end
 
