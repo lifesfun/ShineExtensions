@@ -38,9 +38,7 @@ function Plugin:ClientConfirmConnect( Client )
 	if not Client then return end
 	if Client:GetIsVirtual() then return end
 
-	self:CreateChannel( "admin" , "admin" )
 	self.Active[ Client ] = false
-	self:MoveToChannel( Client , "admin" , "admin" ) 
 
 	self:SimpleTimer( 4 , function() 
 
