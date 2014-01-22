@@ -29,6 +29,7 @@ Plugin.Channels = {}
 function Plugin:Initialize()
 
 	self:CreateCommands()	
+
 	self:CreateChannel( "none" )
 	self:CreateChannel( "admin" , "admin" )
 	self.Enabled = true
@@ -155,7 +156,7 @@ function Plugin:SameChannel( ListenerClient , SpeakerClient )
 	local ListenerChannel = self:GetChannelByClient( Listener ):GetName() 
 	local SpeakerChannel = self:GetChannelByClient( Speaker ):GetName() 
 	
-	if ListenerChannel == SpeakerChannel then return true end
+	if ListenerChannel == SpeakerChannel then return end
 end
 
 function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
@@ -166,7 +167,7 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 
 	local Active = self.Active[ SpeakerClient ] 
 
-	if Active == true and SameChannel == true then return true end
+	if not Active == false and not SameChannel == false then return end
 end 
 
 function Plugin:CreateCommands()
@@ -191,7 +192,7 @@ function Plugin:CreateCommands()
 	CreateChannelCommand:AddParam{ Type = "string" , Optional = true , Default = "PUBLIC" }  
 	CreateChannelCommand:Help( "[ add ChanneName Password ] Change create" )
 	
-	end
+end
 
 
 function Plugin:Cleanup()
