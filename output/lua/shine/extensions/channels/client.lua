@@ -45,7 +45,7 @@ function Plugin:CreateCommands()
 		local Message = StringFormat( "You have set your toggle channel key to '%s'", String  ) 
 		Shine:AddMessageToQueue( 11 , 0.95, 0.2, Message , 5 , 255, 0, 0, 2 )
 	end
-	local ChannelKeyCommand = self:BindCommand( "channelkey" , ChannelKey ) 
+	local ChannelKeyCommand = self:RegisterClientCommand( "channelkey" , ChannelKey ) 
 	ChannelKeyCommand:AddParam{ Type = "string" , MaxLength = 1 , Optional = false , Default = "p" } 
 end
 
@@ -54,3 +54,5 @@ function Plugin:Cleanup()
 	self.BaseClass.Cleanup( self ) 
 	self.Enabled = false
 end
+
+Shine:RegisterExtension( "Channels" , Plugin )
