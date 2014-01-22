@@ -49,7 +49,6 @@ function Plugin:ClientConfirmConnect( Client )
 
 	self.Active[ Client ] = false
 	
-	self:CreateChannel( "none" , "PUBLIC" )
 	self:MoveToChannel( Client , "none" , "PUBLIC" ) 
 
 	self:SimpleTimer( 4 , function() 
@@ -90,7 +89,7 @@ function Plugin:GetChannelByName( ChannelName )
 
 	for Key , Value in ipairs( self.Channels ) do 
 		
-		if Value:GetName() == ChannelName then return Value end
+		if self.Channels[ Key ]:GetName() == ChannelName then return self.Channels[ Key ] end
 	end
 end
 
@@ -99,7 +98,7 @@ function Plugin:GetChannelNames()
 	local Names = {} 
 	for Key , Value in ipairs( self.Channels ) do 
 		
-		Names[ #Names + 1 ] = Value:GetName() 
+		Names[ Key ] = Value:GetName() 
 	end
 	return Names
 end
