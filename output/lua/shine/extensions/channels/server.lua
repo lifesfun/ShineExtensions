@@ -3,6 +3,8 @@ local Shine = Shine
 local Notify = Shared.Message
 local GetOwner = Server.GetOwner
 local FixArray = table.FixArray
+local TimerCreate = Shine.Timer.Create
+local TimerExists = Shine.Timer.Exists
 
 local Plugin = Plugin
 
@@ -120,9 +122,9 @@ end
 
 function Plugin:ReceiveActive( Client ) 
  
-	if self:TimerExists( "Active" ) then return end
+	if TimerExists( "Active" ) then return end
 	
-	self:TimerCreate( "Active" , 0.1 , 1 ,  function() 
+	TimerCreate( "Active" , 0.1 , 1 ,  function() 
 
 		local Active =	self.Active[ Client ]
 		if self.Active[ Client ] == true then 
