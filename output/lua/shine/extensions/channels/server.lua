@@ -30,7 +30,7 @@ function Plugin:Initialize()
 
 	self:CreateCommands()	
 
-	self:CreateChannel( "none" )
+	self:CreateChannel( "none" , "PUBLIC" )
 	self:CreateChannel( "admin" , "admin" )
 	self.Enabled = true
 
@@ -49,6 +49,7 @@ function Plugin:ClientConfirmConnect( Client )
 
 	self.Active[ Client ] = false
 	
+	self:CreateChannel( "none" , "PUBLIC" )
 	self:MoveToChannel( Client , "none" , "PUBLIC" ) 
 
 	self:SimpleTimer( 4 , function() 
@@ -72,9 +73,8 @@ end
 
 function Plugin:CreateChannel( ChannelName , Password )
 
-	if self:GetChannelByName( ChannelName ) then return end
-
 	self:Notify( nil , "Channel %s is being created.", true , ChannelName ) 
+	if self:GetChannelByName( ChannelName ) then return end
 	
 	self.Channels[ #self.Channels + 1 ] = ObjChannel:new{ Name = ChannelName , Password = Password } 
 end
