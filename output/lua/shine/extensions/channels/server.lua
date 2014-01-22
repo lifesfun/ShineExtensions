@@ -11,7 +11,7 @@ Plugin.Version = "0.8"
 Plugin.DefaultState = true 
 
 Script.Load( "lua/shine/extensions/channels/channel.lua" )
-
+local ChannelObj =  ObjChannel
 
 Plugin.Active = {} 
 Plugin.Clients = {} 
@@ -94,7 +94,7 @@ function Plugin:CreateChannel( ChannelName , Password )
 	if self:GetChannelByName( ChannelName ) then return end
 	self:Notify( nil , "Channel %s is being created.", true , ChannelName ) 
 	
-	self.Channels[ #self.Channels + 1 ] = ObjChannel:new{ Name = ChannelName , Password = Password } 
+	self.Channels[ #self.Channels + 1 ] = ChannelObj:new{ Name = ChannelName , Password = Password } 
 end
 
 function Plugin:MoveToChannel( Client , ChannelName , Password )
