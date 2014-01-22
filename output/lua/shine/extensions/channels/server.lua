@@ -66,7 +66,7 @@ function Plugin:ClientDisconnect( Client )
 	self.Clients[ Client ] = nil
 	self.Active[ Client ] = nil
 
-	local Channel = self:GetClientChannel( Client )
+	local Channel = self:GetClientByChannel( Client )
 	if not Channel then return end	
 	Channel:RemoveClient( Client ) 	
 end
