@@ -61,7 +61,8 @@ end
 
 function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker ) 
 
-	if not Listener or not Speaker then return end
+	if not Listener then return end 
+	if not Speaker then return end
 
 	local SpeakerClient = GetOwner( Speaker ) 
 	local SpeakerChannel = self:GetChannelByClient( SpeakerClient ):GetName() 

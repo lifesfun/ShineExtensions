@@ -1,7 +1,7 @@
 ObjChannel = { 
 
-	Name = nil, 
-	Password = nil , 
+	Name = "test", 
+	Password = "test" , 
 	Clients = {}
 }
 
