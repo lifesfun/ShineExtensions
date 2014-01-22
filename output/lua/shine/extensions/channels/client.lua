@@ -5,7 +5,6 @@ local StringFormat = string.format
 
 Plugin.HasConfig = true
 Plugin.ConfigName = "TalkKey.json"
-Plugin.DefaultState = true
 
 Plugin.DefaultConfig = { 	
 
@@ -13,6 +12,7 @@ Plugin.DefaultConfig = {
 }
 
 Plugin.CheckConfig = true
+Plugin.DefaultState = true
 
 function Plugin:Initialise()
 
