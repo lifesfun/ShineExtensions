@@ -6,19 +6,15 @@ local TimerCreate = Shine.Timer.Create
 local TimerExists = Shine.Timer.Exists
 
 local Plugin = Plugin
-
 Plugin.Version = "0.8"
-
-Plugin.DefaultState = true 
 
 Script.Load( "lua/shine/extensions/channels/channel.lua" )
 local ChannelObj = ObjChannel
 
+Plugin.HasConfig = false
 Plugin.Active = {} 
 Plugin.Clients = {} 
 Plugin.Channels = {} 
-
-Plugin.Commands = {}
 
 function Plugin:Initialise()
 
