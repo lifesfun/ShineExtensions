@@ -2,13 +2,13 @@
 
 local Shine = Shine
 
-local Notify = Shared.Message
+local Plugin = {} 
 
-local Plugin = Plugin
+Plugin.HasConfig = false
 
 Script.Load( "lua/shine/extensions/lerklift/LerkLiftMod.lua" )
 
-function Plugin:Intialise()
+function Plugin:Initialise()
 	
 	self:CreateCommands()
 	self.Enabled = true
