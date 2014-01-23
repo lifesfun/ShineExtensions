@@ -34,7 +34,7 @@ function Plugin:CreateCommands()
 
 	end
 	local LerkLiftCommand = self:BindCommand( "lerklift" , "lerklift" , LerkLift )
-	LerkLiftCommand:AddParam{ Type = "string" }
+	LerkLiftCommand:AddParam{ Type = "boolean" }
 	LerkLiftCommand:Help( "Type lerklift 1/0 to enable or disable" )
 end
 
