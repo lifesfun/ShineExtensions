@@ -21,7 +21,7 @@ Plugin.Channels = {}
 
 Plugin.Commands = {}
 
-function Plugin:Initialize()
+function Plugin:Initialise()
 
 	self:CreateCommands()
 	self:CreateChannel( "admin" , "admin" )
