@@ -1,4 +1,4 @@
-Shine Extension Channels
+Shine Extension Lerk Lift
 =========================
 
 
