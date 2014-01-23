@@ -1,5 +1,6 @@
 local Shine = Shine
 
+local Notify = Shared.Message
 local GetOwner = Server.GetOwner
 local FixArray = table.FixArray
 local TimerCreate = Shine.Timer.Create
@@ -69,7 +70,7 @@ function Plugin:CanPlayerHearPlayer( Gamerules , Listener , Speaker )
 
 	local Active = self.Active[ SpeakerClient ] 
 	
-	if SpeakerChannel == ListenrChannel and Active == true then return true end
+	if SpeakerChannel == ListenChannel and Active == true then return true end
 end 
 
 function Plugin:GetChannelByClient( Client ) 
@@ -83,18 +84,17 @@ function Plugin:GetChannelByName( ChannelName )
 
 	for Key , Value in pairs( self.Channels ) do 
 
-		if Value ~= nil then
-			local Channel  = self.Channels[ Key ]
-			local Name = Channel:GetName() 
+		local Channel  = self.Channels[ Key ]
+		local Name = Channel:GetName() 
 
-			if ChannelName == Name then 
-			
-				self:Notify( nil , "Player being moved to %s", true , ChannelName ) 
-			
-				return Channel 
-			end
+		if ChannelName == Name then 
+		
+			self:Notify( nil , "Player being moved to %s", true , ChannelName ) 
+		
+			return Channel 
 		end
 	end
+	return false 
 end
 
 function Plugin:CreateChannel( ChannelName , Password )
