@@ -22,14 +22,9 @@ end
 
 function Plugin:CreateCommands()
 
-	local function LerkLift(client, enable)
+	local function LerkLift( Client, Enable)
 
-		if enable ~= nil then
-
-			Alien.kLiftEnabled = tonumber(enable) ~= 0			
-		end
-
-		Print( string.format( "LerkLiftMod is %d", ConditionalValue( Alien.kLiftEnabled , 1 , 0 ) , enable ) )
+		Alien.kLiftEnabled = Enable 
 		self:Notify( nil , "LerkLiftMod is %s" , true , Alien.kLiftEnabled  )	
 
 	end
