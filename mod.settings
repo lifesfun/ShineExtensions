@@ -1,0 +1,6 @@
+name = "LerkLift[ Shine , Alpha ] 
+source_dir = "source/"
+output_dir = "output/"
+description = [=[Porting the original mod LerkLiftMod by Hackepeter to Shine Framework. This is mod is not working until posted.]=] 
+image = "preview.jpg"
+publish_id = "d19a606"

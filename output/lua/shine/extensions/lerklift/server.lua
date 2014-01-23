@@ -33,7 +33,7 @@ function Plugin:CreateCommands()
 		self:Notify( nil , "LerkLiftMod is %s" , true , Alien.kLiftEnabled  )	
 
 	end
-	local LerkLiftCommand = self.BindCommand( "lerklift" , "lerklift" , LerkLift )
+	local LerkLiftCommand = self:BindCommand( "lerklift" , "lerklift" , LerkLift )
 	LerkLiftCommand:AddParam{ Type = "string" }
 	LerkLiftCommand:Help( "Type lerklift 1/0 to enable or disable" )
 end
