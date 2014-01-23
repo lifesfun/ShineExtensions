@@ -1,6 +1,5 @@
 local Shine = Shine
 
-local Notify = Shared.Message
 local GetOwner = Server.GetOwner
 local FixArray = table.FixArray
 local TimerCreate = Shine.Timer.Create
