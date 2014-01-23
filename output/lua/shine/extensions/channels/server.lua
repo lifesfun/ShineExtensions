@@ -1,27 +1,28 @@
 local Shine = Shine
 
-local Notify = Shared.Message
 local GetOwner = Server.GetOwner
+
 local FixArray = table.FixArray
 local TimerCreate = Shine.Timer.Create
 local TimerExists = Shine.Timer.Exists
 
-local Plugin = Plugin
-Plugin.Version = "0.8"
-
 Script.Load( "lua/shine/extensions/channels/channel.lua" )
 local ChannelObj = ObjChannel
 
+local Plugin = Plugin
+Plugin.Version = "0.8"
+
 Plugin.HasConfig = false
+
 Plugin.Active = {} 
 Plugin.Clients = {} 
 Plugin.Channels = {} 
 
 function Plugin:Initialise()
 
-	self:CreateCommands()
 	self:CreateChannel( "admin" , "admin" )
 
+	self:CreateCommands()
 	self.Enabled = true
 
 	return true
