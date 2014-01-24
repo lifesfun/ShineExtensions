@@ -39,8 +39,8 @@ end
 
 function Alien:OnUse(player, elapsedTime, useSuccessTable)
 
-	if Alien.kLiftEnabled and -- don't trigger lifting to often
-	(self.timeOfLastLift == nil or (Shared.GetTime() - self.timeOfLastLift) > Alien.kLiftInterval) then
+	if Alien.kLiftEnabled then --and -- don't trigger lifting to often
+	--(self.timeOfLastLift == nil or (Shared.GetTime() - self.timeOfLastLift) > Alien.kLiftInterval) then
 		-- if this is the Gorge used by a Lerk
 		if self:isa(Alien.kLiftedClass) and player:isa(Alien.kLifterClass) then
 		
@@ -49,15 +49,15 @@ function Alien:OnUse(player, elapsedTime, useSuccessTable)
 			
 				-- lift the gorge
 				self:SetLiftingTo(player)
-				self.timeOfLastLift = Shared.GetTime()
+				--self.timeOfLastLift = Shared.GetTime()
 				
 				return true
 			-- if the Lerk is already lifting this Gorge (me)
 			elseif player.liftingToId == self:GetId() then
 			
 				-- release
-				//self:ResetLifting()
-				self.timeOfLastLift = Shared.GetTime()
+				self:ResetLifting()
+				--self.timeOfLastLift = Shared.GetTime()
 				
 				return true
 			end
@@ -69,8 +69,8 @@ function Alien:OnUse(player, elapsedTime, useSuccessTable)
 			if self.liftingToId == player:GetId() then
 			
 				-- release
-				//self:ResetLifting()
-				self.timeOfLastLift = Shared.GetTime()
+				self:ResetLifting()
+				--self.timeOfLastLift = Shared.GetTime()
 				
 				return true
 			end
@@ -105,14 +105,14 @@ function Alien:PostUpdateMove(input, runningPrediction)
 						end
 					else
 						-- reset if lifted alien is dead or vanished
-						//self:ResetLifting()
+						self:ResetLifting()
 					end
 					
 				end
 			end
 		-- if lifting has been disabled in midgame reset this lifting now
 		else
-			//self:ResetLifting()
+			self:ResetLifting()
 		end
 	end
 end
@@ -133,11 +133,11 @@ function Alien:ResetLifting()
 
 	if self.liftingToId ~= nil then
 	
-		/*local liftingTo = Shared.GetEntity(self.liftingToId)
+		local liftingTo = Shared.GetEntity(self.liftingToId)
 		self.liftingToId = nil
 		if liftingTo ~= nil then
 			liftingTo:ResetLifting()
-		end*/
+		end
 		
 		self:TriggerEffects(Alien.kLifterOffSound)
 
