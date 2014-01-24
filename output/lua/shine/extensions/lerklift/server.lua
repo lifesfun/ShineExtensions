@@ -1,12 +1,10 @@
---Extended the original to be used with shine. See LerkLift.lua for authors information. Thanks to the author Hackepeter 
+--Extended the original to be used with shine. See LerkLiftMod.lua for authors information. Thanks to the author Hackepeter 
 
 local Shine = Shine
 
 local Plugin = {} 
 
-Plugin.HasConfig = false
-
-Script.Load( "lua/shine/extensions/lerklift/LerkLiftMod.lua" )
+Plugin.HasConfig = false 
 
 function Plugin:Initialise()
 	
@@ -30,7 +28,7 @@ function Plugin:CreateCommands()
 	end
 	local LerkLiftCommand = self:BindCommand( "lerklift" , "lerklift" , LerkLift )
 	LerkLiftCommand:AddParam{ Type = "boolean" }
-	LerkLiftCommand:Help( "Type lerklift 1/0 to enable or disable" )
+	LerkLiftCommand:Help( "Type lerklift true/false to enable or disable" )
 end
 
 function Plugin:Cleanup()
