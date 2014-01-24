@@ -80,10 +80,10 @@ end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	-- only do stuff if something is lifted
+	-- if not lifted then dont do anything
 	if self.liftingToId == nil then return end
 
-	-- if lifting has been disabled in midgame reset this lifting now
+	-- if lifting has been disabled in midgame reset
 	if not Alien.kLiftEnabled then self:ResetLifting() return end
 		
 	local isLifter = self:isa( Alien.kLifterClass )
@@ -91,13 +91,13 @@ function Alien:PostUpdateMove( input, runningPrediction )
 
 	if not isLifter and not isLifted then return end
 				
-	-- reset if lifted alien is dead or vanished
+	-- if not lifting then reset
 	if self.liftingToId == nil then self:ResetLifting() return end
 
 	local liftingTo = nil
 	liftingTo = Shared.GetEntity( self.liftingToId )
 				
-	-- check if there is a lifting
+	-- reset if lifted alien is dead or vanished
 	if liftingTo == nil or not liftingTo:GetIsAlive() then return end
 					
 	-- if this alien is lifted copy position from lifter
@@ -124,9 +124,9 @@ function Alien:ResetLifting()
 
 	if self.liftingToId == nil then return end
 
+	local liftingTo = Shared.GetEntity( self.liftingToId )
 	self.liftingToId = nil
 
-	local liftingTo = Shared.GetEntity( self.liftingToId )
 	if liftingTo ~= nil then liftingTo:ResetLifting() end
 		
 	self:TriggerEffects( Alien.kLifterOffSound )
