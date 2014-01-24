@@ -56,7 +56,7 @@ function Alien:OnUse(player, elapsedTime, useSuccessTable)
 			elseif player.liftingToId == self:GetId() then
 			
 				-- release
-				self:ResetLifting()
+				//self:ResetLifting()
 				self.timeOfLastLift = Shared.GetTime()
 				
 				return true
@@ -69,7 +69,7 @@ function Alien:OnUse(player, elapsedTime, useSuccessTable)
 			if self.liftingToId == player:GetId() then
 			
 				-- release
-				self:ResetLifting()
+				//self:ResetLifting()
 				self.timeOfLastLift = Shared.GetTime()
 				
 				return true
@@ -105,14 +105,14 @@ function Alien:PostUpdateMove(input, runningPrediction)
 						end
 					else
 						-- reset if lifted alien is dead or vanished
-						self:ResetLifting()
+						//self:ResetLifting()
 					end
 					
 				end
 			end
 		-- if lifting has been disabled in midgame reset this lifting now
 		else
-			self:ResetLifting()
+			//self:ResetLifting()
 		end
 	end
 end
@@ -133,15 +133,14 @@ function Alien:ResetLifting()
 
 	if self.liftingToId ~= nil then
 	
-		local liftingTo = Shared.GetEntity(self.liftingToId)
+		/*local liftingTo = Shared.GetEntity(self.liftingToId)
 		self.liftingToId = nil
 		if liftingTo ~= nil then
 			liftingTo:ResetLifting()
-		end
+		end*/
 		
 		self:TriggerEffects(Alien.kLifterOffSound)
 
 	end
 	
 end
-
