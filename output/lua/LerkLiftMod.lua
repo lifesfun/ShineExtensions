@@ -104,7 +104,7 @@ function Alien:PostUpdateMove( input, runningPrediction )
 	if not isLifted then return end
 
 	local lifterPos = liftingTo:GetOrigin()
-	liftedPos = Vector( lifterPos )
+	liftedPos = Vector( lifterPos + Vector( 0 , 1 , 0 ))
 	self:SetOrigin( liftedPos )
 end
 
