@@ -37,8 +37,9 @@ end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
-	if not Alien.kLiftEnabled then return end--and -- don't trigger lifting to often
-	--(self.timeOfLastLift == nil or (Shared.GetTime() - self.timeOfLastLift) > Alien.kLiftInterval) then
+	if not Alien.kLiftEnabled then return end-- don't trigger lifting to often
+
+	if(self.timeOfLastLift == nil or (Shared.GetTime() - self.timeOfLastLift) > Alien.kLiftInterval) then
 		-- if this is the Gorge used by a Lerk
 	if self:isa( Alien.kLiftedClass ) and player:isa( Alien.kLifterClass ) then
 		
@@ -47,7 +48,7 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 			
 			-- lift the gorge
 			self:SetLiftingTo( player )
-			--self.timeOfLastLift = Shared.GetTime()
+			self.timeOfLastLift = Shared.GetTime()
 				
 			return true
 
@@ -56,7 +57,7 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 			
 			-- release
 			self:ResetLifting()
-			--self.timeOfLastLift = Shared.GetTime()
+			self.timeOfLastLift = Shared.GetTime()
 				
 			return true
 		end
@@ -69,7 +70,7 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 			
 			-- release
 			self:ResetLifting()
-			--self.timeOfLastLift = Shared.GetTime()
+			self.timeOfLastLift = Shared.GetTime()
 				
 			return true
 		end
