@@ -14,6 +14,7 @@
 -- ==============================================================
 
 -- should the mod be enabled by default?
+Script.Load( "lua/Player.lua" )
 Alien.kLiftEnabled = true
 
 Alien.kLiftInterval = 1
