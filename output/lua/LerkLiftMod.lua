@@ -122,7 +122,7 @@ function Alien:SetLiftingTo(otherAlien)
 	if self.liftingToId  == nil then
 		self.liftingToId = otherAlien:GetId()
 		self:TriggerEffects(Alien.kLifterOnSound)
-		self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
+	--	self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
 		otherAlien:SetLiftingTo(self)
 	end
 end
