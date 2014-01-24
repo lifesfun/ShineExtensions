@@ -27,7 +27,7 @@ Alien.kLiftedTip = "You just lifted by a Lerk. Press use-key to release."
 Alien.kLifterOnSound = "alien_vision_on"
 Alien.kLifterOffSound = "alien_vision_off"
 
-function Alien:GetCanBeUsed()
+function Alien:GetCanBeUsed( player , useSuccessTable )
 
     if self:GetIsAlive() then
         return true
