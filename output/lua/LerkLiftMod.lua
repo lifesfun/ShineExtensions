@@ -77,7 +77,7 @@ function Alien:OnUse(player, elapsedTime, useSuccessTable)
 		end
 	end
 	
-	return Player.OnUse(self, player, elapsedTime, useSuccessTable )
+--	return Player.OnUse(self, player, elapsedTime, useSuccessTable )
 end
 
 function Alien:PostUpdateMove(input, runningPrediction)
