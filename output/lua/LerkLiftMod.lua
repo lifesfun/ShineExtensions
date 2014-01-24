@@ -38,6 +38,11 @@ end
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
 	if not Alien.kLiftEnabled then return end-- don't trigger lifting to often
+	
+	if self.timeOfLastLift == nil then 
+
+		self.timerOfLastLift = Shared.GetTime()
+	end
 
 	local Time = Shared.GetTime() - self.timeOfLastLift 
 	
