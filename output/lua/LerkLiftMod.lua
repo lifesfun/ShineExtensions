@@ -103,8 +103,8 @@ function Alien:PostUpdateMove( input, runningPrediction )
 	-- if this alien is lifted copy position from lifter
 	if not isLifted then return end
 
-	lifterPos = liftingTo:GetOrigin();
-	local liftedPos = Vector( lifterPos.x, lifterPos.y, lifterPos.z )
+	local lifterPos = liftingTo:GetOrigin();
+	liftedPos = Vector( lifterPos.x, lifterPos.y, lifterPos.z )
 	self:SetOrigin( liftedPos )
 end
 
