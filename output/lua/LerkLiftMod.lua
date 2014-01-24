@@ -75,7 +75,7 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 		end
 	end
 	
---	return Player.OnUse(self, player, elapsedTime, useSuccessTable )
+--	return Player.OnUse(  player, elapsedTime, useSuccessTable )
 end
 
 function Alien:PostUpdateMove( input, runningPrediction )
@@ -103,8 +103,8 @@ function Alien:PostUpdateMove( input, runningPrediction )
 	-- if this alien is lifted copy position from lifter
 	if not isLifted then return end
 
-	local lifterPos = liftingTo:GetOrigin();
-	liftedPos = Vector( lifterPos.x, lifterPos.y, lifterPos.z )
+	local lifterPos = liftingTo:GetOrigin()
+	liftedPos = Vector( lifterPos )
 	self:SetOrigin( liftedPos )
 end
 
