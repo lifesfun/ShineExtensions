@@ -32,24 +32,25 @@ function Alien:GetCanBeUsed( player , useSuccessTable )
 
     if self:GetIsAlive() then return true end
 	
-    return Player.GetCanBeUsed(self)
+    return Player.GetCanBeUsed( self )
 end
 
-function Alien:OnUse(player, elapsedTime, useSuccessTable)
+function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
 	if not Alien.kLiftEnabled then return end--and -- don't trigger lifting to often
 	--(self.timeOfLastLift == nil or (Shared.GetTime() - self.timeOfLastLift) > Alien.kLiftInterval) then
 		-- if this is the Gorge used by a Lerk
-	if self:isa(Alien.kLiftedClass) and player:isa(Alien.kLifterClass) then
+	if self:isa( Alien.kLiftedClass ) and player:isa( Alien.kLifterClass ) then
 		
 		-- if the Lerk is not yet lifting any Gorge
 		if player.liftingToId == nil then
 			
 			-- lift the gorge
-			self:SetLiftingTo(player)
+			self:SetLiftingTo( player )
 			--self.timeOfLastLift = Shared.GetTime()
 				
 			return true
+
 		-- if the Lerk is already lifting this Gorge (me)
 		elseif player.liftingToId == self:GetId() then
 			
@@ -61,7 +62,7 @@ function Alien:OnUse(player, elapsedTime, useSuccessTable)
 		end
 		
 	-- if this is the Lerk used by a Gorge
-	elseif self:isa(Alien.kLifterClass) and player:isa(Alien.kLiftedClass) then
+	elseif self:isa( Alien.kLifterClass ) and player:isa( Alien.kLiftedClass ) then
 		
 		-- if the Lerk is already lifting this Gorge
 		if self.liftingToId == player:GetId() then
@@ -77,57 +78,56 @@ function Alien:OnUse(player, elapsedTime, useSuccessTable)
 --	return Player.OnUse(self, player, elapsedTime, useSuccessTable )
 end
 
-function Alien:PostUpdateMove(input, runningPrediction)
+function Alien:PostUpdateMove( input, runningPrediction )
 
 	-- only do stuff if something is lifted
-	if self.liftingToId ~= nil then return end
+	if self.liftingToId == nil then return end
 
 	-- if lifting has been disabled in midgame reset this lifting now
 	if not Alien.kLiftEnabled then self:ResetLifting() return end
 		
-	local isLifter = self:isa(Alien.kLifterClass)
-	local isLifted = self:isa(Alien.kLiftedClass)
+	local isLifter = self:isa( Alien.kLifterClass )
+	local isLifted = self:isa( Alien.kLiftedClass )
 
 	if not isLifter and not isLifted then return end
-			
-	local liftingTo = nil
 				
 	-- reset if lifted alien is dead or vanished
 	if self.liftingToId == nil then self:ResetLifting() return end
 
-	liftingTo = Shared.GetEntity(self.liftingToId)
+	local liftingTo = nil
+	liftingTo = Shared.GetEntity( self.liftingToId )
 				
-		-- check if there is a lifting
-	if liftingTo == nil and not liftingTo:GetIsAlive() then return end
+	-- check if there is a lifting
+	if liftingTo == nil or not liftingTo:GetIsAlive() then return end
 					
 	-- if this alien is lifted copy position from lifter
 	if not isLifted then return end
 
 	lifterPos = liftingTo:GetOrigin();
-	local liftedPos = Vector(lifterPos.x, lifterPos.y, lifterPos.z)
-	self:SetOrigin(liftedPos)
+	local liftedPos = Vector( lifterPos.x, lifterPos.y, lifterPos.z )
+	self:SetOrigin( liftedPos )
 end
 
 -- enabled the lifting between two aliens if there is no other lifting
-function Alien:SetLiftingTo(otherAlien)
+function Alien:SetLiftingTo( otherAlien )
 
-	if self.liftingToId  ~= nil then return end
+	if self.liftingToId ~= nil then return end
 
 	self.liftingToId = otherAlien:GetId()
-	self:TriggerEffects(Alien.kLifterOnSound)
+	self:TriggerEffects( Alien.kLifterOnSound )
 	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
-	otherAlien:SetLiftingTo(self)
+	otherAlien:SetLiftingTo( self )
 end
 
 -- reset all linking between lifter and lifted alien
 function Alien:ResetLifting()
 
 	if self.liftingToId == nil then return end
-	
-	local liftingTo = Shared.GetEntity(self.liftingToId)
+
 	self.liftingToId = nil
 
+	local liftingTo = Shared.GetEntity( self.liftingToId )
 	if liftingTo ~= nil then liftingTo:ResetLifting() end
 		
-	self:TriggerEffects(Alien.kLifterOffSound)
+	self:TriggerEffects( Alien.kLifterOffSound )
 end
