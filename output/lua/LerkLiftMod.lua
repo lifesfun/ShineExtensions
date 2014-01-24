@@ -41,7 +41,8 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 	
 	if self.timeOfLastLift == nil then 
 
-		self.timerOfLastLift = Shared.GetTime()
+		self.timerOfLastLift = 0 
+		self.timerOfLastLift = self.timerOfLastLift + Shared.GetTime()
 	end
 
 	local Time = Shared.GetTime() - self.timeOfLastLift 
