@@ -41,7 +41,7 @@ function Alien:OnUse(player, elapsedTime, useAttachPoint, usePoint)
 	if Alien.kLiftEnabled and -- don't trigger lifting to often
 	(self.timeOfLastLift == nil or (Shared.GetTime() - self.timeOfLastLift) > Alien.kLiftInterval) then
 		-- if this is the Gorge used by a Lerk
-		if self:isa(Alien.kLiftedClass) and player:isa(Alien.kLifterClass) then
+		if self:isa(Alien.kLifterClass) and player:isa(Alien.kLiftedClass) then
 		
 			-- if the Lerk is not yet lifting any Gorge
 			if player.liftingToId == nil then
