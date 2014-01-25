@@ -30,7 +30,7 @@ Alien.kLifterOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
-	io.write("Use")
+	print("Use")
 	if self:GetIsAlive() then useSuccessTable.UseSuccess = true end
 end
 
@@ -55,13 +55,13 @@ function Alien:CanUseLift( player )
 	-- if this is the Lerk used by a Gorge
 	if isLiftable and player:isa( Alien.kLiftableClass ) then 
 
-		io.write("IsLerk")
+		print("IsLerk")
 		return self:LerkCanUseLift( player ) 
 
 	-- if this is the Gorge used by a Lerk
 	elseif isLifter and player:isa( Alien.kLifterClass ) then 
 
-		io.write("IsGorge")
+		print("IsGorge")
 		return self:GorgeCanUseLift( player ) 
 	end
 
@@ -104,12 +104,12 @@ function Alien:PostUpdateMove( input, runningPrediction )
 
 	--should not be linked or lifting
 	if not self:ShouldLift() then return end
-	io.write( "ShouldLift" )
+	print( "ShouldLift" )
 
 	--Is the alien still lifting
 	local partner = LinkedPartner()
 	if not partner then self:ResetLift() return end
-	io.write( "Partner" )
+	print( "Partner" )
 
 	if self:isa( Alien.kLiftableClass ) then self:Lift() end
 end
@@ -143,7 +143,7 @@ function Alien:Lift()
 	local lifterOrigin = lift:GetOrigin()
 	lifterOrigin = Vector( lifterPos + Vector( -1 , -1 , -1 ) )
 	self:SetOrigin( lifterOrigin )
-	io.write( "Lift" )
+	print( "Lift" )
 end
 
 -- enabled the lifting between two aliens if there is no other lifting
@@ -161,7 +161,7 @@ end
 -- reset all linking between lifter and lifted alien
 function Alien:ResetLift()
 
-	io.write( "Reset" )
+	print( "Reset" )
 	
 	if not self.liftId then return end
 
