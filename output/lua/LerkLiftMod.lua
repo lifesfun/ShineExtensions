@@ -30,12 +30,11 @@ Alien.kLifterOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
-	if self:GetIsAlive() then useSuccessTable.UseSuccess = true end
+	useSuccessTable.UseSuccess = self:CanUseLift( player ) 	
 end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
-	useSuccessTable.UseSuccess = self:CanUseLift( player ) 	
 end
 
 function Alien:CanUseLift( player )
@@ -46,8 +45,8 @@ function Alien:CanUseLift( player )
 	-- don't trigger lifting to often
 	if self.lastLift and self.lastLift + Alien.KLiftInterval > Shared.GetTime() then return false end
 
-	local isLiftable = self:isa( Alien.kLifterClass )
-	local isLifter = self:isa( Alien.kLiftableClass )
+	local isLifter = self:isa( Alien.kLifterClass )
+	local isLiftable = self:isa( Alien.kLiftableClass )
 
 	if not isLiftable and not isLifter then return false end 
 
