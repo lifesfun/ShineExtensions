@@ -84,16 +84,16 @@ end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
-	if Alien:CanLift() == false then useSuccessTable.UseSuccess = false return end	
+	if self:CanLift() == false then useSuccessTable.UseSuccess = false return end	
 
 	-- if this is the Gorge used by a Lerk
 	if self:isa( Alien.kLiftedClass ) and player:isa( Alien.kLifterClass ) then 
-		useSuccessTable.UseSuccess = Alien:IsGorge( player ) 
+		useSuccessTable.UseSuccess = self:IsGorge( player ) 
 	
 	-- if this is the Lerk used by a Gorge
 	elseif self:isa( Alien.kLifterClass ) and player:isa( Alien.kLiftedClass ) then 
 	
-		useSuccessTable.UseSuccess = Alien:IsLerk( player ) 
+		useSuccessTable.UseSuccess = self:IsLerk( player ) 
 	end
 end
 
