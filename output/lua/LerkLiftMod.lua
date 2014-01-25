@@ -94,8 +94,11 @@ end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
+	-- if not linked then dont do anything
+	if not self.liftId then return end
+
 	--should not be linked or lifting
-	if not self:ShouldLift() then self:ResetLifting() return end
+	if not self:ShouldLift() then return end
 
 	--Is the alien still lifting
 	local partner = LinkedPartner()
@@ -106,14 +109,11 @@ end
 
 function Alien:ShouldLift()
 
-	-- if not linked then dont do anything
-	if not self.liftId then return false end
-
 	-- if lifting has been disabled in midgame reset
-	if not Alien.kLiftEnabled then return false end
+	if not Alien.kLiftEnabled then self:ResetLift() return end
 
 	--if not a liftable class then reset
-	if self:LiftClass() then return true end 	
+	if self:LiftClass() then return self:ResetLift()  end 	
 end
 
 function Alien:LiftClass()
