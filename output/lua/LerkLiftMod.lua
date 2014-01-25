@@ -155,7 +155,7 @@ end
 function Alien:LiftClass()
 
 	local isLifter = self:isa( Alien.kLifterClass )
-	local isLiftable = self:isa( Alien.kLiftablClass )
+	local isLiftable = self:isa( Alien.kLiftableClass )
 
 	if not isLiftable and not isLifter then return false end 
 end
