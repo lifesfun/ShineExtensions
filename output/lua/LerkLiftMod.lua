@@ -43,7 +43,7 @@ function Alien:CanUseLift( player )
 	if not Alien.kLiftEnabled then return false end
 
 	-- don't trigger lifting to often
-	if self.lastLift and self.lastLift + Alien.KLiftInterval > Shared.GetTime() then return false end
+	if self.lastLift and self.lastLift + Alien.kLiftInterval > Shared.GetTime() then return false end
 
 	local isLifter = self:isa( Alien.kLifterClass )
 	local isLiftable = self:isa( Alien.kLiftableClass )
