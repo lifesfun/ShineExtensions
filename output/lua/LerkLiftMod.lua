@@ -40,6 +40,7 @@ end
 
 function Alien:CanUseLift( player )
 
+		io.write("Use")
 	--not enabled
 	if not Alien.kLiftEnabled then return false end
 
