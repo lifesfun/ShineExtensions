@@ -30,19 +30,16 @@ Alien.kLifterOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
-	print("Use")
 	if self:GetIsAlive() then useSuccessTable.UseSuccess = true end
 end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
-	print("OnUse")
 	useSuccessTable.UseSuccess = self:CanUseLift( player ) 	
 end
 
 function Alien:CanUseLift( player )
 
-	print("CanUse")
 	--not enabled
 	if not Alien.kLiftEnabled then return false end
 
@@ -53,7 +50,7 @@ function Alien:CanUseLift( player )
 	local isLifter = self:isa( Alien.kLifterClass )
 	local isLiftable = self:isa( Alien.kLiftableClass )
 
-	if not isLiftable or not isLifter then return false end 
+	if not isLiftable and not isLifter then return false end 
 
 	print("isclas")
 	-- if this is the Lerk used by a Gorge
