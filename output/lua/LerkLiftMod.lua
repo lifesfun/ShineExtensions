@@ -54,13 +54,17 @@ function Alien:CanUseLift( player )
 	-- if this is the Lerk used by a Gorge
 	if isLiftable and player:isa( Alien.kLiftableClass ) then 
 
+		io.write("IsLerk")
 		return self:LerkCanUseLift( player ) 
 
 	-- if this is the Gorge used by a Lerk
 	elseif isLifter and player:isa( Alien.kLifterClass ) then 
 
+		io.write("IsGorge")
 		return self:GorgeCanUseLift( player ) 
 	end
+
+	return false
 end
 
 function Alien:LerkCanUseLift( player )
@@ -99,10 +103,12 @@ function Alien:PostUpdateMove( input, runningPrediction )
 
 	--should not be linked or lifting
 	if not self:ShouldLift() then return end
+	io.write( "ShouldLift" )
 
 	--Is the alien still lifting
 	local partner = LinkedPartner()
 	if not partner then self:ResetLift() return end
+	io.write( "Partner" )
 
 	if self:isa( Alien.kLiftableClass ) then self:Lift() end
 end
@@ -136,7 +142,7 @@ function Alien:Lift()
 	local lifterOrigin = lift:GetOrigin()
 	lifterOrigin = Vector( lifterPos + Vector( -1 , -1 , -1 ) )
 	self:SetOrigin( lifterOrigin )
-	print( "Lift" )
+	io.write( "Lift" )
 end
 
 -- enabled the lifting between two aliens if there is no other lifting
@@ -154,6 +160,8 @@ end
 -- reset all linking between lifter and lifted alien
 function Alien:ResetLift()
 
+	io.write( "Reset" )
+	
 	if not self.liftId then return end
 
 	local otherlift = Shared.GetEntity( self.liftId )
