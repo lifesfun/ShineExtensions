@@ -30,6 +30,7 @@ Alien.kLifterOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
+	io.write("Use")
 	if self:GetIsAlive() then useSuccessTable.UseSuccess = true end
 end
 
@@ -40,7 +41,6 @@ end
 
 function Alien:CanUseLift( player )
 
-		io.write("Use")
 	--not enabled
 	if not Alien.kLiftEnabled then return false end
 
