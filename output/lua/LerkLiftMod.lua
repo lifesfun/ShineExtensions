@@ -50,17 +50,14 @@ function Alien:CanUseLift( player )
 
 	if not isLiftable and not isLifter then return false end 
 
-	print("isclass")
 	-- if this is the Lerk used by a Gorge
 	if isLifter and player:isa( Alien.kLiftableClass ) then 
 
-		print("IsLerk")
 		return self:LerkCanUseLift( player ) 
 
 	-- if this is the Gorge used by a Lerk
 	elseif isLiftable and player:isa( Alien.kLifterClass ) then 
 
-		print("IsGorge")
 		return self:GorgeCanUseLift( player ) 
 	end
 
@@ -99,6 +96,36 @@ function Alien:GorgeCanUseLift( player )
 	end
 end
 
+-- enabled the lifting between two aliens if there is no other lifting
+function Alien:SetLift( otherAlien )
+
+	if self.liftId then return end
+
+	print("set")
+	self.liftId = otherAlien:GetId()
+	otherAlien:SetLift( self )
+
+	self:TriggerEffects( Alien.kLifterOnSound )
+	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
+end
+
+-- reset all linking between lifter and lifted alien
+function Alien:ResetLift()
+
+	print( "Reset" )
+	
+	if not self.liftId then return end
+
+	local otherlift = Shared.GetEntity( self.liftId )
+
+	self.liftId = nil
+
+	if otherLift then 
+
+		otherLift:ResetLift() 
+		self:TriggerEffects( Alien.kLifterOffSound )
+	end
+end
 function Alien:PostUpdateMove( input, runningPrediction )
 
 	-- if not linked then dont do anything
@@ -148,32 +175,3 @@ function Alien:Lift()
 	print( "Lift" )
 end
 
--- enabled the lifting between two aliens if there is no other lifting
-function Alien:SetLift( otherAlien )
-
-	if self.liftedId then return end
-
-	self.liftedId = otherAlien:GetId()
-	otherAlien:SetLift( self )
-
-	self:TriggerEffects( Alien.kLifterOnSound )
-	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
-end
-
--- reset all linking between lifter and lifted alien
-function Alien:ResetLift()
-
-	print( "Reset" )
-	
-	if not self.liftId then return end
-
-	local otherlift = Shared.GetEntity( self.liftId )
-
-	self.liftId = nil
-
-	if otherLift then 
-
-		otherLift:ResetLift() 
-		self:TriggerEffects( Alien.kLifterOffSound )
-	end
-end
