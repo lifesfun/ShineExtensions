@@ -125,8 +125,6 @@ function Alien:PostUpdateMove( input, runningPrediction )
 	self:SetOrigin( lifterOrigin )
 end
 
-function 
-
 -- enabled the lifting between two aliens if there is no other lifting
 function Alien:SetLift( otherAlien )
 
