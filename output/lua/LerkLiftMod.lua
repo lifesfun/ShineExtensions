@@ -28,13 +28,20 @@ Alien.kLiftableTip = "You just lifted by a Lerk. Press use-key to release."
 Alien.kLifterOnSound = "alien_vision_on"
 Alien.kLifterOffSound = "alien_vision_off"
 
+---lift class
+--lifter class
+--
 function Alien:GetCanBeUsed( player , useSuccessTable )
+	
+	local isLifter = self:isa( Alien.kLifterClass )
+	local isLiftable = self:isa( Alien.kLiftableClass )
 
-	useSuccessTable.UseSuccess = self:CanUseLift( player ) 	
+	if isLifter or Liftable then return true end
 end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
+	useSuccessTable.UseSuccess = self:CanUseLift( player ) 	
 end
 
 function Alien:CanUseLift( player )
@@ -43,7 +50,7 @@ function Alien:CanUseLift( player )
 	if not Alien.kLiftEnabled then return false end
 
 	-- don't trigger lifting to often
-	if self.lastLift and self.lastLift + Alien.kLiftInterval > Shared.GetTime() then return false end
+	if self.lastLift and self.lastLift + Alien.kLiftInterval < Shared.GetTime() then return false end
 
 	local isLifter = self:isa( Alien.kLifterClass )
 	local isLiftable = self:isa( Alien.kLiftableClass )
@@ -70,7 +77,6 @@ function Alien:LerkCanUseLift( player )
 	--Can lift
 	if not self.liftId and not player.liftId then
 
-		print("set")
 		self:SetLift( player )
 		self.lastLift = Shared.GetTime()
 		return true
