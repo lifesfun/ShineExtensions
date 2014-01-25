@@ -36,22 +36,26 @@ end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
+	print("OnUse")
 	useSuccessTable.UseSuccess = self:CanUseLift( player ) 	
 end
 
 function Alien:CanUseLift( player )
 
+	print("CanUse")
 	--not enabled
 	if not Alien.kLiftEnabled then return false end
 
 	-- don't trigger lifting to often
 	if self.lastLift and self.lastLift + Alien.KInterval > Shared.GetTime() then return false end
 
+	print("timer")
 	local isLifter = self:isa( Alien.kLifterClass )
 	local isLiftable = self:isa( Alien.kLiftableClass )
 
 	if not isLiftable or not isLifter then return false end 
 
+	print("isclas")
 	-- if this is the Lerk used by a Gorge
 	if isLiftable and player:isa( Alien.kLiftableClass ) then 
 
@@ -70,11 +74,13 @@ end
 
 function Alien:LerkCanUseLift( player )
 	
+	print("can use")
 	--Can lift
 	if not self.liftId and not player.liftId then
 
 		self:SetLift( player )
 		self.lastLift = Shared.GetTime()
+	print("set")
 		return true
 
 	-- if the Lerk is already lifting this Gorge
