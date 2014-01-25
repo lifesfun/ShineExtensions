@@ -57,13 +57,13 @@ function Alien:CanUseLift( player )
 
 	print("isclas")
 	-- if this is the Lerk used by a Gorge
-	if isLiftable and player:isa( Alien.kLiftableClass ) then 
+	if isLifter and player:isa( Alien.kLiftableClass ) then 
 
 		print("IsLerk")
 		return self:LerkCanUseLift( player ) 
 
 	-- if this is the Gorge used by a Lerk
-	elseif isLifter and player:isa( Alien.kLifterClass ) then 
+	elseif isLiftable and player:isa( Alien.kLifterClass ) then 
 
 		print("IsGorge")
 		return self:GorgeCanUseLift( player ) 
