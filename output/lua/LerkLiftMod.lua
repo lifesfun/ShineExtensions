@@ -20,109 +20,123 @@ Alien.kLiftEnabled = true
 Alien.kLiftInterval = 1
 
 Alien.kLifterClass = "Lerk"
-Alien.kLiftedClass = "Gorge"
+Alien.kLiftableClass = "Gorge"
 
 Alien.kLifterTip = "You just lifted a Gorge. Press use-key to release."
-Alien.kLiftedTip = "You just lifted by a Lerk. Press use-key to release."
+Alien.kLiftableTip = "You just lifted by a Lerk. Press use-key to release."
 
 Alien.kLifterOnSound = "alien_vision_on"
 Alien.kLifterOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
-	if not self:GetIsAlive() then useSuccessTable.UseSuccess = true return end
+	if self:GetIsAlive() then useSuccessTable.UseSuccess = true end
 end
 
-function Alien:IsLerk( player )
-	
-	if not self.liftId and not player.liftId then
-		self:SetLift( player )
-		self.LastLift = Shared.GetTime()
-		return true
-	end
+function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
-	-- if the Lerk is already lifting this Gorge
-	if not self.liftId then return false end
-	if self.liftId == player:GetId() then 
-		
-		-- release
-		self:ResetLift()
-		self.LastLift = Shared.GetTime() 
-		return  true
-	end
-	return false
+	useSuccessTable.UseSuccess = self:CanUseLift( player ) 	
 end
 
-function Alien:IsGorge( player )
-	if not self.liftId then return false end
-	-- if the Lerk is already lifting this Gorge (me)
-	if self.liftId == player:GetId() then
-		-- release
-		self:ResetLift()
-		self.LastLift = Shared.GetTime() 
-		return true
-	end
-	return false
-end
-
-function Alien:CanLift( player )
+function Alien:CanUseLift( player )
 
 	--not enabled
 	if not Alien.kLiftEnabled then return false end
 
 	-- don't trigger lifting to often
-	if self.LastLift and self.LastLift + Alien.KInterval > Shared.GetTime() then return false end
+	if self.lastLift and self.lastLift + Alien.KInterval > Shared.GetTime() then return false end
 
 	local isLifter = self:isa( Alien.kLifterClass )
-	local isLifted = self:isa( Alien.kLiftedClass )
+	local isLiftable = self:isa( Alien.kLiftableClass )
 
-	if not isLifted and not isLifter then return false end 
+	if not isLiftable or not isLifter then return false end 
 
-	return true
+	-- if this is the Lerk used by a Gorge
+	if isLiftable and player:isa( Alien.kLiftableClass ) then 
 
-end
-
-function Alien:OnUse( player, elapsedTime, useSuccessTable )
-
-	if self:CanLift() == false then useSuccessTable.UseSuccess = false return end	
+		return self:LerkCanUseLift( player ) 
 
 	-- if this is the Gorge used by a Lerk
-	if self:isa( Alien.kLiftedClass ) and player:isa( Alien.kLifterClass ) then 
-		useSuccessTable.UseSuccess = self:IsGorge( player ) 
+	elseif isLifter and player:isa( Alien.kLifterClass ) then 
+
+		return self:GorgeCanUseLift( player ) 
+	end
+end
+
+function Alien:LerkCanUseLift( player )
 	
-	-- if this is the Lerk used by a Gorge
-	elseif self:isa( Alien.kLifterClass ) and player:isa( Alien.kLiftedClass ) then 
-	
-		useSuccessTable.UseSuccess = self:IsLerk( player ) 
+	--Can lift
+	if not self.liftId and not player.liftId then
+
+		self:SetLift( player )
+		self.lastLift = Shared.GetTime()
+		return true
+
+	-- if the Lerk is already lifting this Gorge
+	elseif self.liftId and self.liftId ==  player:GetId() then 
+		
+		self:ResetLift()
+		self.lastLift = Shared.GetTime() 
+		return  true
+	end
+end
+
+function Alien:GorgeCanUseLift( player )
+
+	--Gorge Can Release
+	if self.liftId and self.liftId == player:GetId() then
+
+		self:ResetLift()
+		self.lastLift = Shared.GetTime() 
+		return true
 	end
 end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	-- if not lift then dont do anything
-	if not self.liftId then return end
+	--should not be linked or lifting
+	if not self:ShouldLift() then self:ResetLifting() return end
+
+	--Is the alien still lifting
+	local partner = LinkedPartner()
+	if not partner then self:ResetLift() return end
+
+	if self:isa( Alien.kLiftableClass ) then self:Lift() end
+end
+
+function Alien:ShouldLift()
+
+	-- if not linked then dont do anything
+	if not self.liftId then return false end
 
 	-- if lifting has been disabled in midgame reset
-	if not Alien.kLiftEnabled then self:ResetLift() return end
+	if not Alien.kLiftEnabled then return false end
+
+	--if not a liftable class then reset
+	if self:LiftClass() then return true end 	
+end
+
+function Alien:LiftClass()
 
 	local isLifter = self:isa( Alien.kLifterClass )
-	local isLifted = self:isa( Alien.kLiftedClass )
+	local isLiftable = self:isa( Alien.kLiftablClass )
 
-	if not isLifted and not isLifter then self:ResetLift() return end 
-			
-	-- reset if lifted alien is dead or vanished
-	local lift = Shared.GetEntity( self.liftId )
-	if not lift or not lift:GetIsAlive() then self:ResetLift()return end
-			
-	-- if not lifting then reset
-	if self.liftId ~= lift then self:ResetLift() return end
+	if not isLiftable and not isLifter then return false end 
+end
 
-	if not isLifted then return end
+function Alien:LinkedPartner()
+
+	local partner = Shared.GetEntity( self.liftId )
+	if partner and partner:GetIsAlive() then return partner end   
+end
+
+function Alien:Lift()
 
 	-- if this alien is lifted copy position from lifter
 	local lifterOrigin = lift:GetOrigin()
 	lifterOrigin = Vector( lifterPos + Vector( -1 , -1 , -1 ) )
 	self:SetOrigin( lifterOrigin )
+	print( "Lift" )
 end
 
 -- enabled the lifting between two aliens if there is no other lifting
