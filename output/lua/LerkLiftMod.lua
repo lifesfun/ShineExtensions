@@ -96,10 +96,10 @@ function Alien:LiftTo( target , deltaTime )
 	local AttachPoint = target:GetOrigin() + AttachOffset 
 
 	local Distance = ( self:GetOrigin() - AttachPoint ):GetLength()
-	if Distance < 3 then return end
+	if Distance < 2 then return end
 
-	local MaxDistance = deltaTime * 15  
-	if Distance < MaxDistance then self:ResetLift() return end
+	--local MaxDistance = deltaTime * 15  
+	--if Distance < MaxDistance then self:ResetLift() return end
 
 	local MoveDir = GetNormalizedVector( AttachPoint - self:GetOrigin() )
 
