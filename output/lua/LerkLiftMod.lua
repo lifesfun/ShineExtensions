@@ -108,8 +108,9 @@ function Alien:SetLift( otherAlien )
 	if self.liftId then return end
 
 	print("set")
-	self.liftId = otherAlien:GetId()
-	otherAlien:SetLift( self )
+	--self.liftId = otherAlien:GetId()
+	self.liftId = self
+	otherAlien:SetLift( otherAlien:GetId() )
 
 	self:TriggerEffects( Alien.kLifterOnSound )
 	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
