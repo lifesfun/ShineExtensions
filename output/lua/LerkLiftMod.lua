@@ -65,6 +65,8 @@ end
 function Alien:SetLift( target )
 	
 	self.liftId = target:GetId()  
+	self:SetPhysicsType( CollisionObject.Kinematic ) 
+
 	self:TriggerEffects( Alien.kLiftOnSound )
 	print("hooked")
 	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
@@ -72,8 +74,8 @@ end
 
 function Alien:ResetLift()
 
-	if not self.physicsBody then self.physicsBody:SetPhysicsType( CollisionObject.Dynamic ) end
 	if self.liftId then self.liftId = nil end 
+	self:SetPhysicsType( CollisionObject.Dynamic ) 
 
 	self:TriggerEffects( Alien.kLiftOffSound )
 	print("release")
@@ -86,7 +88,6 @@ function Alien:UpdateMove( deltaTime )
 	local target = Shared.GetEntity( self.liftId ) 
 	if not target or not target:GetIsAlive() then self:ResetLift() return end
 
-	if self.physicsBody then self.physicsBody:SetPhysicsType( CollisionObject.Kinematic ) end
 	self:LiftTo( target , detaTime ) 
 	print("update")
 end
@@ -105,6 +106,8 @@ function Alien:LiftTo( target , deltaTime )
 	if distance < MaxDistance then self:ResetLift() return end
 
 	local MoveDir = GetNormalizedVector( AttachPoint - self:GetOrigin() )
+
+	if self:GetPhysicsType() ~= "Kinematic" then self:SetPhysicsType( CollisionObject.Kinematic ) end 
 
 	self:SetOrigin( self:GetOrigin() + MoveDir * Distance )
 	print("lift")
