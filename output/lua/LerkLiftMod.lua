@@ -104,10 +104,12 @@ function Alien:PostUpdateMove( input, runningPrediction )
 	
 	local player = Shared.GetEntity( self.liftId ) 
 
-	if not player or not player:GetIsAlive() then self:ResetLift() return end
+	if not player then
 
-	print("player") 
-	print( "update" )
+	print( "noplayer" ) 
+	self:ResetLift() return end
+
+	print( player ) 
 	if self:isa( Alien.kLiftable ) then self:LiftTo( player ) end
 end
 
