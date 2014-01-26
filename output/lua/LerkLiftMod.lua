@@ -78,31 +78,25 @@ end
 function Alien:SetLift( player )
 	
 	self.liftId = player:GetId()  
-
-	print("set")
-
 	self:TriggerEffects( Alien.kLiftOnSound )
+	print("set")
 	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
 end
 
-function Alien:ResetLift()
+function Alien:ResetLift( player )
 
-	if not self.liftId then return end
-	local player = Shared.GetEntity( self.liftId ) 
-
-	print("release")
-	self.liftId = nil 
+	if self.liftId then self.liftId = nil end 
+	if player.liftId then player.liftId = nil end
 	self:TriggerEffects( Alien.kLiftOffSound )
-
-	if player and player.liftId then player.liftId = nil end
-	print("release both")
+	print("release")
 end
 
 function Alien:PostUpdateMove( input, runningPrediction )
-	if not  self.liftId then return end
-	local player = Shared.GetEntity( self.liftId ) 
 
-	if not player or not player:GetIsAlive() then print( "noplayer" ) self:ResetLift() return end
+	if not self.liftId then return end
+
+	local player = Shared.GetEntity( self.liftId ) 
+	if not player or not player:GetIsAlive() then self:ResetLift() return end
 
 	self:LiftTo( player ) 
 end
@@ -111,7 +105,7 @@ function Alien:LiftTo( player )
 	
 	-- if this alien is lifted copy position from lifter
 	local Origin = player:GetOrigin()
-	local newOrigin = Vector( Origin + Vector( 0 , 1 , 1 ) )
+	local newOrigin = Origin + Vector( 0 , 1 , 0 ) 
 	self:SetOrigin( newOrigin )
 end
 
