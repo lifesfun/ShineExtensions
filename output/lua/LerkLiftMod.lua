@@ -43,18 +43,19 @@ end
 
 function Alien:OnUse( target, elapsedTime, useSuccessTable )
 
-	print("use")
 	--if not self:CanUseLift( target ) then return end	
 
-	print( elapsedTime )
 	if not self.Time then self.Time = Shared.GetTime() end 
-	
-	if Shared.GetTime() - self.Time < Alien.kLiftInterval then self.Time = nil return false end
-	if not target and target:GetIsAlive() then self:ResetLift( target ) end 
+	if Shared.GetTime() - self.Time < Alien.kLiftInterval then return end
 
-	if not self.liftId and not target.liftId then self:SetLift( target ) end 
-	self:ResetLift( target )
+	print("use")
+	if not target and target:GetIsAlive() then self:ResetLift( target ) return end 
+
 	useSuccessTable.UseSuccess = true
+	self.Time = Shared.GetTime()
+
+	if not self.liftId and not target.liftId then self:SetLift( target )return end 
+	self:ResetLift( target )
 end
 
 function Alien:SetLift( target )
