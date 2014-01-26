@@ -50,7 +50,7 @@ function Alien:OnUse( target, elapsedTime, useSuccessTable )
 	--if elapsedTime < Alien.kLiftInterval then return false end
 
 	if not self:HaveLinks( target ) and target:GetIsAlive() then self:SetLift( target ) 
-	else self:ResetLift() end
+	else self:ResetLift( target ) end
 	useSuccessTable.UseSuccess = true
 end
 
@@ -65,19 +65,19 @@ end
 function Alien:SetLift( target )
 	
 	self.liftId = target:GetId()  
-	self:SetPhysicsType( CollisionObject.Kinematic ) 
-
 	self:TriggerEffects( Alien.kLiftOnSound )
+
+	self:SetPhysicsType( CollisionObject.Kinematic ) 
 	print("hooked")
 	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
 end
 
-function Alien:ResetLift()
+function Alien:ResetLift( target )
 
 	if self.liftId then self.liftId = nil end 
-	self:SetPhysicsType( CollisionObject.Dynamic ) 
-
+	if target.liftId then target.liftId = nil end 
 	self:TriggerEffects( Alien.kLiftOffSound )
+	self:SetPhysicsType( CollisionObject.Dynamic ) 
 	print("release")
 end
 
