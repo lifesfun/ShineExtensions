@@ -17,7 +17,7 @@
 --
 Alien.kLiftEnabled = true
 
-Alien.kLiftInterval = 1
+Alien.kLiftInterval = 0.33
 
 Alien.kLifter = "Lerk"
 Alien.kLiftable = "Gorge"
@@ -30,10 +30,7 @@ Alien.kLiftOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
-	if not Alien.kLiftEnabled then return false end 
-
 	print("use")
-	if not player:GetIsAlive() or not self:GetIsAlive() then return false end 
 	if not self:CanUseLift( player ) then return end
 
 	if self:HaveLinks( player ) and not self:Linked( player ) then return false 
@@ -72,6 +69,7 @@ end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
+	if not Alien.kLiftEnabled then return false end 
 	print("onuse")
 
 	print( elapsedTime )
@@ -79,7 +77,7 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
 	print("timer")
 
-	if not self:Havelinks( player ) and self:isa( Alien.kLiftable ) then self:SetLift( player ) 
+	if not self:HaveLinks( player ) and self:isa( Alien.kLiftable ) then self:SetLift( player ) 
 
 	elseif self:Linked( player ) then self:ResetLift( player ) end
 
