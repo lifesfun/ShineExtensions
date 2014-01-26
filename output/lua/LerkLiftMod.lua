@@ -31,7 +31,7 @@ Alien.kLiftOffSound = "alien_vision_off"
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
 	useSuccessTable.UseSuccess = true 
-en
+end
 
 function Alien:CanUseLift( player )
 
