@@ -110,8 +110,7 @@ function Alien:PostUpdateMove( input, runningPrediction )
 	print( "noplayer" ) 
 	self:ResetLift() return end
 
-	print( player ) 
-	if player:isa( Alien.kLiftable ) then self:LiftTo( player ) end
+	if self:isa( Alien.kLiftable ) then self:LiftTo( player ) end
 end
 
 function Alien:LiftTo( player )
