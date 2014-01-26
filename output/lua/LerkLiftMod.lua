@@ -36,7 +36,7 @@ function Alien:GetCanBeUsed( player , useSuccessTable )
 	if not player:GetIsAlive() or not self:GetIsAlive() then return false end 
 	if not self:CanUseLift( player ) then return end
 
-	if self:HaveLinks() and not self:Linked() then return false 
+	if self:HaveLinks( player ) and not self:Linked( player ) then return false 
 
 	elseif self:HaveLinks( player ) then return false end 
 	print("usegood")
