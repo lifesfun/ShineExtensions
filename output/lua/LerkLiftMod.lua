@@ -30,7 +30,7 @@ Alien.kLiftOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
-	if not Alien.LiftkEnabled then return false end 
+	if not Alien.kLiftEnabled then return false end 
 
 	print("use")
 	if not player:GetIsAlive() or not self:GetIsAlive() then return false end 
