@@ -116,11 +116,9 @@ end
 
 function Alien:LiftTo( player )
 	
-	print( "move" )
 	-- if this alien is lifted copy position from lifter
-	local playerOrigin = player:GetOrigin()
-	local newOrigin = Vector( playerOrigin + Vector( 1 , 1 , 1 ) )
-	self:SetOrigin( newOrigin )
-	print( "Lift" )
+	local Origin = self:GetOrigin()
+	local newOrigin = Vector( Origin + Vector( 0 , 4 , 4 ) )
+	player:SetOrigin( newOrigin )
 end
 
