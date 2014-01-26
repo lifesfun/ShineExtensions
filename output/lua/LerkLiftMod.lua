@@ -43,8 +43,8 @@ end
 function Alien:HaveLinks( player ) 
 
 	if self.liftId or player.liftId then
-	print("havelinks")
 	return true end  
+	print("nolinks")
 	return false
 end
 
@@ -53,9 +53,11 @@ function Alien:Linked( player )
 	local playerId = player:GetId()
 	local selfId = self:GetId()
 
-	if playerId and selfId and self.liftId == playerId or player.liftId == selfId then
-	print("linked")
-	return true end 
+	if playerId and selfId then 
+		if self.liftId == playerId or player.liftId == selfId then
+		print("linked")
+		return true end 
+	end
 	return false
 end
 
@@ -69,7 +71,7 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
 	if not self:HaveLinks( player ) then self:SetLift( player ) 
 
-	elseif self:Linked( player ) then self:ResetLift( player ) end
+	elseif self:Linked( player )then self:ResetLift( player ) end
 
 	useSuccessTable.UseSuccess = true
 end
