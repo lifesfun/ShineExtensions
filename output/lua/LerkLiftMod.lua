@@ -88,7 +88,7 @@ function Alien:UpdateMove( deltaTime )
 	local target = Shared.GetEntity( self.liftId ) 
 	if not target or not target:GetIsAlive() then self:ResetLift() return end
 
-	self:LiftTo( target , detaTime ) 
+	self:LiftTo( target , deltaTime ) 
 	print("update")
 end
 
