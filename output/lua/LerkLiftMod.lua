@@ -60,8 +60,6 @@ end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
-	print("onuse")
-	
 	if not self:CanUseLift( player ) then return end	
 
 	print( elapsedTime )
@@ -87,7 +85,7 @@ function Alien:SetLift( player )
 	print("setgood")
 
 	self:TriggerEffects( Alien.kLiftOnSound )
-	self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
+	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
 end
 
 function Alien:ResetLift()
