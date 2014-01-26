@@ -99,7 +99,7 @@ function Alien:ResetLift()
 end
 
 function Alien:PostUpdateMove( input, runningPrediction )
-
+	if not  self.liftId then return end
 	local player = Shared.GetEntity( self.liftId ) 
 
 	if not player or not player:GetIsAlive() then print( "noplayer" ) self:ResetLift() return end
