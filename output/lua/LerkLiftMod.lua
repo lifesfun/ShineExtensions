@@ -60,7 +60,7 @@ function Alien:SetLift( target )
 	self:TriggerEffects( Alien.kLiftOnSound )
 	self.liftId = target:GetId()  
 
-	self:SetPhysicsType( CollisionObject.Kinematic ) 
+	--self:SetPhysicsType( CollisionObject.Kinematic ) 
 	print("hooked")
 	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
 end
@@ -70,7 +70,7 @@ function Alien:ResetLift( target )
 	self:TriggerEffects( Alien.kLiftOffSound )
 	if self.liftId then self.liftId = nil end 
 	if target.liftId then target.liftId = nil end 
-	self:SetPhysicsType( CollisionObject.Dynamic ) 
+	--self:SetPhysicsType( CollisionObject.Dynamic ) 
 	print("release")
 end
 
