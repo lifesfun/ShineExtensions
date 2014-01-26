@@ -69,9 +69,8 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 	print( elapsedTime )
 	--if elapsedTime < Alien.kLiftInterval then return false end
 
-	if not self:HaveLinks( player ) then self:SetLift( player ) 
-
-	elseif self:Linked( player )then self:ResetLift( player ) end
+	if self:Linked( player )then self:ResetLift( player ) return end
+	if not self:HaveLinks( player ) then self:SetLift( player )return end 
 
 	useSuccessTable.UseSuccess = true
 end
@@ -112,7 +111,7 @@ function Alien:PostUpdateMove( input, runningPrediction )
 	self:ResetLift() return end
 
 	print( player ) 
-	if self:isa( Alien.kLiftable ) then self:LiftTo( player ) end
+	if player:isa( Alien.kLiftable ) then self:LiftTo( player ) end
 end
 
 function Alien:LiftTo( player )
