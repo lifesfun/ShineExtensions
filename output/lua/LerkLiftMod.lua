@@ -32,7 +32,7 @@ function Alien:GetCanBeUsed( player , useSuccessTable )
 
 	print("use")
 	if not Alien.kEnabled then return end 
-	if not player:GetIsAlive() or not self:GetIsAlive() then return end 
+	--if not player:GetIsAlive() or not self:GetIsAlive() then return end 
 	if not self:CanUseLift() then return end
 
 	if self:HaveLinks() and not self:Linked() then return 
