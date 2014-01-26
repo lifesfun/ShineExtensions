@@ -104,18 +104,19 @@ function Alien:PostUpdateMove( input, runningPrediction )
 	
 	local player = Shared.GetEntity( self.liftId ) 
 
-	print( "update" )
 	if not player or not player:GetIsAlive() then self:ResetLift() return end
-	print( "move" )
 
+	print("player") 
+	print( "update" )
 	if self:isa( Alien.kLiftable ) then self:LiftTo( player ) end
 end
 
 function Alien:LiftTo( player )
 	
+	print( "move" )
 	-- if this alien is lifted copy position from lifter
 	local playerOrigin = player:GetOrigin()
-	newOrigin = Vector( playerOrigin + Vector( 1 , 1 , 1 ) )
+	local newOrigin = Vector( playerOrigin + Vector( 1 , 1 , 1 ) )
 	self:SetOrigin( newOrigin )
 	print( "Lift" )
 end
