@@ -30,12 +30,15 @@ Alien.kLiftOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
+	print("use")
 	if not Alien.kEnabled then return end 
+	if not player:GetIsAlive() or not self:GetIsAlive() then return end 
 	if not self:CanUseLift() then return end
 
 	if self:HaveLinks() and not self:Linked() then return 
 
 	elseif self:HaveLinks() then return end 
+	print("usegood")
 
 	--if linked together or both do not have links then alien can use
 	useSuccessTable.UseSuccess = true 
@@ -43,6 +46,7 @@ end
 
 function Alien:CanUseLift( player )
 
+	print("canuse")
 	if self:isa( Alien.kLifter ) and player:isa( Alien.kLiftable ) then return true end
 	if player:isa( Alien.kLifter ) and self:isa( Alien.kLiftable ) then return true end 	
 	return false
@@ -50,12 +54,14 @@ end
 
 function Alien:HaveLinks( player ) 
 
+	print("havelinks")
 	if self.liftId or player.liftId then return true end  
 	return false
 end
 
 function Alien:Linked( player ) 
 
+	print("linked")
 	local playerId = player:GetId()
 	local selfId = player:GetId()
 
@@ -65,22 +71,26 @@ end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
+	print("onuse")
+
 	if elapsedTime < Alien.kLiftInterval then return end
 
 	if not self:Havelinks( player ) and self:isa( Alien.kLiftable ) then self:SetLift( player ) 
 
 	elseif self:Linked( player ) then self:ResetLift( player ) end
 
+	print("onusegood")
 	useSuccessTable.UseSuccess = true
 end
 
 function Alien:SetLift( player )
 	
+	print("set")
         player.liftId = self:GetId()
 	self.liftId = player:GetId()  
 
 	if not player.liftId or not self.liftId then self:Resetlift() return end
-	print("lift")
+	print("setgood")
 
 	self:TriggerEffects( Alien.kLiftOnSound )
 	self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
@@ -97,17 +107,16 @@ function Alien:ResetLift()
 	self:TriggerEffects( Alien.kLiftOffSound )
 
 	if player and player.liftId then player.liftId = nil end
-	print("reset")
-
-
+	print("release both")
 end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	if not Alien.Enabled then self:ResetLift() return end 
+	print( "update" )
+	if not Alien.kEnabled then self:ResetLift() return end 
 
 	local player = self.liftId 
-	if not player then self:ResetLift() return end
+	if not player or not player:GetIsAlive() then self:ResetLift() return end
 
 	if self:isa( Alien.kLiftableClass ) then self:LiftTo( player ) end
 end
