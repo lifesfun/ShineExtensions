@@ -31,7 +31,7 @@ Alien.kLiftOffSound = "alien_vision_off"
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
 	useSuccessTable.UseSuccess = true 
-end
+en
 
 function Alien:CanUseLift( player )
 
@@ -113,8 +113,8 @@ end
 function Alien:LiftTo( player )
 	
 	-- if this alien is lifted copy position from lifter
-	local Origin = self:GetOrigin()
+	local Origin = player:GetOrigin()
 	local newOrigin = Vector( Origin + Vector( 0 , 4 , 4 ) )
-	player:SetOrigin( newOrigin )
+	self:SetOrigin( newOrigin )
 end
 
