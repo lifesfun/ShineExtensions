@@ -69,7 +69,7 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 	print( elapsedTime )
 	--if elapsedTime < Alien.kLiftInterval then return false end
 
-	if self:Linked( player ) then self:ResetLift( player ) return end
+	if self:HaveLinks( player ) then self:ResetLift( player ) return end
 	if not self:HaveLinks( player ) then self:SetLift( player )return end 
 
 	useSuccessTable.UseSuccess = true
@@ -77,7 +77,6 @@ end
 
 function Alien:SetLift( player )
 	
-        player.liftId = self:GetId()
 	self.liftId = player:GetId()  
 
 	print("set")
@@ -101,11 +100,9 @@ end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	if not self.liftId then return end 
-	
 	local player = Shared.GetEntity( self.liftId ) 
 
-	if not player then print( "noplayer" ) self:ResetLift() return end
+	if not player or not player:GetIsAlive() then print( "noplayer" ) self:ResetLift() return end
 
 	self:LiftTo( player ) 
 end
