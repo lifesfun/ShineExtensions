@@ -30,15 +30,6 @@ Alien.kLiftOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
-	print("use")
-	if not self:CanUseLift( player ) then return end
-
-	if self:HaveLinks( player ) and not self:Linked( player ) then return false 
-
-	elseif self:HaveLinks( player ) then return false end 
-	print("usegood")
-
-	--if linked together or both do not have links then alien can use
 	useSuccessTable.UseSuccess = true 
 end
 
@@ -69,15 +60,16 @@ end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
-	if not Alien.kLiftEnabled then return false end 
 	print("onuse")
+	
+	if not self:CanUseLift( player ) then return end	
 
 	print( elapsedTime )
 	--if elapsedTime < Alien.kLiftInterval then return false end
 
 	print("timer")
 
-	if not self:HaveLinks( player ) and self:isa( Alien.kLiftable ) then self:SetLift( player ) 
+	if not self:HaveLinks( player ) then self:SetLift( player ) 
 
 	elseif self:Linked( player ) then self:ResetLift( player ) end
 
@@ -95,10 +87,9 @@ function Alien:SetLift( player )
 	print("setgood")
 
 	self:TriggerEffects( Alien.kLiftOnSound )
-	self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
+	self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
 end
 
--- reset all linking between lifter and lifted alien
 function Alien:ResetLift()
 
 	if not self.liftId then return end
@@ -113,8 +104,6 @@ function Alien:ResetLift()
 end
 
 function Alien:PostUpdateMove( input, runningPrediction )
-
-	if not Alien.kLiftEnabled and self.liftId then self:ResetLift() return end 
 
 	if self.liftId then local player = Shared.GetEntity( self.liftId ) end  
 
