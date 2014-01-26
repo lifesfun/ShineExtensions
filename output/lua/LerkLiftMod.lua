@@ -52,7 +52,7 @@ function Alien:Linked( player )
 
 	print("linked")
 	local playerId = player:GetId()
-	local selfId = player:GetId()
+	local selfId = self:GetId()
 
 	if playerId and selfId and self.liftId == playerId or player.liftId == selfId then return true end 
 	return false
@@ -65,24 +65,21 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 	print( elapsedTime )
 	--if elapsedTime < Alien.kLiftInterval then return false end
 
-	print("timer")
-
 	if not self:HaveLinks( player ) then self:SetLift( player ) 
 
 	elseif self:Linked( player ) then self:ResetLift( player ) end
 
-	print("onusegood")
+	print("use")
 	useSuccessTable.UseSuccess = true
 end
 
 function Alien:SetLift( player )
 	
-	print("set")
         player.liftId = self:GetId()
 	self.liftId = player:GetId()  
 
-	if not player.liftId or not self.liftId then self:Resetlift() return end
-	print("setgood")
+	if not player.liftId or not self.liftId then print("toggleoff") self:Resetlift() return end
+	print("set")
 
 	self:TriggerEffects( Alien.kLiftOnSound )
 	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
