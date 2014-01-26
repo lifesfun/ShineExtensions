@@ -112,11 +112,15 @@ end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	print( "update" )
 	if not Alien.kEnabled then self:ResetLift() return end 
 
-	local player = self.liftId 
+	if self.liftId then 
+	
+		local player = Shared.GetEntity( self.liftId ) 
+	end  
+
 	if not player or not player:GetIsAlive() then self:ResetLift() return end
+	print( "update" )
 
 	if self:isa( Alien.kLiftableClass ) then self:LiftTo( player ) end
 end
