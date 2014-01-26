@@ -48,24 +48,17 @@ function Alien:OnUse( target, elapsedTime, useSuccessTable )
 
 	print( elapsedTime )
 	--if elapsedTime < Alien.kLiftInterval then return false end
+	if not target and target:GetIsAlive() then self:ResetLift( target ) end 
 
-	if not self:HaveLinks( target ) and target:GetIsAlive() then self:SetLift( target ) 
-	else self:ResetLift( target ) end
+	if not self.liftId and not target.liftId then self:SetLift( target ) end 
+	self:ResetLift( target )
 	useSuccessTable.UseSuccess = true
 end
 
-function Alien:HaveLinks( target ) 
-
-	if not target then return false end
-	if self.liftId or target.liftId then return true end  
-	return false
-end
-
-
 function Alien:SetLift( target )
 	
-	self.liftId = target:GetId()  
 	self:TriggerEffects( Alien.kLiftOnSound )
+	self.liftId = target:GetId()  
 
 	self:SetPhysicsType( CollisionObject.Kinematic ) 
 	print("hooked")
@@ -74,9 +67,9 @@ end
 
 function Alien:ResetLift( target )
 
+	self:TriggerEffects( Alien.kLiftOffSound )
 	if self.liftId then self.liftId = nil end 
 	if target.liftId then target.liftId = nil end 
-	self:TriggerEffects( Alien.kLiftOffSound )
 	self:SetPhysicsType( CollisionObject.Dynamic ) 
 	print("release")
 end
@@ -103,7 +96,7 @@ function Alien:LiftTo( target , deltaTime )
 	if Distance < 3 then return end
 
 	local MaxDistance = deltaTime * 15  
-	if distance < MaxDistance then self:ResetLift() return end
+	if Distance < MaxDistance then self:ResetLift() return end
 
 	local MoveDir = GetNormalizedVector( AttachPoint - self:GetOrigin() )
 
