@@ -19,166 +19,105 @@ Alien.kLiftEnabled = true
 
 Alien.kLiftInterval = 1
 
-Alien.kLifterClass = "Lerk"
-Alien.kLiftableClass = "Gorge"
+Alien.kLifter = "Lerk"
+Alien.kLiftable = "Gorge"
 
 Alien.kLifterTip = "You just lifted a Gorge. Press use-key to release."
 Alien.kLiftableTip = "You just lifted by a Lerk. Press use-key to release."
 
-Alien.kLifterOnSound = "alien_vision_on"
-Alien.kLifterOffSound = "alien_vision_off"
+Alien.kLiftOnSound = "alien_vision_on"
+Alien.kLiftOffSound = "alien_vision_off"
 
----lift class
---lifter class
---
 function Alien:GetCanBeUsed( player , useSuccessTable )
-	
-	local isLifter = self:isa( Alien.kLifterClass )
-	local isLiftable = self:isa( Alien.kLiftableClass )
 
-	if isLifter or Liftable then return true end
-end
+	if not Alien.kEnabled then return end 
+	if not self:CanUseLift() then return end
 
-function Alien:OnUse( player, elapsedTime, useSuccessTable )
+	if self:HaveLinks() and not self:Linked() then return 
 
-	useSuccessTable.UseSuccess = self:CanUseLift( player ) 	
+	elseif self:HaveLinks() then return end 
+
+	--if linked together or both do not have links then alien can use
+	useSuccessTable.UseSuccess = true 
 end
 
 function Alien:CanUseLift( player )
 
-	--not enabled
-	if not Alien.kLiftEnabled then return false end
-
-	-- don't trigger lifting to often
-	--if self.lastLift and self.lastLift + Alien.kLiftInterval < Shared.GetTime() then return false end
-
-	local isLifter = self:isa( Alien.kLifterClass )
-	local isLiftable = self:isa( Alien.kLiftableClass )
-
-	if not isLiftable and not isLifter then return false end 
-
-	-- if this is the Lerk used by a Gorge
-	if isLifter and player:isa( Alien.kLiftableClass ) then 
-
-		return self:LerkCanUseLift( player ) 
-
-	-- if this is the Gorge used by a Lerk
-	elseif isLiftable and player:isa( Alien.kLifterClass ) then 
-
-		return self:GorgeCanUseLift( player ) 
-	end
-
+	if self:isa( Alien.kLifter ) and player:isa( Alien.kLiftable ) then return true end
+	if player:isa( Alien.kLifter ) and self:isa( Alien.kLiftable ) then return true end 	
 	return false
 end
 
-function Alien:LerkCanUseLift( player )
+function Alien:HaveLinks( player ) 
+
+	if self.liftId or player.liftId then return true end  
+	return false
+end
+
+function Alien:Linked( player ) 
+
+	local playerId = player:GetId()
+	local selfId = player:GetId()
+
+	if playerId and selfId and self.liftId == playerId or player.liftId == selfId then return true end 
+	return false
+end
+
+function Alien:OnUse( player, elapsedTime, useSuccessTable )
+
+	if elapsedTime < Alien.kLiftInterval then return end
+
+	if not self:Havelinks( player ) and self:isa( Alien.kLiftable ) then self:SetLift( player ) 
+
+	elseif self:Linked( player ) then self:ResetLift( player ) end
+
+	useSuccessTable.UseSuccess = true
+end
+
+function Alien:SetLift( player )
 	
-	print("lerk")
-	--Can lift
-	if not self.liftId and not player.liftId then
+        player.liftId = self:GetId()
+	self.liftId = player:GetId()  
 
-		self:SetLift( player )
-		self.lastLift = Shared.GetTime()
-		return true
+	if not player.liftId or not self.liftId then self:Resetlift() return end
+	print("lift")
 
-	-- if the Lerk is already lifting this Gorge
-	elseif self.liftId and self.liftId ==  player:GetId() then 
-		
-		self:ResetLift()
-		self.lastLift = Shared.GetTime() 
-		return  true
-	end
-end
-
-function Alien:GorgeCanUseLift( player )
-
-	print("gorge")
-	--Gorge Can Release
-	if self.liftId and self.liftId == player:GetId() then
-
-		self:ResetLift()
-		self.lastLift = Shared.GetTime() 
-		return true
-	end
-end
-
--- enabled the lifting between two aliens if there is no other lifting
-function Alien:SetLift( otherAlien )
-
-	if self.liftId then return end
-
-	print("set")
-	--self.liftId = otherAlien:GetId()
-	self.liftId = self
-	otherAlien:SetLift( otherAlien:GetId() )
-
-	self:TriggerEffects( Alien.kLifterOnSound )
-	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
+	self:TriggerEffects( Alien.kLiftOnSound )
+	self:AddTooltip(ConditionalValue(self:isa(Alien.kLiftedClass), Alien.kLiftedTip, Alien.kLifterTip))
 end
 
 -- reset all linking between lifter and lifted alien
 function Alien:ResetLift()
 
-	print( "Reset" )
-	
 	if not self.liftId then return end
+	local player = Shared.GetEntity( self.liftId ) 
 
-	local otherlift = Shared.GetEntity( self.liftId )
+	print("release")
+	self.liftId = nil 
+	self:TriggerEffects( Alien.kLiftOffSound )
 
-	self.liftId = nil
+	if player and player.liftId then player.liftId = nil end
+	print("reset")
 
-	if otherLift then 
 
-		otherLift:ResetLift() 
-		self:TriggerEffects( Alien.kLifterOffSound )
-	end
 end
+
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	-- if not linked then dont do anything
-	if not self.liftId then return end
+	if not Alien.Enabled then self:ResetLift() return end 
 
-	--should not be linked or lifting
-	if not self:ShouldLift() then return end
-	print( "ShouldLift" )
+	local player = self.liftId 
+	if not player then self:ResetLift() return end
 
-	--Is the alien still lifting
-	local partner = LinkedPartner()
-	if not partner then self:ResetLift() return end
-	print( "Partner" )
-
-	if self:isa( Alien.kLiftableClass ) then self:Lift() end
+	if self:isa( Alien.kLiftableClass ) then self:LiftTo( player ) end
 end
 
-function Alien:ShouldLift()
-
-	-- if lifting has been disabled in midgame reset
-	if not Alien.kLiftEnabled then self:ResetLift() return end
-
-	--if not a liftable class then reset
-	if self:LiftClass() then return self:ResetLift()  end 	
-end
-
-function Alien:LiftClass()
-
-	local isLifter = self:isa( Alien.kLifterClass )
-	local isLiftable = self:isa( Alien.kLiftableClass )
-
-	if not isLiftable and not isLifter then return false end 
-end
-
-function Alien:LinkedPartner()
-
-	local partner = Shared.GetEntity( self.liftId )
-	if partner and partner:GetIsAlive() then return partner end   
-end
-
-function Alien:Lift()
-
+function Alien:LiftTo( player )
+	
 	-- if this alien is lifted copy position from lifter
-	local lifterOrigin = lift:GetOrigin()
-	lifterOrigin = Vector( lifterPos + Vector( -1 , -1 , -1 ) )
-	self:SetOrigin( lifterOrigin )
+	local playerOrigin = player:GetOrigin()
+	newOrigin = Vector( playerOrigin + Vector( 1 , 1 , 1 ) )
+	self:SetOrigin( newOrigin )
 	print( "Lift" )
 end
 
