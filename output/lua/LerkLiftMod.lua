@@ -35,31 +35,33 @@ end
 
 function Alien:CanUseLift( player )
 
-	print("canuse")
-	if self:isa( Alien.kLifter ) and player:isa( Alien.kLiftable ) then return true end
-	if player:isa( Alien.kLifter ) and self:isa( Alien.kLiftable ) then return true end 	
+	if self:isa( Alien.kLifter ) and player:isa( Alien.kLiftable ) then print("lerk") return true end
+	if player:isa( Alien.kLifter ) and self:isa( Alien.kLiftable ) then  print("gorge") return true end 	
 	return false
 end
 
 function Alien:HaveLinks( player ) 
 
+	if self.liftId or player.liftId then
 	print("havelinks")
-	if self.liftId or player.liftId then return true end  
+	return true end  
 	return false
 end
 
 function Alien:Linked( player ) 
 
-	print("linked")
 	local playerId = player:GetId()
 	local selfId = self:GetId()
 
-	if playerId and selfId and self.liftId == playerId or player.liftId == selfId then return true end 
+	if playerId and selfId and self.liftId == playerId or player.liftId == selfId then
+	print("linked")
+	return true end 
 	return false
 end
 
 function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
+	print("use")
 	if not self:CanUseLift( player ) then return end	
 
 	print( elapsedTime )
@@ -69,7 +71,6 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
 	elseif self:Linked( player ) then self:ResetLift( player ) end
 
-	print("use")
 	useSuccessTable.UseSuccess = true
 end
 
@@ -100,10 +101,12 @@ end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
+	print( "post" )
 	if self.liftId then local player = Shared.GetEntity( self.liftId ) end  
 
-	if not player or not player:GetIsAlive() then self:ResetLift() return end
 	print( "update" )
+	if not player or not player:GetIsAlive() then self:ResetLift() return end
+	print( "move" )
 
 	if self:isa( Alien.kLiftable ) then self:LiftTo( player ) end
 end
