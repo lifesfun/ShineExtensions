@@ -79,7 +79,6 @@ function Alien:SetLift( player )
         player.liftId = self:GetId()
 	self.liftId = player:GetId()  
 
-	if not player.liftId or not self.liftId then print("toggleoff") self:Resetlift() return end
 	print("set")
 
 	self:TriggerEffects( Alien.kLiftOnSound )
@@ -101,8 +100,9 @@ end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	print( "post" )
-	if self.liftId then local player = Shared.GetEntity( self.liftId ) end  
+	if not self.liftId then return end 
+	
+	local player = Shared.GetEntity( self.liftId ) 
 
 	print( "update" )
 	if not player or not player:GetIsAlive() then self:ResetLift() return end
