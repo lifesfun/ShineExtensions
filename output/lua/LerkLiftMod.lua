@@ -105,7 +105,7 @@ function Alien:LiftTo( player )
 	
 	-- if this alien is lifted copy position from lifter
 	local O = player:GetOrigin()
-	local new = O
+	local new = O + Vector( 0 , 0 , 1 )
 	self:SetOrigin( new )
 end
 
