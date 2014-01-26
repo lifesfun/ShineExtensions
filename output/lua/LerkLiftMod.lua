@@ -28,84 +28,86 @@ Alien.kLiftableTip = "You just lifted by a Lerk. Press use-key to release."
 Alien.kLiftOnSound = "alien_vision_on"
 Alien.kLiftOffSound = "alien_vision_off"
 
-function Alien:GetCanBeUsed( player , useSuccessTable )
-
+function Alien:GetCanBeUsed( target , useSuccessTable )
+	
+	if not target:GetIsAlive() then return end
 	useSuccessTable.UseSuccess = true 
 end
 
-function Alien:CanUseLift( player )
+function Alien:CanUseLift( target )
 
-	if self:isa( Alien.kLifter ) and player:isa( Alien.kLiftable ) then print("lerk") return true end
-	if player:isa( Alien.kLifter ) and self:isa( Alien.kLiftable ) then  print("gorge") return true end 	
+	if self:isa( Alien.kLifter ) and target:isa( Alien.kLiftable ) then print("lerk") return true end
+	if target:isa( Alien.kLifter ) and self:isa( Alien.kLiftable ) then  print("gorge") return true end 	
 	return false
 end
 
-function Alien:HaveLinks( player ) 
-
-	if self.liftId or player.liftId then
-	return true end  
-	print("nolinks")
-	return false
-end
-
-function Alien:Linked( player ) 
-
-	local playerId = player:GetId()
-	local selfId = self:GetId()
-
-	if playerId and selfId then 
-		if self.liftId == playerId or player.liftId == selfId then
-		print("linked")
-		return true end 
-	end
-	return false
-end
-
-function Alien:OnUse( player, elapsedTime, useSuccessTable )
+function Alien:OnUse( target, elapsedTime, useSuccessTable )
 
 	print("use")
---	if not self:CanUseLift( player ) then return end	
+	--if not self:CanUseLift( target ) then return end	
 
 	print( elapsedTime )
 	--if elapsedTime < Alien.kLiftInterval then return false end
 
-	if self:HaveLinks( player ) then self:ResetLift( player ) return end
-	if not self:HaveLinks( player ) then self:SetLift( player )return end 
-
+	if not self:HaveLinks( target ) and target:GetIsAlive() then self:SetLift( target ) 
+	else self:ResetLift() end
 	useSuccessTable.UseSuccess = true
 end
 
-function Alien:SetLift( player )
+function Alien:HaveLinks( target ) 
+
+	if not target then return false end
+	if self.liftId or target.liftId then return true end  
+	return false
+end
+
+
+function Alien:SetLift( target )
 	
-	self.liftId = player:GetId()  
+	self.liftId = target:GetId()  
 	self:TriggerEffects( Alien.kLiftOnSound )
-	print("set")
+	print("hooked")
 	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
 end
 
-function Alien:ResetLift( player )
+function Alien:ResetLift()
 
+	if not self.physicsBody then self.physicsBody:SetPhysicsType( CollisionObject.Dynamic ) end
 	if self.liftId then self.liftId = nil end 
-	if player.liftId then player.liftId = nil end
+
 	self:TriggerEffects( Alien.kLiftOffSound )
 	print("release")
 end
 
-function Alien:PostUpdateMove( input, runningPrediction )
+function Alien:UpdateMove( deltaTime )
 
 	if not self.liftId then return end
 
-	local player = Shared.GetEntity( self.liftId ) 
-	if not player or not player:GetIsAlive() then self:ResetLift() return end
+	local target = Shared.GetEntity( self.liftId ) 
+	if not target or not target:GetIsAlive() then self:ResetLift() return end
 
-	self:LiftTo( player ) 
+	if self.physicsBody then self.physicsBody:SetPhysicsType( CollisionObject.Kinematic ) end
+	self:LiftTo( target , detaTime ) 
+	print("update")
 end
 
-function Alien:LiftTo( player )
+function Alien:LiftTo( target , deltaTime )
 	
 	-- if this alien is lifted copy position from lifter
-	local O = player:GetOrigin()
-	local new = O + Vector( 0 , 0 , 1 )
-	self:SetOrigin( new )
+	
+	local AttachOffset = Vector( 0 , 1 , 1 )
+	local AttachPoint = target:GetOrigin() + AttachOffset 
+
+	local Distance = ( self:GetOrigin() - AttachPoint ):GetLength()
+	if Distance < 3 then return end
+
+	local MaxDistance = deltaTime * 15  
+	if distance < MaxDistance then self:ResetLift() return end
+
+	local MoveDir = GetNormalizedVector( AttachPoint - self:GetOrigin() )
+
+	self:SetOrigin( self:GetOrigin() + MoveDir * Distance )
+	print("lift")
+	
 end
 
