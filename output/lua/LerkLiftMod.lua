@@ -31,7 +31,7 @@ Alien.kLiftOffSound = "alien_vision_off"
 function Alien:GetCanBeUsed( player , useSuccessTable )
 
 	print("use")
-	if not Alien.kEnabled then return end 
+	if not Alien.LiftkEnabled then return end 
 	--if not player:GetIsAlive() or not self:GetIsAlive() then return end 
 	if not self:CanUseLift() then return end
 
@@ -112,7 +112,7 @@ end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	if not Alien.kEnabled then self:ResetLift() return end 
+	if not Alien.kLiftEnabled then self:ResetLift() return end 
 
 	if self.liftId then 
 	
