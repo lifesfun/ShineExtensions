@@ -74,7 +74,8 @@ function Alien:OnUse( player, elapsedTime, useSuccessTable )
 
 	print("onuse")
 
-	if elapsedTime < Alien.kLiftInterval then return false end
+	print( elapsedTime )
+	--if elapsedTime < Alien.kLiftInterval then return false end
 
 	print("timer")
 
@@ -115,12 +116,9 @@ end
 
 function Alien:PostUpdateMove( input, runningPrediction )
 
-	if not Alien.kLiftEnabled then self:ResetLift() return end 
+	if not Alien.kLiftEnabled and self.liftId then self:ResetLift() return end 
 
-	if self.liftId then 
-	
-		local player = Shared.GetEntity( self.liftId ) 
-	end  
+	if self.liftId then local player = Shared.GetEntity( self.liftId ) end  
 
 	if not player or not player:GetIsAlive() then self:ResetLift() return end
 	print( "update" )
