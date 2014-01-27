@@ -100,11 +100,11 @@ end
 
 function Alien:LiftTo( target , deltaTime )
 	
-	local attachOffset = Vector( self.kLiftx , self.kLifty  , self.kLiftz )
+	local attachOffset = Vector( Alien.kLiftx , Alien.kLifty  , Alien.kLiftz )
 	local attachPoint = target:GetOrigin() + attachOffset 
 
 	local distance = ( self:GetOrigin() - attachPoint ):GetLength()
-	if distance < self.kLiftDistance then return end
+	if distance < Alien.kLiftDistance then return end
 
 	local moveDir = GetNormalizedVector( attachPoint - self:GetOrigin() )
 
