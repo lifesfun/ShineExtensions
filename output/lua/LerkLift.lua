@@ -39,7 +39,7 @@ function Alien:MinTime()
 	local time = Shared.GetTime()
 
 	print("Time: "..time )
-	if self.LastUse and ( time > ( self.LastUse + Alien.kLiftInterval ) ) then 
+	if self.LastUse and ( time < ( self.LastUse + Alien.kLiftInterval ) ) then 
 
 		self.LastUse = Time 
 	else
