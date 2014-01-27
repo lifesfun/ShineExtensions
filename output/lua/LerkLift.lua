@@ -43,6 +43,7 @@ function Alien:MinTime()
 		self.LastUse = Shared.GetTime()
 		return 
 	end
+	self.LastUse = Shared.GetTime()
 end
 	
 function Alien:OnUse( target, elapsedTime, useSuccessTable )
