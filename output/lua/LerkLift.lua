@@ -98,7 +98,6 @@ function Alien:UpdateMove( deltaTime )
 		print("movereset")
 		self:ResetLift() 
 	end
-	print("update")
 end
 
 function Alien:LiftTo( target , deltaTime )
@@ -107,11 +106,10 @@ function Alien:LiftTo( target , deltaTime )
 	local attachPoint = target:GetOrigin() + attachOffset 
 
 	local distance = ( self:GetOrigin() - attachPoint ):GetLength()
-	if distance > 1 and distance < 3 then return end
+	if distance < 2.5 then return end
 
 	local moveDir = GetNormalizedVector( attachPoint - self:GetOrigin() )
 
 	self:SetOrigin( self:GetOrigin() + moveDir * distance )
-	print("lift")
 end
 
