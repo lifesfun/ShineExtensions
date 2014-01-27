@@ -41,6 +41,7 @@ function Alien:MinTime()
 	print("Time: "..time )
 	if self.LastUse and ( time < ( self.LastUse + Alien.kLiftInterval ) ) then 
 
+		print( self.LaseUse )
 		self.LastUse = time 
 	else
 		self.LastUse = time 
