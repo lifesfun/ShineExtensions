@@ -45,7 +45,7 @@ function Alien:MinTime()
 		self.LastUse = time 
 	else
 		self.LastUse = time 
-		return
+		return true
 	end
 end
 	
