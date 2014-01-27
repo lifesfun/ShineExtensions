@@ -49,6 +49,8 @@ end
 function Alien:OnUse( target, elapsedTime, useSuccessTable )
 	
 	if not Alien.kLiftEnabled then return end
+
+	self:TriggerEffects( Alien.kLiftOffSound )
 	if not target then return end
 	if not self:MinTime() then return end
 
