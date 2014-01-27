@@ -38,7 +38,7 @@ function Alien:MinTime()
 
 	local time = Shared.GetTime()
 
-	if self.LastUse == nil and ( time > ( self.LastUse + Alien.kLiftInterval ) ) then 
+	if self.LastUse and ( time > ( self.LastUse + Alien.kLiftInterval ) ) then 
 
 		self.LastUse = Shared.GetTime()
 		return 
