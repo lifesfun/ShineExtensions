@@ -102,11 +102,11 @@ end
 
 function Alien:LiftTo( target , deltaTime )
 	
-	local attachOffset = Vector( 0 , 2 , 0 )
+	local attachOffset = Vector( 1 , 2 , 0 )
 	local attachPoint = target:GetOrigin() + attachOffset 
 
 	local distance = ( self:GetOrigin() - attachPoint ):GetLength()
-	if distance < 2.5 then return end
+	if distance < 3.1 then return end
 
 	local moveDir = GetNormalizedVector( attachPoint - self:GetOrigin() )
 
