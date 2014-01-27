@@ -8,7 +8,7 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/AlienUpgradeManager.lua")
-Script.Load("lua/LerkLiftMod.lua")
+Script.Load("lua/LerkLift.lua")
 
 function Alien:TriggerEnzyme(duration)
 
