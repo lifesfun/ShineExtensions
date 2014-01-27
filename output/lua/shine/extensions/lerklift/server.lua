@@ -29,18 +29,22 @@ function Plugin:CreateCommands()
 	local LerkLiftCommand = self:BindCommand( "lerklift" , "lerklift" , LerkLift )
 	LerkLiftCommand:AddParam{ Type = "boolean" }
 	LerkLiftCommand:Help( "Type lerklift true/false to enable or disable" )
-	local function LerkSet( Client, distance , x , y , z )
 
-		Alien.kLiftDistance = distance
+	local function LerkLiftSet( Client, x , y , z , distance )
+
 		Alien.kLiftx = x
 		Alien.kLifty = y
 		Alien.kLiftz = z
+		Alien.kLiftDistance = distance
 
-		self:Notify( nil , "LerkLiftMod Values Set to D %s x %s y %s z %s" , true ,  Alien.kLiftDistance , Alien.kLiftx  , Alien.kLifty  , Alien.kLiftz  )
+		self:Notify( nil , "x %s " , true ,  Alien.kLiftx  )
+		self:Notify( nil , "y %s" , true ,  Alien.kLifty    )
+		self:Notify( nil , "z %s" , true ,  Alien.kLiftz  )
+		self:Notify( nil , "D %s " , true ,  kLiftDistance )
 
 
 	end
-	local LerkLiftCommand = self:BindCommand( "lerkliftset" , "lerkliftset" , LerkLift )
+	local LerkLiftCommand = self:BindCommand( "lerkliftset" , "lerkliftset" , LerkLiftSet )
 	LerkLiftCommand:AddParam{ Type = "number" }
 	LerkLiftCommand:AddParam{ Type = "number" }
 	LerkLiftCommand:AddParam{ Type = "number" }
