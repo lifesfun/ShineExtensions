@@ -40,10 +40,13 @@ function Alien:MinTime()
 
 	if self.LastUse and ( time > ( self.LastUse + Alien.kLiftInterval ) ) then 
 
+		print("Time: ".Time."LastUse: ".self.LastUse )
+		self.LastUse = Shared.GetTime()
+	else
+		print("Time: ".Time)
 		self.LastUse = Shared.GetTime()
 		return 
 	end
-	self.LastUse = Shared.GetTime()
 end
 	
 function Alien:OnUse( target, elapsedTime, useSuccessTable )
@@ -51,8 +54,8 @@ function Alien:OnUse( target, elapsedTime, useSuccessTable )
 	if not Alien.kLiftEnabled then return end
 
 	self:TriggerEffects( Alien.kLiftOffSound )
-	if not target then return end
-	if not self:MinTime() then return end
+	if not target then print("notarget") return end
+	if not self:MinTime() then print("UnderMinTime") return end
 
 	if not self.liftId and not target.liftId then 
 
@@ -68,7 +71,7 @@ end
 function Alien:SetLift( target )
 		
 	self:TriggerEffects( Alien.kLiftOnSound )
-	if not target then end
+	if not target then return print("notarget") end
 
 	local id = target:GetId()	
 	if id then self.liftId = id end
@@ -94,6 +97,7 @@ function Alien:UpdateMove( deltaTime )
 
 		self:LiftTo( target , deltaTime ) 
 	else 
+		print("movereset")
 		self:ResetLift() 
 	end
 	print("update")
