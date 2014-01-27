@@ -17,7 +17,7 @@
 --
 Alien.kLiftEnabled = true
 
-Alien.kLiftInterval = 1
+Alien.kLiftInterval = 0.5
 
 Alien.kLifter = "Lerk"
 Alien.kLiftable = "Gorge"
@@ -38,10 +38,8 @@ function Alien:MinTime()
 
 	local time = Shared.GetTime()
 
-	print("Time: "..time )
 	if self.LastUse and ( time < ( self.LastUse + Alien.kLiftInterval ) ) then 
 
-		print( self.LaseUse )
 		self.LastUse = time 
 	else
 		self.LastUse = time 
@@ -113,8 +111,7 @@ function Alien:LiftTo( target , deltaTime )
 
 	local moveDir = GetNormalizedVector( attachPoint - self:GetOrigin() )
 
-	local player = self:GetParent()
-	player:SetOrigin( self:GetOrigin() + moveDir * distance )
+	self:SetOrigin( self:GetOrigin() + moveDir * distance )
 	print("lift")
 end
 
