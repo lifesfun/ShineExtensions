@@ -30,7 +30,7 @@ Alien.kLiftOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( target , useSuccessTable )
 	
-	if not Alien.kEnabled then return end
+	if not Alien.kLiftEnabled then return end
 	if target:GetIsAlive() then useSuccessTable.UseSuccess = true return end
 end
 
@@ -47,7 +47,7 @@ end
 	
 function Alien:OnUse( target, elapsedTime, useSuccessTable )
 	
-	if not Alien.kEnabled then return end
+	if not Alien.kLiftEnabled then return end
 	if not target then return end
 	if not self:MinTime() then return end
 
@@ -84,7 +84,7 @@ end
 function Alien:UpdateMove( deltaTime )
 
 	if not self.liftId then return end
-	if not Alien.kEnabled then self:ResetLift( nil ) return end
+	if not Alien.kLiftEnabled then self:ResetLift( nil ) return end
 
 	local target = Shared.GetEntity( self.liftId ) 
 	if target and target:GetIsAlive() then 
