@@ -102,7 +102,7 @@ end
 
 function Alien:LiftTo( target , deltaTime )
 	
-	local attachOffset = Vector( 1 , 2 , 0 )
+	local attachOffset = Vector( -1 , 1 , -1 )
 	local attachPoint = target:GetOrigin() + attachOffset 
 
 	local distance = ( self:GetOrigin() - attachPoint ):GetLength()
