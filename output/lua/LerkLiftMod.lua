@@ -30,50 +30,52 @@ Alien.kLiftOffSound = "alien_vision_off"
 
 function Alien:GetCanBeUsed( target , useSuccessTable )
 	
-	if not target:GetIsAlive() then return end
-	useSuccessTable.UseSuccess = true 
+	if target:GetIsAlive() then useSuccessTable.UseSuccess = true return end
 end
 
-function Alien:CanUseLift( target )
+function Alien:MinTime() 
 
-	if self:isa( Alien.kLifter ) and target:isa( Alien.kLiftable ) then print("lerk") return true end
-	if target:isa( Alien.kLifter ) and self:isa( Alien.kLiftable ) then  print("gorge") return true end 	
-	return false
+	local time = Shared.GetTime()
+
+	if self.LastUse == nil and ( time > ( self.LastUse + Alien.kLiftInterval ) ) then 
+
+		self.LastUse = Shared.GetTime()
+		return 
+	end
 end
-
+	
 function Alien:OnUse( target, elapsedTime, useSuccessTable )
+	
+	if not target then return end
+	if not self:MinTime() then return end
 
-	--if not self:CanUseLift( target ) then return end	
+	if not self.liftId and not target.liftId then 
 
-	if not self.Time then self.Time = Shared.GetTime() end 
-	if Shared.GetTime() - self.Time < Alien.kLiftInterval then return end
-
-	print("use")
-	if not target and target:GetIsAlive() then self:ResetLift( target ) return end 
+		self:SetLift( target ) 
+	else 
+		self:ResetLift( target ) 
+	end
 
 	useSuccessTable.UseSuccess = true
-	self.Time = Shared.GetTime()
-
-	if not self.liftId and not target.liftId then self:SetLift( target )return end 
-	self:ResetLift( target )
+	print("use")
 end
 
 function Alien:SetLift( target )
-	
+		
 	self:TriggerEffects( Alien.kLiftOnSound )
-	self.liftId = target:GetId()  
 
-	--self:SetPhysicsType( CollisionObject.Kinematic ) 
+	local id = target:GetId()	
+
+	self.liftId = id 
 	print("hooked")
-	--self:AddTooltip(ConditionalValue(self:isa(Alien.kLifter), Alien.kLifterTip, Alien.kLiftableTip))
 end
 
 function Alien:ResetLift( target )
 
 	self:TriggerEffects( Alien.kLiftOffSound )
-	if self.liftId then self.liftId = nil end 
+
 	if target.liftId then target.liftId = nil end 
-	--self:SetPhysicsType( CollisionObject.Dynamic ) 
+	if self.liftId then self.liftId = nil end 
 	print("release")
 end
 
@@ -82,31 +84,27 @@ function Alien:UpdateMove( deltaTime )
 	if not self.liftId then return end
 
 	local target = Shared.GetEntity( self.liftId ) 
-	if not target or not target:GetIsAlive() then self:ResetLift() return end
+	if target and target:GetIsAlive() then 
 
-	self:LiftTo( target , deltaTime ) 
+		self:LiftTo( target , deltaTime ) 
+	else 
+		self:ResetLift() 
+	end
 	print("update")
 end
 
 function Alien:LiftTo( target , deltaTime )
 	
-	-- if this alien is lifted copy position from lifter
-	
-	local AttachOffset = Vector( 0 , 1 , 1 )
-	local AttachPoint = target:GetOrigin() + AttachOffset 
+	local attachOffset = Vector( 0 , 2 , 0 )
+	local attachPoint = target:GetOrigin() + attachOffset 
 
-	local Distance = ( self:GetOrigin() - AttachPoint ):GetLength()
-	if Distance < 2 then return end
+	local distance = ( self:GetOrigin() - attachPoint ):GetLength()
+	if distance > 1 and distance < 3 then return end
 
-	--local MaxDistance = deltaTime * 15  
-	--if Distance < MaxDistance then self:ResetLift() return end
+	local moveDir = GetNormalizedVector( attachPoint - self:GetOrigin() )
 
-	local MoveDir = GetNormalizedVector( AttachPoint - self:GetOrigin() )
-
-	if self:GetPhysicsType() ~= "Kinematic" then self:SetPhysicsType( CollisionObject.Kinematic ) end 
-
-	self:SetOrigin( self:GetOrigin() + MoveDir * Distance )
+	local player = self:GetParent()
+	player:SetOrigin( self:GetOrigin() + moveDir * distance )
 	print("lift")
-	
 end
 
