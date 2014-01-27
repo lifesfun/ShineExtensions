@@ -83,8 +83,8 @@ end
 
 function Alien:UpdateMove( deltaTime )
 
-	if not Alien.kEnabled then self:ResetLift( target ) return end
 	if not self.liftId then return end
+	if not Alien.kEnabled then self:ResetLift( nil ) return end
 
 	local target = Shared.GetEntity( self.liftId ) 
 	if target and target:GetIsAlive() then 
