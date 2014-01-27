@@ -42,10 +42,9 @@ function Alien:MinTime()
 	if self.LastUse and ( time > ( self.LastUse + Alien.kLiftInterval ) ) then 
 
 		self.LastUse = Time 
-		return true  
 	else
 		self.LastUse = Time 
-		return false 
+		return 
 	end
 end
 	
