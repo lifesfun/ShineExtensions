@@ -17,7 +17,7 @@
 --
 Alien.kLiftEnabled = true
 
-Alien.kLiftInterval = 0.5
+Alien.kLiftInterval = 1
 
 Alien.kLifter = "Lerk"
 Alien.kLiftable = "Gorge"
@@ -42,9 +42,10 @@ function Alien:MinTime()
 	if self.LastUse and ( time > ( self.LastUse + Alien.kLiftInterval ) ) then 
 
 		self.LastUse = Time 
-		return 
+		return true  
 	else
 		self.LastUse = Time 
+		return false 
 	end
 end
 	
