@@ -15,22 +15,21 @@ end
 
 function Plugin:Notify( Player , String , Format , ... ) 
 
-	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "LerkLiftMod" , 255 ,  255 , 255 , String , Format , ... ) 
+	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "LiftMod" , 255 ,  255 , 255 , String , Format , ... ) 
 end
 
 function Plugin:CreateCommands()
 
-	local function LerkLift( Client, Enable)
+	local function Lift( Client, Enable)
 
 		Alien.kLiftEnabled = Enable 
-		self:Notify( nil , "LerkLiftMod is %s" , true , Alien.kLiftEnabled  )	
-
+		self:Notify( nil , "Lift is %s" , true , Alien.kLiftEnabled  )	
 	end
-	local LerkLiftCommand = self:BindCommand( "lerklift" , "lerklift" , LerkLift )
+	local LerkLiftCommand = self:BindCommand( "lift" , "lift" , Lift )
 	LerkLiftCommand:AddParam{ Type = "boolean" }
-	LerkLiftCommand:Help( "Type lerklift true/false to enable or disable" )
+	LerkLiftCommand:Help( "Type lift true/false to enable or disable" )
 
-	local function LerkLiftSet( Client, x , y , z , distance )
+	local function SetLift( Client, x , y , z , distance )
 
 		Alien.kLiftx = x
 		Alien.kLifty = y
@@ -40,16 +39,14 @@ function Plugin:CreateCommands()
 		self:Notify( nil , "x %s " , true ,  Alien.kLiftx  )
 		self:Notify( nil , "y %s" , true ,  Alien.kLifty    )
 		self:Notify( nil , "z %s" , true ,  Alien.kLiftz  )
-		self:Notify( nil , "D %s " , true ,  kLiftDistance )
-
-
+		self:Notify( nil , "D %s " , true ,  Alien.kLiftDistance )
 	end
-	local LerkLiftCommand = self:BindCommand( "lerkliftset" , "lerkliftset" , LerkLiftSet )
-	LerkLiftCommand:AddParam{ Type = "number" }
-	LerkLiftCommand:AddParam{ Type = "number" }
-	LerkLiftCommand:AddParam{ Type = "number" }
-	LerkLiftCommand:AddParam{ Type = "number" }
-	LerkLiftCommand:Help( "Type lerklift true/false to enable or disable" )
+	local LiftSetCommand = self:BindCommand( "setlift" , "setlift" , SetLift )
+	LiftSetCommand:AddParam{ Type = "number" }
+	LiftSetCommand:AddParam{ Type = "number" }
+	LiftSetCommand:AddParam{ Type = "number" }
+	LiftSetCommand:AddParam{ Type = "number" }
+	LiftSetCommand:Help( "Type lift x y z distance to enable or disable" )
 
 end
 

@@ -16,19 +16,12 @@
 -- should the mod be enabled by default?
 --
 Alien.kLiftEnabled = true
+Alien.kLiftInterval = 0.5
+
 Alien.kLiftDistance = 1
 Alien.kLiftx = 0
 Alien.kLifty = 1
 Alien.kLiftz = 0
-
-
-Alien.kLiftInterval = 0.5
-
-Alien.kLifter = "Lerk"
-Alien.kLiftable = "Gorge"
-
-Alien.kLifterTip = "You just lifted a Gorge. Press use-key to release."
-Alien.kLiftableTip = "You just lifted by a Lerk. Press use-key to release."
 
 Alien.kLiftOnSound = "alien_vision_on"
 Alien.kLiftOffSound = "alien_vision_off"
