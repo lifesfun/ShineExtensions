@@ -41,10 +41,10 @@ function Alien:MinTime()
 	print("Time: "..time )
 	if self.LastUse and ( time < ( self.LastUse + Alien.kLiftInterval ) ) then 
 
-		self.LastUse = Time 
+		self.LastUse = time 
 	else
-		self.LastUse = Time 
-		return 
+		self.LastUse = time 
+		return
 	end
 end
 	
@@ -52,9 +52,9 @@ function Alien:OnUse( target, elapsedTime, useSuccessTable )
 	
 	if not Alien.kLiftEnabled then return end
 
-	self:TriggerEffects( Alien.kLiftOffSound )
 	if not target then print("notarget") return end
 	if not self:MinTime() then print("UnderMinTime") return end
+	self:TriggerEffects( Alien.kLiftOffSound )
 
 	if not self.liftId and not target.liftId then 
 
