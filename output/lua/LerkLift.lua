@@ -16,6 +16,11 @@
 -- should the mod be enabled by default?
 --
 Alien.kLiftEnabled = true
+Alien.kLiftDistance = 1
+Alien.kLiftx = 0
+Alien.kLifty = 1
+Alien.kLiftz = 0
+
 
 Alien.kLiftInterval = 0.5
 
@@ -102,11 +107,11 @@ end
 
 function Alien:LiftTo( target , deltaTime )
 	
-	local attachOffset = Vector( -1 , 1 , -1 )
+	local attachOffset = Vector( self.kLiftx , self.kLifty  , self.kLiftz )
 	local attachPoint = target:GetOrigin() + attachOffset 
 
 	local distance = ( self:GetOrigin() - attachPoint ):GetLength()
-	if distance < 3.1 then return end
+	if distance < self.kLiftDistance then return end
 
 	local moveDir = GetNormalizedVector( attachPoint - self:GetOrigin() )
 
