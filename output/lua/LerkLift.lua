@@ -1,20 +1,8 @@
--- ==============================================================
---
--- Lerk Lift Mod v0.1
---    by Hackepeter
---
--- Date: 2011-10-28
---
--- Installation: place this file in ns2\lua and add to the beginning
--- of Alien_Server.lua: Script.Load("lua/LerkLiftMod.lua")
--- 
--- Admins can turn the mod at anytime (also mid game) off/on
--- with lerklift 0/1 in the server console.
---
--- ==============================================================
+--[ Shine ] LerkLift Alpha by LifesFun
 
--- should the mod be enabled by default?
---
+--Inspired by the methods of the 
+-- Lerk Lift Mod v0.1 by Hackepeter
+
 Alien.kLiftEnabled = true
 Alien.kLiftInterval = 0.5
 Alien.kAll = false
