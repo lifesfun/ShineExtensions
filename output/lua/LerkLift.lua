@@ -18,6 +18,7 @@
 Alien.kLiftEnabled = true
 Alien.kLiftInterval = 0.5
 
+Alien.kLiftMin = 0 
 Alien.kLiftDistance = 1
 Alien.kLiftx = 0
 Alien.kLifty = 1
@@ -104,7 +105,7 @@ function Alien:LiftTo( target , deltaTime )
 	local attachPoint = target:GetOrigin() + attachOffset 
 
 	local distance = ( self:GetOrigin() - attachPoint ):GetLength()
-	if distance < Alien.kLiftDistance then return end
+	if distance > Alien.kLiftMin and distance < Alien.kLiftDistance then return end
 
 	local moveDir = GetNormalizedVector( attachPoint - self:GetOrigin() )
 

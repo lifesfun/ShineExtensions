@@ -29,24 +29,35 @@ function Plugin:CreateCommands()
 	LerkLiftCommand:AddParam{ Type = "boolean" }
 	LerkLiftCommand:Help( "Type lift true/false to enable or disable" )
 
-	local function SetLift( Client, x , y , z , distance )
+	local function SetLiftOffset( Client, x , y , z  )
 
 		Alien.kLiftx = x
 		Alien.kLifty = y
 		Alien.kLiftz = z
-		Alien.kLiftDistance = distance
 
 		self:Notify( nil , "x %s " , true ,  Alien.kLiftx  )
 		self:Notify( nil , "y %s" , true ,  Alien.kLifty    )
 		self:Notify( nil , "z %s" , true ,  Alien.kLiftz  )
+	end
+	local LiftSetOffsetCommand = self:BindCommand( "setoffset" , "setoffset" , SetLiftOffset , true )
+	LiftSetOffsetCommand:AddParam{ Type = "number" }
+	LiftSetOffsetCommand:AddParam{ Type = "number" }
+	LiftSetOffsetCommand:AddParam{ Type = "number" }
+	LiftSetOffsetCommand:Help( "Type lift x y z distance to enable or disable" )
+
+	local function SetLift( Client, min , distance )
+
+		Alien.kLiftMin = min
+		Alien.kLiftDistance = distance
+
+		self:Notify( nil , "M %s " , true ,  Alien.kLiftMin)
 		self:Notify( nil , "D %s " , true ,  Alien.kLiftDistance )
 	end
-	local LiftSetCommand = self:BindCommand( "setlift" , "setlift" , SetLift )
-	LiftSetCommand:AddParam{ Type = "number" }
-	LiftSetCommand:AddParam{ Type = "number" }
-	LiftSetCommand:AddParam{ Type = "number" }
-	LiftSetCommand:AddParam{ Type = "number" }
-	LiftSetCommand:Help( "Type lift x y z distance to enable or disable" )
+	local LiftSetCommand = self:BindCommand( "setlift" , "setlift" , SetLift , true )
+	SetLiftCommand:AddParam{ Type = "number" }
+	SetLiftCommand:AddParam{ Type = "number" }
+	SetLiftCommand:Help( "Type lift x y z distance to enable or disable" )
+
 
 end
 
