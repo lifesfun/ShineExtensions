@@ -32,7 +32,7 @@ function Plugin:CreateCommands()
 	local function LiftAll( Client, Enable)
 
 		Alien.kAll = Enable 
-		self:Notify( nil , "Lift is %s" , true , Alien.kAll)	
+		self:Notify( nil , "LiftAll is %s" , true , Alien.kAll)	
 	end
 	local LiftAllCommand = self:BindCommand( "liftall" , "liftall" , LiftAll )
 	LiftAllCommand:AddParam{ Type = "boolean" }
