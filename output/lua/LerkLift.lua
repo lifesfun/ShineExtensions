@@ -65,8 +65,10 @@ function Alien:OnUse( target, elapsedTime, useSuccessTable )
 end
 
 function Alien:SetLift( target )
-		
-	if not self:isa( "Gorge" ) or not target:isa( "Lerk" ) then return end
+	if not Alien:kAll then  		
+		if not self:isa( "Gorge" ) or not target:isa( "Lerk" ) then return end
+	end
+
 	self:TriggerEffects( Alien.kLiftOnSound )
 	if not target then return print("notarget") end
 
