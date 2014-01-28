@@ -25,9 +25,19 @@ function Plugin:CreateCommands()
 		Alien.kLiftEnabled = Enable 
 		self:Notify( nil , "Lift is %s" , true , Alien.kLiftEnabled  )	
 	end
-	local LerkLiftCommand = self:BindCommand( "lift" , "lift" , Lift )
-	LerkLiftCommand:AddParam{ Type = "boolean" }
-	LerkLiftCommand:Help( "Type lift true/false to enable or disable" )
+	local LiftCommand = self:BindCommand( "lift" , "lift" , Lift )
+	LiftCommand:AddParam{ Type = "boolean" }
+	LiftCommand:Help( "Type lift true/false to enable or disable" )
+
+	local function LiftAll( Client, Enable)
+
+		Alien.kAll = Enable 
+		self:Notify( nil , "Lift is %s" , true , Alien.kAll)	
+	end
+	local LiftAllCommand = self:BindCommand( "liftall" , "liftall" , LiftAll )
+	LiftAllCommand:AddParam{ Type = "boolean" }
+	LiftAllCommand:Help( "Type lift true/false to enable or disable" )
+
 
 	local function SetLiftOffset( Client, x , y , z  )
 

@@ -17,6 +17,7 @@
 --
 Alien.kLiftEnabled = true
 Alien.kLiftInterval = 0.5
+Alien.kAll = false
 
 Alien.kLiftMin = 0.99
 Alien.kLiftDistance = 0.33
