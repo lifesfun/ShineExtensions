@@ -39,7 +39,7 @@ function Plugin:CreateCommands()
 		self:Notify( nil , "y %s" , true ,  Alien.kLifty    )
 		self:Notify( nil , "z %s" , true ,  Alien.kLiftz  )
 	end
-	local LiftSetOffsetCommand = self:BindCommand( "setoffset" , "setoffset" , SetLiftOffset , true )
+	local LiftSetOffsetCommand = self:BindCommand( "setoffset" , "setoffset" , SetLiftOffset )
 	LiftSetOffsetCommand:AddParam{ Type = "number" }
 	LiftSetOffsetCommand:AddParam{ Type = "number" }
 	LiftSetOffsetCommand:AddParam{ Type = "number" }
@@ -53,7 +53,7 @@ function Plugin:CreateCommands()
 		self:Notify( nil , "M %s " , true ,  Alien.kLiftMin)
 		self:Notify( nil , "D %s " , true ,  Alien.kLiftDistance )
 	end
-	local SetLiftCommand = self:BindCommand( "setlift" , "setlift" , SetLift , true )
+	local SetLiftCommand = self:BindCommand( "setlift" , "setlift" , SetLift )
 	SetLiftCommand:AddParam{ Type = "number" }
 	SetLiftCommand:AddParam{ Type = "number" }
 	SetLiftCommand:Help( "Type lift x y z distance to enable or disable" )

@@ -18,10 +18,10 @@
 Alien.kLiftEnabled = true
 Alien.kLiftInterval = 0.5
 
-Alien.kLiftMin = 0 
-Alien.kLiftDistance = 1
+Alien.kLiftMin = 0.99
+Alien.kLiftDistance = 0.33
 Alien.kLiftx = 0
-Alien.kLifty = 1
+Alien.kLifty = 0.95
 Alien.kLiftz = 0
 
 Alien.kLiftOnSound = "alien_vision_on"
@@ -50,8 +50,8 @@ function Alien:OnUse( target, elapsedTime, useSuccessTable )
 	
 	if not Alien.kLiftEnabled then return end
 
-	if not target then print("notarget") return end
-	if not self:MinTime() then print("UnderMinTime") return end
+	if not target then return end
+	if not self:MinTime() then return end
 	self:TriggerEffects( Alien.kLiftOffSound )
 
 	if not self.liftId and not target.liftId then 
@@ -62,7 +62,6 @@ function Alien:OnUse( target, elapsedTime, useSuccessTable )
 	end
 
 	useSuccessTable.UseSuccess = true
-	print("use")
 end
 
 function Alien:SetLift( target )
@@ -72,7 +71,6 @@ function Alien:SetLift( target )
 
 	local id = target:GetId()	
 	if id then self.liftId = id end
-	print("hooked")
 end
 
 function Alien:ResetLift( target )
@@ -81,7 +79,6 @@ function Alien:ResetLift( target )
 
 	if target and target.liftId then target.liftId = nil end 
 	if self.liftId then self.liftId = nil end 
-	print("release")
 end
 
 function Alien:UpdateMove( deltaTime )
@@ -94,7 +91,6 @@ function Alien:UpdateMove( deltaTime )
 
 		self:LiftTo( target , deltaTime ) 
 	else 
-		print("movereset")
 		self:ResetLift() 
 	end
 end
