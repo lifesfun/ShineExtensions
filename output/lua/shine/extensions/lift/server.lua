@@ -81,7 +81,7 @@ function Plugin:CreateCommands()
 		kOffset = Vector(  x  , y  , z )
 		self.Config.kOffset = KOffset
 		self:SaveConfig()
-		self:Notify( Client , "Offset: Y %s  X %s  Z %s" , true , y , x , z  )
+		self:Notify( Client , "Lift Offset: Y %s  X %s  Z %s" , true , y , x , z  )
 	end
 	local LiftOffsetCommand = self:BindCommand( "lftos" , "lftos" , SetOffset )
 	LiftOffsetCommand:AddParam{ Type = "number" , Optional = true Default = 0 }
