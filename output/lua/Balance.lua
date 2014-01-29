@@ -27,7 +27,7 @@ kCorrodeMarineStructureArmorOnInfestation = true
 
 kInfestationCorrodeDamagePerSecond = 15
 
-kMaxSupply = 200
+kMaxSupply = 250
 kSupplyPerTechpoint = 100
 
 // used as fallback
@@ -50,7 +50,7 @@ kAdvancedArmoryUpgradeCost = 30
 kPrototypeLabCost = 40
 
 kSentryCost = 5
-kPowerNodeCost = 0
+kPowerNodeCost = 1
 
 kMACCost = 5
 kMineCost = 15
@@ -82,8 +82,8 @@ kDetonationTimeTechResearchCost = 15
 
 kAdvancedWeaponryResearchCost = 10
 
-kFlamethrowerCost = 25
-kFlamethrowerDropCost = 25
+kFlamethrowerCost = 20
+kFlamethrowerDropCost = 20
 kFlamethrowerTechResearchCost = 20
 kFlamethrowerRangeTechResearchCost = 10
 
@@ -94,19 +94,19 @@ kARCCost = 10
 kARCSplashTechResearchCost = 15
 kARCArmorTechResearchCost = 15
 kWelderTechResearchCost = 0
-kWelderCost = 3
-kWelderDropCost = 5
+kWelderCost = 2
+kWelderDropCost = 2
 
-kPulseGrenadeDamageRadius = 6
+kPulseGrenadeDamageRadius = 8
 kPulseGrenadeEnergyDamageRadius = 10
 kPulseGrenadeDamage = 110
 kPulseGrenadeEnergyDamage = 0
 kPulseGrenadeDamageType = kDamageType.Normal
 
 kClusterGrenadeDamageRadius = 10
-kClusterGrenadeDamage = 55
-kClusterFragmentDamageRadius = 6
-kClusterFragmentDamage = 20
+kClusterGrenadeDamage = 110
+kClusterFragmentDamageRadius = 8
+kClusterFragmentDamage = 10
 kClusterGrenadeDamageType = kDamageType.Flame
 
 kNerveGasDamagePerSecond = 50
@@ -153,11 +153,11 @@ kPhaseTechResearchCost = 10
 kResearchBioMassOneCost = 20
 kBioMassOneTime = 25
 kResearchBioMassTwoCost = 30
-kBioMassTwoTime = 40
-kResearchBioMassThreeCost = 70
-kBioMassThreeTime = 60
-kResearchBioMassFourCost = 100
-kBioMassFourTime = 80
+kBioMassTwoTime = 35
+kResearchBioMassThreeCost = 40
+kBioMassThreeTime = 45
+kResearchBioMassFourCost = 50
+kBioMassFourTime = 55
 
 kHiveCost = 40
 
@@ -175,27 +175,27 @@ kShadeCost = 10
 kWhipCost = 10
 kEvolveBombardCost = 5
 
-kGorgeCost = 8
-kGorgeEggCost = 15
-kLerkCost = 25
+kGorgeCost = 10
+kGorgeEggCost = 10
+kLerkCost = 30
 kLerkEggCost = 30
 kFadeCost = 40
-kFadeEggCost = 70
+kFadeEggCost = 40
 kOnosCost = 60
-kOnosEggCost = 100
+kOnosEggCost = 60
 
 kSkulkUpgradeCost = 0
 kGorgeUpgradeCost = 1
 kLerkUpgradeCost = 3
-kFadeUpgradeCost = 5
-kOnosUpgradeCost = 8
+kFadeUpgradeCost = 4
+kOnosUpgradeCost = 6
 
 kHydraCost = 3
 kClogCost = 0
 kGorgeTunnelCost = 5
 kGorgeTunnelBuildTime = 10
 
-kEnzymeCloudDuration = 3
+kEnzymeCloudDuration = 2
 
 kCarapaceCost = 0
 kRegenerationCost = 0
@@ -206,9 +206,9 @@ kAdrenalineCost = 0
 kCelerityCost = 0
 
 kPlayingTeamInitialTeamRes = 60
-kMaxTeamResources = 200
+kMaxTeamResources = 300
 
-kPlayerInitialIndivRes = 20
+kPlayerInitialIndivRes = 25
 kCommanderInitialIndivRes = 0
 kMaxPersonalResources = 100
 
@@ -354,10 +354,10 @@ kSpitEnergyCost = 7
 kBabblerPheromoneEnergyCost = 7
 kBabblerDamage = 10
 
-kBabblerCost = 1
+kBabblerCost = 0
 kBabblerEggBuildTime = 8
 kNumBabblerEggsPerGorge = 3
-kNumBabblersPerEgg = 3
+kNumBabblersPerEgg = 6
 
 // Also see kHealsprayHealStructureRate
 kHealsprayDamage = 8
@@ -460,7 +460,7 @@ kWhipBombardROF = 6
 kMarineRespawnTime = 9
 
 kAlienSpawnTime = 10
-kEggGenerationRate = 13
+kEggGenerationRate = 11
 kAlienEggsPerHive = 3
 
 // BUILD/RESEARCH TIMES
@@ -616,11 +616,11 @@ kWebResearchTime = 60
 
 
 kCommandStationInitialEnergy = 100  kCommandStationMaxEnergy = 250
-kNanoShieldCost = 5
-kNanoShieldCooldown = 10
+kNanoShieldCost = 2
+kNanoShieldCooldown = 2
 kEMPCost = 50
 
-kPowerSurgeCooldown = 20
+kPowerSurgeCooldown = 10
 kPowerSurgeDuration = 20
 kPowerSurgeCost = 5
 
@@ -629,7 +629,7 @@ kArmoryInitialEnergy = 100  kArmoryMaxEnergy = 150
 kAmmoPackCost = 1
 kMedPackCost = 1
 kMedPackCooldown = 0
-kCatPackCost = 3
+kCatPackCost = 2
 kCatPackMoveAddSpeed = 1.25
 kCatPackWeaponSpeed = 1.5
 kCatPackDuration = 12
@@ -643,23 +643,23 @@ kDrifterInitialEnergy = 50
 kDrifterMaxEnergy = 200
 
 kEnzymeCloudCost = 2
-kHallucinationCloudCost = 1
+kHallucinationCloudCost = 2
 kMucousMembraneCost = 2
-kStormCost = 1
+kStormCost = 2
 
 kHallucinationCloudCooldown = 2
 kDrifterAbilityCooldown = 0
 
 kNutrientMistCost = 1
-kNutrientMistCooldown = 2
+kNutrientMistCooldown = 5
 // Note: If kNutrientMistDuration changes, there is a tooltip that needs to be updated.
 kNutrientMistDuration = 15
 
-kRuptureCost = 2
-kRuptureCooldown = 2
+kRuptureCost = 1
+kRuptureCooldown = 1
 
-kBoneWallCost = 3
-kBoneWallCooldown = 10
+kBoneWallCost = 2
+kBoneWallCooldown = 5
 
 kContaminationCost = 5
 kContaminationCooldown = 5
@@ -680,8 +680,8 @@ kDrifterCooldown = 0
 kDrifterHatchTime = 7
 
 kCragInitialEnergy = 25  kCragMaxEnergy = 100 
-kCragHealWaveCost = 3
-kHealWaveCooldown = 6
+kCragHealWaveCost = 2
+kHealWaveCooldown = 2
 kMatureCragMaxEnergy = 150
 
 kHydraDamage = 15 // From NS1
@@ -709,9 +709,9 @@ kEchoEggCost = 2
 kEchoHarvesterCost = 2
 
 kShadeInitialEnergy = 25  kShadeMaxEnergy = 100
-kShadeInkCost = 3
-kShadeInkCooldown = 16
-kShadeInkDuration = 6.3
+kShadeInkCost = 2
+kShadeInkCooldown = 10
+kShadeInkDuration = 5
 kMatureShadeMaxEnergy = 150
 
 kEnergyUpdateRate = 0.5
@@ -720,7 +720,7 @@ kEnergyUpdateRate = 0.5
 kUpgradeHiveCost = 10
 kUpgradeHiveResearchTime = 20
 
-kHiveBiomass = 1
+kHiveBiomass = 2
 
 kCragBiomass = 0
 kShadeBiomass = 0

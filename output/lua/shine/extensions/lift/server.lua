@@ -1,9 +1,18 @@
---Extended the original to be used with shine. See LerkLiftMod.lua for authors information. Thanks to the author Hackepeter 
+--A mod that provides Lift functions and more!
 
 local Shine = Shine
 
+local Lift = Lift
+
+local kEnabled = Lift.kLiftEnabled 
+local kDev = Lift.kLiftDev 
+local kOffset = Lift.kLiftOffset
+local kTolerance = Lift.kLiftTolerance
+local Vector = Vector
+
+
 local Plugin = {} 
-Plugin.Version "0.9"
+Plugin.Version "1.0"
 
 Plugin.HasConfig = true 
 Plugin.ConfigName = "Lift.json"
@@ -11,33 +20,20 @@ Plugin.ConfigName = "Lift.json"
 Plugin.DefaultConfig = {
 
 	Default = true,
-	DevMode = false
-
-	Clogs = 20,
-
-	Hydras = 5,
-	HydraCost = 1,
-
-	Babblers= 5,
-	BabblerPerEgg = 5,
-	BabblerCost = 0
+	DevMode = false,
+	Tolerance = 0.53,
+	Offset = Vector( 0 , 0 , 0 )
 }
 
 Plugin.CheckConfig = true
 Plugin.DefaultState = true
 
 function Plugin:Initialise()
-	Clogs 
 
-	kH 
-	kHydraCost
-
-	kNumBabblerEggsPerGorge =  BabblereggsPerGorge
-	kNumBabblersPerEgg = BabblerPerEgg
-	kBabblerCost = BabblerCost
-
-	Player.kLiftEnabled = self.Config.Default 
-	DevMode = self.Config.Dev
+	kEnabled = self.Config.Default 
+	kDev = self.Config.kDev
+	kOffset = self.Config.kOffset
+	kTolerance = self.Config.kTolerance
 
 	self:CreateCommands()
 	self.Enabled = true
@@ -46,65 +42,69 @@ end
 
 function Plugin:Notify( Player , String , Format , ... ) 
 
-	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "LiftMod" , 255 ,  255 , 255 , String , Format , ... ) 
+	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "LiftBot" , 255 ,  255 , 255 , String , Format , ... ) 
+end
+
+function Plugin:ClientConfirmConnect( Client )
+
+		self:Notify( Client , "The Lift mod is enabled!" )
+		self:Notify( Client , "Use e to lift up a gorge as a lerk." )
+		self:Notify( Client , "Use e to lift up any living player as a gorge" )
 end
 
 function Plugin:CreateCommands()
 
-	local function Lift( Client, Enable)
+	local function SetLift( Client, Enable)
 
-		Player.kLiftEnabled = Enable 
-		self:Notify( nil , "Lift is %s" , true , Player.kLiftEnabled  )	
+		kEnabled = Enable 
+	 	self.Config.Default = Enabled 
+		self:SaveConfig()
+		self:Notify( nil , "Lift set to %s" , true , Enabled  )	
 	end
-	local LiftCommand = self:BindCommand( "lift" , "lift" , Lift )
+	local LiftCommand = self:BindCommand( "lft" , "lft" , Lift )
+	LiftCommand:AddParam{ Type = "boolean" , Optional = true , Default = true }
+	LiftCommand:Help( "Sets if should be enabled" )
+
+	local function SetDev( Client, Enable )
+
+		kLift = Enable 
+		self.Config.kDev = Enabled
+		self:SaveConfig()
+		self:Notify( nil , "LiftDev is set to %s" , true , Enabled )	
+	end
+	local LiftDevCommand = self:BindCommand( "lftdev" , "lftdev" , SetLiftDev )
 	LiftDevCommand:AddParam{ Type = "boolean" , Optional = true , Default = true }
-	LiftCommand:Help( "Type lift true/false to enable or disable" )
+	LiftDevCommand:Help( "Sets to  dev mode" )
 
-	local function LiftDev( Client, Enable)
+	local function SetOffset( Client , y , x , z  )
 
-		Player.kLift = Enable 
-		self:Notify( nil , "LiftDev is %s" , true , Player.kLiftDev )	
+		kOffset = Vector(  x  , y  , z )
+		self.Config.kOffset = KOffset
+		self:SaveConfig()
+		self:Notify( Client , "Offset: Y %s  X %s  Z %s" , true , y , x , z  )
 	end
-	local LiftDevCommand = self:BindCommand( "liftdev" , "liftdev" , LiftDev )
-	LiftDevCommand:AddParam{ Type = "boolean" , Optional = true , Default = true }
-	LiftDevCommand:Help( "Type lift true/false to enable or disable" )
+	local LiftOffsetCommand = self:BindCommand( "lftos" , "lftos" , SetOffset )
+	LiftOffsetCommand:AddParam{ Type = "number" , Optional = true Default = 0 }
+	LiftOffsetCommand:AddParam{ Type = "number" , Optional = true , Default = 0 }
+	LiftOffsetCommand:AddParam{ Type = "number" , Optional = true , Default = 0 }
+	LiftOffsetCommand:Help( "Sets the offset y x z" )
 
+	local function SetTolerance( Client, tolerance )
 
-	local function SetLiftOffset( Client, x , y , z  )
-
-		Player.kLiftx = x
-		Player.kLifty = y
-		Player.kLiftz = z
-
-		self:Notify( nil , "x %s " , true ,  Player.kLiftx  )
-		self:Notify( nil , "y %s" , true ,  Player.kLifty    )
-		self:Notify( nil , "z %s" , true ,  Player.kLiftz  )
+		kTolerance = tolerance 
+		self.Config.kTolerance = tolerance
+		self:SaveConfig()
+		self:Notify( Client  , "Lift Tolerance is set to %s " , true , tolerance )
 	end
-	local LiftSetOffsetCommand = self:BindCommand( "setoffset" , "setoffset" , SetLiftOffset )
-	LiftSetOffsetCommand:AddParam{ Type = "number" }
-	LiftSetOffsetCommand:AddParam{ Type = "number" }
-	LiftSetOffsetCommand:AddParam{ Type = "number" }
-	LiftSetOffsetCommand:Help( "Type lift x y z distance to enable or disable" )
-
-	local function SetLift( Client, min , distance )
-
-		Player.kLiftMin = min
-		Player.kLiftDistance = distance
-
-		self:Notify( nil , "M %s " , true ,  Player.kLiftMin)
-		self:Notify( nil , "D %s " , true ,  Player.kLiftDistance )
-	end
-	local SetLiftCommand = self:BindCommand( "setlift" , "setlift" , SetLift )
-	SetLiftCommand:AddParam{ Type = "number" }
-	SetLiftCommand:AddParam{ Type = "number" }
-	SetLiftCommand:Help( "Type lift x y z distance to enable or disable" )
-
+	local LiftToleranceCommand = self:BindCommand( "lftol" , "lftol" , SetTolerance )
+	LiftToleranceCommand:AddParam{ Type = "number" , Optional = true , Default = 0.28 }
+	LiftToleranceCommand:Help( "Sets the tolerance" )
 
 end
 
 function Plugin:Cleanup()
 
-	Player.kLiftEnabled = false 
+	kLiftEnabled = false 
 	self.BaseClass.Cleanup( self )
 end
 
