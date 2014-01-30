@@ -8,6 +8,7 @@ local Player = {
 	LiftID = nil
 }
 --todo create hooks that load on top of the current ones 
+--
 --timer to delay spamming
 function Player:MinTime() 
 
@@ -28,7 +29,7 @@ function Player:OnUse( target , elapsedTime , useSuccessTable )
 
 	if not target then return end
 	--not sure about this
-	self.LiftEnabled = Mode( self , target )
+	if not Lift.Dev or self.LiftEnabled = Mode( self , target ) then return end
 	if not self.LiftEnabled then return end
 	if not self:MinTime() then return end
 
@@ -58,7 +59,7 @@ end
 function Player:UpdateMove( deltaTime )
 
 	--how to check global
-	if not self.LiftEnabled then return end
+	if not Lift.kDev or not Lift.kLiftEnabled then return end
 	if not self.LiftID then return end
 
 	local target = Shared.GetEntity( self.LiftID ) 

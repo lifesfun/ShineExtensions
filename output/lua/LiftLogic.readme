@@ -1,0 +1,14 @@
+--Logic for LIft prediction
+--Offset = Model/2 + AttachedModel/2 
+--Grav per tick = kgrav/tick 
+--Interpolation = 100
+--30 20 rate per 30 = .66 per tick per interpolate
+--.66 = 2 snapshots
+--reset origin everysnapshot so every 66ms 
+--if falling at 16/30  or .53 per tick 
+--then how much tolerance should we give them for prediction 
+--prediction relyies on this it thinks .53 will happen every .66ms  and provides a buffer of 100ms if we reset if the range falls outside of  .53   then = smooth?
+--asuming this grave/tick = tolerance
+--so every .66 ms check .53 if so then change. this probably relies on movespeed to. Velocity will be added later.
+--find offset set min and max .53 or in the model  
+

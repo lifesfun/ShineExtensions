@@ -53,7 +53,7 @@ kSentryCost = 5
 kPowerNodeCost = 1
 
 kMACCost = 5
-kMineCost = 15
+kMineCost = 10
 kDropMineCost = 15
 kMineResearchCost  = 10
 kTechEMPResearchCost = 0
@@ -632,7 +632,7 @@ kMedPackCooldown = 0
 kCatPackCost = 2
 kCatPackMoveAddSpeed = 1.25
 kCatPackWeaponSpeed = 1.5
-kCatPackDuration = 12
+kCatPackDuration = 5
 
 kHiveInitialEnergy = 50  kHiveMaxEnergy = 200
 kMatureHiveMaxEnergy = 250
