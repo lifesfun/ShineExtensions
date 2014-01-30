@@ -1,6 +1,10 @@
 local Plugin = Plugin
 
 Plugin.Cinematic = nil
+function Plugin:Initialise()
+
+	self.Enabled = true 
+end
 
 function Plugin:ReceiveOrigin( origin )
 
@@ -19,4 +23,10 @@ function Plugin:ReceiveOrigin( origin )
 	self.Cinematic:SetCoords( coords )
 	self.Cinematic:SetIsVisible( true )
 	self.Cinematic:SetRepeatStyle( Cinematic.Repeat_Loop )
+end
+
+function Plugin:Cleanup()
+
+	self:BaseClass.Cleanup( self )
+	self.Enabled = false
 end

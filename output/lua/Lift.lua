@@ -15,15 +15,15 @@ Lift = {
 
 --first array is lifter, second is lifted
 Lift.Class = { 
-		"Skulk" = Vector( 0 , 1 , 0 ), "Lerk" = Vector( 0 , 1 , 0 ),
-		"Gorge" = Vector( 0 , 1 , 0 ),	"Fade" = Vector( 0 , 3 , 0 ),
-		"Onos" = Vector( 0 , 4 , 0 ), "Marine" = Vector( 0 , 3 , 0 ),
-		"Exo" = Vector( 0 , 4 , 0 )
+		[ "Skulk" ] = Vector( 0 , 1 , 0 ), [ "Lerk" ] = Vector( 0 , 1 , 0 ),
+		[ "Gorge" ] = Vector( 0 , 1 , 0 ),[ "Fade" ] = Vector( 0 , 3 , 0 ),
+		[ "Onos" ] = Vector( 0 , 4 , 0 ), [ "Marine" ] = Vector( 0 , 3 , 0 ),
+		[ "Exo" ] = Vector( 0 , 4 , 0 )
 }, { 
-		"Skulk" = Vector( 0 , 0 , 0 ), "Lerk" = Vector( 0 , 0 , 0 ),
-		"Gorge" = Vector( 0 , 0 , 0 ),	"Fade" = Vector( 0 , 1 , 0 ),
-		"Onos" = Vector( 0 , 1 , 0 ), "Marine" = Vector( 0 , 1 , 0 ),
-		"Exo" = Vector( 0 , 1 , 0 )
+		[ "Skulk" ] = Vector( 0 , 0 , 0 ), [ "Lerk" ] = Vector( 0 , 0 , 0 ),
+		[ "Gorge" ] = Vector( 0 , 0 , 0 ),[ "Fade" ] = Vector( 0 , 1 , 0 ),
+		[ "Onos" ] = Vector( 0 , 1 , 0 ), [ "Marine" ] = Vector( 0 , 1 , 0 ),
+		[ "Exo" ] = Vector( 0 , 1 , 0 )
 }  
 
 function Lift:Mode( self , target )
