@@ -45,32 +45,33 @@ end
 
 function Plugin:CreateCommands()
 
-	local function SetLift( Client, Enable)
+	local function SetLiftEnabled( client , enable )
 
-		kEnabled = Enable 
-	 	self.Config.Default = Enabled 
+		kLiftEnabled = enable 
+	 	self.Config.Default = enabled 
 		self:SaveConfig()
-		self:Notify( nil , "Lift Mod is set to %s" , true , Enabled  )	
+		self:Notify( nil , "Lift Mod is set to %s" , true , kLiftEnabled )	
 	end
-	local LiftCommand = self:BindCommand( "lft" , "lft" , SetLift )
-	LiftCommand:AddParam{ Type = "boolean" , Optional = true , Default = true }
-	LiftCommand:Help( "Sets if should be enabled" )
+	local LiftEnabledCommand = self:BindCommand( "lft" , "lft" , SetLiftEnabled )
+	LiftEnabledCommand:AddParam{ Type = "boolean" , Optional = true , Default = true }
+	LiftEnabledCommand:Help( "Sets if should be enabled" )
 
-	local function SetDev( Client, Enable )
+	local function SetLiftDev( client, enable )
 
-		kDev = Enable 
-		self.Config.kDev = Enabled
+		kLiftDev = enable 
+		self.Config.kDev = enable
 		self:SaveConfig()
-		self:Notify( nil , "LiftDev is set to %s" , true , Enabled )	
+		self:Notify( nil , "LiftDev is set to %s" , true , kLiftDev )	
 	end
-	local LiftDevCommand = self:BindCommand( "lftdev" , "lftdev" , SetDev )
+	local LiftDevCommand = self:BindCommand( "lftdev" , "lftdev" , SetLiftDev )
 	LiftDevCommand:AddParam{ Type = "boolean" , Optional = true , Default = false }
 	LiftDevCommand:Help( "Sets to  dev mode" )
 end
 
 function Plugin:Cleanup()
 
-	kLiftEnabled = false 
+	kEnabled = false 
+	self.Enabled = false
 	self.BaseClass.Cleanup( self )
 end
 

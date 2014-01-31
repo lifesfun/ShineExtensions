@@ -1,3 +1,5 @@
+kLiftEnabled = nil
+kLiftDev = nil
 
 local Player = { 
 
