@@ -11,6 +11,7 @@ local Player = {
 
 function Player:MinTime() 
 
+	print( "hello" )
 	local time = Shared.GetTime()
 
 	if self.LiftLastUse and ( time < ( self.LiftLastUse + Lift.Interval ) ) then self.LiftLastUse = time 
@@ -20,6 +21,7 @@ end
 
 function Player:LerkLift( target )
 
+print( "test" )
 	if kLiftDev then return true end
 	if target.LiftID then return end
 	if target:isa( "Gorge" ) then return true 
@@ -35,6 +37,7 @@ end
 
 function Player:OnUse( target , elapsedTime , useSuccessTable )
 
+print( "use" )
 	if not target then return end
 	if not kLiftEnabled then return end
 	if not self:LerkLift( target ) then return end
@@ -63,23 +66,27 @@ end
 function Player:UpdateMove( deltaTime )
 
 	if not kLiftEnabled then return end
+print( "update" )
 	if not self.LiftID then return end
 
 	local target = Shared.GetEntity( self.LiftID ) 
 	if target then self:Lift( target )  
 
+print( "lift" )
 	else self:ResetLift() end
 end
 
 ---use functions 
 function Player:SetLift( id )
 
+print( "set" )
 	self:TriggerEffects( Lift.OnSound )
 	if id then self.LiftID = id end
 end
 
 function Player:ResetLift()
 
+print( "reset" )
 	self:TriggerEffects( Lift.OffSound )
 	if self.LiftID then self.LiftID = nil end 
 end
