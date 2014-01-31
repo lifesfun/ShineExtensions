@@ -7,7 +7,7 @@ local kDev = kLiftDev
 
 
 local Plugin = {} 
-Plugin.Version "1.0"
+Plugin.Version = "1.0"
 
 Plugin.HasConfig = true 
 Plugin.ConfigName = "Lift.json"
