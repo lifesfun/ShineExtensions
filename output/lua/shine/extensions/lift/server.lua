@@ -31,11 +31,17 @@ function Plugin:Notify( Player , String , Format , ... )
 	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "LiftBot" , 255 ,  255 , 255 , String , Format , ... ) 
 end
 
-function Plugin:ClientConfirmConnect( Client )
-		if K
-		self:Notify( Client , "The Lift mod is enabled!" )
-		self:Notify( Client , "Use e to lift up a gorge as a lerk." )
-		self:Notify( Client , "Use e to lift up any living player as a gorge." )
+function Plugin:ClientConfirmConnect( client )
+
+	self:TellPlayers( client ) 
+end
+
+function Plugin:TellPlayers( client )
+
+	if not kLiftEnabled then return end
+	self:Notify( client , "The Lift mod is Enabled!" )
+	self:Notify( client , "Use e to lift up a gorge as a lerk." )
+	self:Notify( client , "Use e to lift up any living player as a gorge." )
 end
 
 function Plugin:CreateCommands()
@@ -45,7 +51,7 @@ function Plugin:CreateCommands()
 		kLiftEnabled = enable 
 	 	self.Config.Default = enabled 
 		self:SaveConfig()
-		self:Notify( nil , "Lift Mod is set to %s" , true , kLiftEnabled )	
+		self:TellPlayers( nil ) 
 	end
 	local LiftEnabledCommand = self:BindCommand( "lft" , "lft" , SetLiftEnabled )
 	LiftEnabledCommand:AddParam{ Type = "boolean" , Optional = true , Default = true }
@@ -65,7 +71,7 @@ end
 
 function Plugin:Cleanup()
 
-	kEnabled = false 
+	kLiftEnabled = false 
 	self.Enabled = false
 	self.BaseClass.Cleanup( self )
 end
