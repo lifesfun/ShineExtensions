@@ -4,9 +4,6 @@ local Shine = Shine
 
 local kEnabled = kLiftEnabled 
 local kDev = kLiftDev 
-local kOffset = Lift.kLiftOffset
-local kTolerance = Lift.kLiftTolerance
-local Vector = Vector
 
 
 local Plugin = {} 
