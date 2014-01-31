@@ -49,19 +49,15 @@ function Plugin:CreateCommands()
 	local function SetLiftEnabled( client , enable )
 
 		kLiftEnabled = enable 
-	 	self.Config.Default = enabled 
-		self:SaveConfig()
 		self:TellPlayers( nil ) 
 	end
 	local LiftEnabledCommand = self:BindCommand( "lft" , "lft" , SetLiftEnabled )
 	LiftEnabledCommand:AddParam{ Type = "boolean" , Optional = true , Default = true }
-	LiftEnabledCommand:Help( "Sets if should be enabled" )
+	LiftEnabledCommand:Help( "Sets if lift is enabled." )
 
 	local function SetLiftDev( client, enable )
 
 		kLiftDev = enable 
-		self.Config.kDev = enable
-		self:SaveConfig()
 		self:Notify( nil , "LiftDev is set to %s" , true , kLiftDev )	
 	end
 	local LiftDevCommand = self:BindCommand( "lftdev" , "lftdev" , SetLiftDev )
