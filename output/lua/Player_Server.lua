@@ -7,7 +7,7 @@
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
 
 Script.Load("lua/Gamerules.lua")
-Script.Load("lua/Lift.lua")
+Script.Load("lua/Player_Lift.lua")
 
 // Called when player first connects to server
 // TODO: Move this into NS specific player class

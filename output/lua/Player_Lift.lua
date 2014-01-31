@@ -1,14 +1,12 @@
-Script.Load( "lua/Lift.lua")
 
 local Player = { 
 
-	LiftTolerance = 0.53,
-	LiftOffset = 1,
+	LiftOffset = Vector( 0 , 1 , 0 ),
+	LiftTolerance = 0.28,
 	LiftLastUse = nil,
 	LiftID = nil
 }
---todo create hooks that load on top of the current ones 
---timer to delay spamming
+
 function Player:MinTime() 
 
 	local time = Shared.GetTime()
@@ -18,22 +16,28 @@ function Player:MinTime()
 	else self.LiftLastUse = time return true end
 end
 
---Ns2 hooks
+function Player:LerkLift( target )
+
+	if kLiftDev then return true end
+	if target.LiftID then return end
+	if target:isa( "Gorge" ) then return true 
+
+	elseif self:isa( "Gorge" ) and target:isa( "Lerk" ) then 
+	return true end
+end
+
 function Player:GetCanBeUsed( target , useSuccessTable )
 	
-	if LiftEnabled then useSuccessTable.UseSuccess = true end
+	if kLiftEnabled then useSuccessTable.UseSuccess = true end
 end
 
 function Player:OnUse( target , elapsedTime , useSuccessTable )
 
 	if not target then return end
-	--not sure about this
-	self.LiftEnabled = Mode( self , target )
-	if not self.LiftEnabled then return end
-	if not self:MinTime() then return end
+	if not kLiftEnabled then return end
+	if not self:LerkLift( target ) then return end
 
-	self.LiftOffset = Lift:GetOffset( target.kMapName , self.kMapName , Lift.Override[ 1 ] )
-	self.LiftTolerance = Lift:GetPrediction( target.kGravity , Lift.Override[ 2 ] )
+	if not self:MinTime() then return end
 	
 	local selfID = self:GetId()
 	local targetID = target:GetId()
@@ -49,7 +53,6 @@ function Player:OnUse( target , elapsedTime , useSuccessTable )
 		target:ResetLift() 
 	else
 		target:ResetLift() 
-		--add gravity change only on lift do not be overwritten during this
 		target:SetLift( selfID ) 
 	end
 	useSuccessTable.UseSuccess = true
@@ -57,8 +60,7 @@ end
 
 function Player:UpdateMove( deltaTime )
 
-	--how to check global
-	if not self.LiftEnabled then return end
+	if not kLiftEnabled then return end
 	if not self.LiftID then return end
 
 	local target = Shared.GetEntity( self.LiftID ) 
