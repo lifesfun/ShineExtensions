@@ -1,6 +1,6 @@
-name        = "[ Shine ]Lift ALPHA"
+name        = "LifeIsFunSupport+"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[ Lift mod by lifesfun. Inspired by Hackepeter methods in the LerkLiftmod]=]
+description = [=[Balance and changes to support roles gorges sentries and etc]=]
 image       = "preview.jpg"
-publish_id = "d19a606"
+publish_id = "d410625"
