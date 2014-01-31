@@ -1,13 +1,7 @@
-kLiftEnabled = nil
-kLiftDev = nil
-
-local Player = { 
-
-	LiftOffset = Vector( 0 , 1 , 0 ),
-	LiftTolerance = 0.28,
-	LiftLastUse = nil,
-	LiftID = nil
-}
+Player.LiftOffset = Vector( 0 , 1 , 0 )
+Player.LiftTolerance = 0.28
+Player.LiftLastUse = nil
+Player.LiftID = nil
 
 function Player:MinTime() 
 
