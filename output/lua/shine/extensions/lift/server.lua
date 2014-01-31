@@ -4,8 +4,8 @@ local Shine = Shine
 
 local Lift = Lift
 
-local kEnabled = Lift.kLiftEnabled 
-local kDev = Lift.kLiftDev 
+local kEnabled = kLiftEnabled 
+local kDev = kLiftDev 
 local kOffset = Lift.kLiftOffset
 local kTolerance = Lift.kLiftTolerance
 local Vector = Vector
@@ -20,7 +20,7 @@ Plugin.ConfigName = "Lift.json"
 Plugin.DefaultConfig = {
 
 	Default = true,
-	DevMode = false,
+	DevMode = false
 }
 
 Plugin.CheckConfig = true
@@ -28,8 +28,8 @@ Plugin.DefaultState = true
 
 function Plugin:Initialise()
 
-	kLiftEnabled = self.Config.Default 
-	kLiftDev = self.Config.kDev
+	kEnabled = self.Config.Default 
+	kDev = self.Config.kDev
 
 	self:CreateCommands()
 	self.Enabled = true
@@ -52,7 +52,7 @@ function Plugin:CreateCommands()
 
 	local function SetLift( Client, Enable)
 
-		kLiftEnabled = Enable 
+		kEnabled = Enable 
 	 	self.Config.Default = Enabled 
 		self:SaveConfig()
 		self:Notify( nil , "Lift Mod is set to %s" , true , Enabled  )	
@@ -63,7 +63,7 @@ function Plugin:CreateCommands()
 
 	local function SetDev( Client, Enable )
 
-		kLiftDev = Enable 
+		kDev = Enable 
 		self.Config.kDev = Enabled
 		self:SaveConfig()
 		self:Notify( nil , "LiftDev is set to %s" , true , Enabled )	
