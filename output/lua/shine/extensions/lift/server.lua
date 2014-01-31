@@ -2,8 +2,6 @@
 
 local Shine = Shine
 
-local Lift = Lift
-
 local kEnabled = kLiftEnabled 
 local kDev = kLiftDev 
 local kOffset = Lift.kLiftOffset
