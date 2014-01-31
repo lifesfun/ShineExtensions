@@ -1,10 +1,5 @@
 --A mod that provides Lift functions and more!
-
 local Shine = Shine
-
-local kEnabled = kLiftEnabled 
-local kDev = kLiftDev 
-
 
 local Plugin = {} 
 Plugin.Version = "1.0"
@@ -15,7 +10,7 @@ Plugin.ConfigName = "Lift.json"
 Plugin.DefaultConfig = {
 
 	Default = true,
-	DevMode = false
+	Dev = false
 }
 
 Plugin.CheckConfig = true
@@ -23,8 +18,8 @@ Plugin.DefaultState = true
 
 function Plugin:Initialise()
 
-	kEnabled = self.Config.Default 
-	kDev = self.Config.kDev
+	kLiftEnabled = self.Config.Default 
+	kLiftDev = self.Config.Dev
 
 	self:CreateCommands()
 	self.Enabled = true
@@ -37,7 +32,7 @@ function Plugin:Notify( Player , String , Format , ... )
 end
 
 function Plugin:ClientConfirmConnect( Client )
-
+		if K
 		self:Notify( Client , "The Lift mod is enabled!" )
 		self:Notify( Client , "Use e to lift up a gorge as a lerk." )
 		self:Notify( Client , "Use e to lift up any living player as a gorge." )
