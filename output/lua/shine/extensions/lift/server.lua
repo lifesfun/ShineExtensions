@@ -1,4 +1,6 @@
 --A mod that provides Lift functions and more!
+kLiftEnabled = true
+kLiftDev = false
 local Shine = Shine
 
 local Plugin = {} 
@@ -28,7 +30,7 @@ end
 
 function Plugin:Notify( Player , String , Format , ... ) 
 
-	Shine:NotifyDualColour( Client , 0 , 100 , 255 , "LiftBot" , 255 ,  255 , 255 , String , Format , ... ) 
+	Shine:NotifyDualColour( Player , 0 , 100 , 255 , "LiftBot" , 255 ,  255 , 255 , String , Format , ... ) 
 end
 
 function Plugin:ClientConfirmConnect( client )
