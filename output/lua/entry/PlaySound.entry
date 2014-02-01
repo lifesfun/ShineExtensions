@@ -1,0 +1,7 @@
+modEntry = [[
+	Client: lua/PlaySound.lua,
+	Server: lua/PlaySound.lua,
+	Predict: lua/Predict.lua,
+	Shared: lua/Shared.lua,
+	Priority: 5
+]]

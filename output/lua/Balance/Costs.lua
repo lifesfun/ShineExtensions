@@ -163,7 +163,6 @@
 	kUpgradeHiveCost = 10
 	kUpgradeHiveResearchTime = 20
 
-	kHiveBiomass = 2
 	kResearchBioMassOneCost = 20
 	kBioMassOneTime = 25
 	kResearchBioMassTwoCost = 30

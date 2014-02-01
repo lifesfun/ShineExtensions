@@ -188,7 +188,7 @@ kWeapons3DamageScalar = 1 + kDamagePerUpgradeScalar * 3
 
 //lerk
 	
-	LerkFlapEnergyCost = 3
+	kLerkFlapEnergyCost = 3
 	// Umbra blocks 1 out of this many bullet
 	kUmbraBlockRate = 2
 	// Carries the umbra cloud for x additional seconds

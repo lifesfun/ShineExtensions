@@ -59,7 +59,7 @@ kPlayerInitialIndivRes = 25
 
 kMaxSupply = 250
 kSupplyPerTechpoint = 100
-kHiveBiomass = 2
+kHiveBiomass = 1
 
 kMACSupply = 5
 kArmorySupply = 0
