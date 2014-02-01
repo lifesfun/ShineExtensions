@@ -39,6 +39,7 @@ print( "use" )
 	if not self:MinTime() then return end
 	
 	local selfID = self:GetId()
+	self:CanLift( lifter , lifted )
 	local targetID = target:GetId()
 
 	--if I am used and I have my targets Id 
