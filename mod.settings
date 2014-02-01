@@ -1,6 +1,6 @@
 name        = "LifeIsFunSupport+"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[Balance and changes to support roles gorges sentries and etc]=]
+description = [=[Balance Changes, Custom Hud, LerkLift, PreGamePlus]=]
 image       = "preview.jpg"
 publish_id = "d410625"
