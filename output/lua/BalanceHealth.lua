@@ -1,1 +1,1 @@
-Script.Load( "lua/Balance/Health.lua" )
+Script.Load("lua/Balance/General.lua")

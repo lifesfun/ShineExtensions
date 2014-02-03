@@ -46,17 +46,17 @@ kRTsPerTechpoint = 3
 
 
 // maturation time for alien buildings
-kHiveMaturationTime = 220
-kHarvesterMaturationTime = 150
-kWhipMaturationTime = 120
-kCragMaturationTime = 120
+kHiveMaturationTime = 210
+kHarvesterMaturationTime = 120
+kWhipMaturationTime = 90
+kCragMaturationTime = 90
 kShiftMaturationTime = 90
-kShadeMaturationTime = 120
+kShadeMaturationTime = 90
 kVeilMaturationTime = 60
 kSpurMaturationTime = 60
 kShellMaturationTime = 60
-kCystMaturationTime = 180
-kHydraMaturationTime = 140
-kEggMaturationTime = 100
+kCystMaturationTime = 30
+kHydraMaturationTime = 90
+kEggMaturationTime = 90
 kTunnelEntranceMaturationTime = 120
 

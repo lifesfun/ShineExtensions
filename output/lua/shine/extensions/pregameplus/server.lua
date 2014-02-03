@@ -6,7 +6,7 @@ Plugin.ConfigName = "PregamePlus.json"
 
 Plugin.DefaultConfig = {
    EnablePGP = true,
-   CheckLimit = true,
+   CheckLimit = false,
    PlayerLimit = 8,
    LimitToggleOffDelay = 20,
    LimitToggleOnDelay = 45,
@@ -34,14 +34,8 @@ local ResetNoticeDelay = 2
 --used to set camera distance when forcing respawn
 local kFirstPerson = 0
 
-
-
-
 local SetupClassHook = Shine.Hook.SetupClassHook
 local SetupGlobalHook = Shine.Hook.SetupGlobalHook
-
-
-
 
 -- lets you jump into empty exosuits during PGP
 -- not under Modified NS2 funcs because its not defined
@@ -91,7 +85,7 @@ end
 
 
 local function NotifyR( Player, Prefix, String, Format, ... )
-   Shine:NotifyDualColour( Player, 255, 000, 000, Prefix, 
+   Shine:NotifyDualColour( Player, 0, 100, 255, Prefix, 
                                    255, 255, 255, String, Format, ... )
 end
 
@@ -520,8 +514,10 @@ function Plugin:PGPJoinTeam(success, newPlayer, ns2rules, player, newTeamNumber,
       newPlayer:SetResources(100)
       --do not notify them if they join the ready room
       if ns2rules:GetWorldTeam():GetTeamNumber() ~= newTeamNumber then
-         local notice = "Type pgp_help in console for more info"
-         NotifyG( newPlayer, "[PGP mod enabled]", notice)
+         local notice = "Pregame Plus mode enabled! Game starts on Commanders!"
+         NotifyG( newPlayer, "PregameBot", notice)
+		 local notice = "Lift Bot is reporting to me, that we can lift any player using E..."
+         NotifyG( newPlayer, "PregameBot", notice)
          if newPlayer.ResetScores then newPlayer:ResetScores() end
          PGPReplace(newPlayer)
       end

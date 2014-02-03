@@ -4,20 +4,20 @@
 	kPowerNodeCost = 0
 
 	kExtractorCost = 10
-	kExtractorBuildTime = 11
+	kExtractorBuildTime = 10
 
-	kInfantryPortalCost = 20
+	kInfantryPortalCost = 15
 	kInfantryPortalBuildTime = 7
 
 	kCommandStationCost = 15
 	kCommandStationBuildTime = 15
 
-	kNanoShieldResearchCost = 15
+	kNanoShieldResearchCost = 20
 	kNanoSnieldResearchTime = 60
-	kCatPackTechResearchCost = 15
-	kCatPackTechResearchTime = 45
+	kCatPackTechResearchCost = 20
+	kCatPackTechResearchTime = 60
 
-	kMACCost = 5
+	kMACCost = 3
 	kMACBuildTime = 5
 	kARCCost = 10
 	kARCBuildTime = 7
@@ -28,8 +28,9 @@
 
 	kSentryCost = 5
 	kSentryBuildTime = 3
-	kSentryBatteryCost = 10
+	kSentryBatteryCost = 5
 	kSentryBatteryBuildTime = 5
+	kSentryBatteryRange = 8.0
 
 	kObservatoryCost = 10
 	kObservatoryBuildTime = 15
@@ -59,12 +60,12 @@
 	kArmoryCost = 10
 	kArmoryBuildTime = 12
 	kShotgunTechResearchTime = 30
-	kMineResearchTime  = 20
+	kMineResearchTime  = 30
 	kAdvancedArmoryUpgradeCost = 30
 	kAdvancedArmoryResearchTime = 90
 
-	kWelderCost = 2
-	kWelderDropCost = 2
+	kWelderCost = 1
+	kWelderDropCost = 1
 
 	kNumMines = 3
 	kMineCost = 10
@@ -85,9 +86,9 @@
 
 	kGrenadeTechResearchCost = 10
 	kGrenadeTechResearchTime = 45
-	kClusterGrenadeCost = 3
-	kGasGrenadeCost = 3
-	kPulseGrenadeCost = 3
+	kClusterGrenadeCost = 2
+	kGasGrenadeCost = 2
+	kPulseGrenadeCost = 2
 
 	kPrototypeLabCost = 40
 	kPrototypeLabBuildTime = 20
@@ -96,11 +97,11 @@
 	kJetpackDropCost = 15
 	kJetpackTechResearchCost = 25
 	kJetpackTechResearchTime = 90
-	kExosuitCost = 40
+	kExosuitCost = 30
 	kExosuitTechResearchCost = 20
 	kExosuitTechResearchTime = 90
 	kExosuitUpgradeTechResearchTime = 60
-	kDrifterBuildTime = 4
+	
 
 	
 //Aliens
@@ -108,6 +109,7 @@
 	kUpgradeGestationTime = 2
 	kEvolutionGestateTime = 3
 	kEggGestateTime = 45
+	kDrifterBuildTime = 4
 
 
 	kSkulkUpgradeCost = 0
@@ -164,25 +166,25 @@
 	kUpgradeHiveResearchTime = 20
 
 	kResearchBioMassOneCost = 20
-	kBioMassOneTime = 25
+	kBioMassOneTime = 30
 	kResearchBioMassTwoCost = 30
-	kBioMassTwoTime = 35
+	kBioMassTwoTime = 40
 	kResearchBioMassThreeCost = 40
-	kBioMassThreeTime = 45
+	kBioMassThreeTime = 50
 	kResearchBioMassFourCost = 50
-	kBioMassFourTime = 55
+	kBioMassFourTime = 60
 
-	kShellCost = 20
+	kShellCost = 10
 	kShellBuildTime = 18
 	kCragCost = 10
 	kCragBuildTime = 25
 	
-	kSpurCost = 20
+	kSpurCost = 10
 	kSpurBuildTime = 16
 	kShiftCost = 10
 	kShiftBuildTime = 18
 
-	kVeilCost = 20
+	kVeilCost = 10
 	kVeilBuildTime = 14
 	kShadeCost = 10
 	kShadeBuildTime = 18

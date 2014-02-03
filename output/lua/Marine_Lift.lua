@@ -1,18 +1,19 @@
-Marine.LiftOffset = Vector( 0 , 1 , 0 )
-Marine.LiftTolerance = 0.28
+Marine.LiftOffset = Vector( 0 , 2 , 0 )
+Marine.LiftTolerance = 0.16
 
 Marine.LiftInterval = 0.33
 
-Marine.LiftLastUse = nil
+Marine.LiftLastUse = 0
 Marine.LiftID = nil
+Marine.TimeLift = nil
 
 function Marine:MinTime() 
 
-	local time = Shared.GetTime()
+	self.TimeLift = Shared.GetTime()
 
-	if self.LiftLastUse and ( time < ( self.LiftLastUse + self.LiftInterval ) ) then self.LiftLastUse = time 
+	if self.LiftLastUse and ( self.TimeLift < ( self.LiftLastUse + self.LiftInterval ) ) then 
 
-	else self.LiftLastUse = time return true end
+	else return true end
 end
 
 function Marine:GetCanBeUsed( target , useSuccessTable )
@@ -30,32 +31,36 @@ function Marine:OnUse( target , elapsedTime , useSuccessTable )
 	local selfID = self:GetId()
 
 	--if I am used and I have my targets Id 
-	if self.LiftID and self.LiftID == targetID then self:ResetLift() 
-
-	--if I am used and target has my id then reset 
-	elseif target.LiftID and target.LiftID == selfID then target:ResetLift() 
+	if self.LiftID and self.LiftID == targetID then 
 	
-	else self:ResetLift() 
+		self:ResetLift() 
+		self.LiftLastUse = self.TimeLift
+		
+	--if I am used and target has my id then reset 
+	elseif target.LiftID and target.LiftID == selfID then
+	
+		target:ResetLift() 
+		self.LiftLastUse = self.TimeLift
+		
+	elseif self:CanLift( target ) then 
+	
+		self.LiftLastUse = self.TimeLift
 		self:SetLift( targetID ) 
 	end
 	useSuccessTable.UseSuccess = true
 end
 
-function Marine:LerkLift( target )
+function Marine:CanLift( target )
 
 	if Shared.GetCheatsEnabled() or kLiftDev or not self:GetGameStarted() then return true end
-	
 	if not self:GetIsAlive() then return end 
 	if target.LiftedID then return end 
 	
-	if target:isa( "Gorge" ) then return true 
-	elseif self:isa( "Gorge" ) and target:isa( "Lerk" ) then return true end
+	if target:isa( "Gorge" ) then return true end
 end
 
 function Marine:SetLift( id )
 
-	if not self:LerkLift( target ) then return end
-	
 	self:TriggerEffects( "Marine_vision_on" )
 	if id then self.LiftID = id end
 end
@@ -66,7 +71,7 @@ function Marine:ResetLift()
 	if self.LiftID then self.LiftID = nil end 
 end
 
-function Marine:UpdateMove( input , runningPrediction )
+function Marine:PreUpdateMove( input , runningPrediction )
 
 	if not self.LiftID then return end
 	if not self:GetIsAlive() then self:ResetLift() return end 
@@ -75,7 +80,7 @@ function Marine:UpdateMove( input , runningPrediction )
 	local target = Shared.GetEntity( self.LiftID ) 
 	if not target then self:ResetLift()
 	
-	else target:Lift( self )  end
+	else target:Lift( self ) end
 end
 
 function Marine:Lift( target )

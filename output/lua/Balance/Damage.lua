@@ -78,8 +78,8 @@ kWeapons3DamageScalar = 1 + kDamagePerUpgradeScalar * 3
 	kShotgunClipSize = 6
 	kShotgunBulletsPerShot = 17
 
-	kFlamethrowerDamage = 15
-	kFlameThrowerEnergyDamage = 3
+	kFlamethrowerDamage = 10
+	kFlameThrowerEnergyDamage = 5
 	kBurnDamagePerSecond = 2
 	kFlamethrowerDamageType = kDamageType.Flame
 	kFlamethrowerClipSize = 50

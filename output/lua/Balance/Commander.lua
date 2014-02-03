@@ -1,35 +1,35 @@
 
 //Marine
 
-	kInitialMACs = 1
-	kMACConstructEfficacy = .3
-	kMACSpeedAmount = 1
+	kInitialMACs = 0
+	kMACConstructEfficacy = .7
+	kMACSpeedAmount = 2
 
-	kSentriesRange = 7.0 --added 
+	kSentrieBatteryRange = 8.0 --added 
 	kSentriesPerBattery = 5
 
 	kArmoryWeaponAttachRange = 10
 
 	// Minimum distance that initial IP spawns away from team location
-	kInfantryPortalMinSpawnDistance = 4
+	kInfantryPortalMinSpawnDistance = 5
 	kInfantryPortalAttachRange = 10
 	kSpawnBlockRange = 5
 
 //Marine micro
-	kNanoShieldCost = 2
-	kNanoShieldCooldown = 2
+	kNanoShieldCost = 1
+	kNanoShieldCooldown = 1
 	kNanoShieldDuration = 5
 	kNanoArmorHealPerSecond = 0.5
-	kNanoShieldDamageReductionDamage = 0.68
+	kNanoShieldDamageReductionDamage = 0.5
 
-	kPowerSurgeCooldown = 10
+	kPowerSurgeCooldown = 5
 	kPowerSurgeDuration = 20
 	kPowerSurgeCost = 5
 
 	kAmmoPackCost = 1
 	kMedPackCost = 1
 	kMedPackCooldown = 0
-	kCatPackCost = 2
+	kCatPackCost = 1
 	kCatPackMoveAddSpeed = 1.25
 	kCatPackWeaponSpeed = 1.5
 	kCatPackDuration = 5
@@ -44,16 +44,16 @@
 	kDistressBeaconTime = 3
 
 //aliens
-	kEggsPerHatch = 2 
-	kHatchCooldown = 4
+	kEggsPerHatch = 3 
+	kHatchCooldown = 3
 
-	kContaminationCost = 5
-	kContaminationCooldown = 5
-	kBoneWallCost = 2
-	kBoneWallCooldown = 5
+	kContaminationCost = 10
+	kContaminationCooldown = 3
+	kBoneWallCost = 10
+	kBoneWallCooldown = 3
 
 	kNutrientMistCost = 1
-	kNutrientMistCooldown = 5
+	kNutrientMistCooldown = 1
 	// Note: If kNutrientMistDuration changes, there is a tooltip that needs to be updated.
 	kNutrientMistDuration = 15
 	// 100% + X (increases by 66%, which is 10 second reduction over 15 seconds)
@@ -62,37 +62,37 @@
 	kNutrientMistMaturitySpeedup = 2
 	kNutrientMistAutobuildMultiplier = 1
 
-	kShadeInkCost = 2
+	kShadeInkCost = 1
 	kShadeInkCooldown = 10
 	kShadeInkDuration = 5
 
-	kCragHealWaveCost = 2
-	kHealWaveCooldown = 2
+	kCragHealWaveCost = 1
+	kHealWaveCooldown = 1
 
-	kEchoRange = 8
+	kEchoRange = 10
 
 //drifter
 	kInitialDrifters = 0
 	kDrifterHatchTime = 7
-	kDrifterCost = 8
+	kDrifterCost = 5
 	kDrifterAbilityCooldown = 0
 	kDrifterCooldown = 0
 
-	kMucousMembraneCost = 2
+	kMucousMembraneCost = 1
 
-	kEnzymeCloudCost = 2
+	kEnzymeCloudCost = 1
 	kEnzymeAttackSpeed = 1.25
 	kEnzymeCloudDuration = 2
 
 	kHallucinationCloudCost = 2
-	kHallucinationCloudCooldown = 2
+	kHallucinationCloudCooldown = 5
 	kHallucinationHealthFraction = 0.33
 	kHallucinationArmorFraction = 0
 	kHallucinationMaxHealth = 700
 
 	//Stuctures echo
 	kEchoHydraCost = 1
-	kEchoWhipCost = 2
+	kEchoWhipCost = 1
 	kEchoCragCost = 1
 	kEchoShadeCost = 1
 	kEchoShiftCost = 1
@@ -100,13 +100,13 @@
 	kEchoSpurCost = 1
 	kEchoShellCost = 1
 	kEchoEggCost = 2
-	kEchoHarvesterCost = 2
+	kEchoHarvesterCost = 1
 	kEchoTunnelCost = 5
 	kEchoHiveCost = 10
 
 //cysts
 	kRuptureCost = 1
-	kRuptureCooldown = 1
+	kRuptureCooldown = 0
 
 	kCystCost = 1
 	kCystCooldown = 0.0

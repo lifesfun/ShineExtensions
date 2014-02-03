@@ -2,6 +2,7 @@
 kLiftEnabled = true
 kLiftDev = false
 local Shine = Shine
+local GetOwner = Server.GetOwner
 
 local Plugin = {} 
 Plugin.Version = "1.0"
@@ -22,7 +23,7 @@ function Plugin:Initialise()
 
 	kLiftEnabled = self.Config.Default 
 	kLiftDev = self.Config.Dev
-
+    self.Started = false
 	self:CreateCommands()
 	self.Enabled = true
 	return true
@@ -33,17 +34,25 @@ function Plugin:Notify( Player , String , Format , ... )
 	Shine:NotifyDualColour( Player , 0 , 100 , 255 , "LiftBot" , 255 ,  255 , 255 , String , Format , ... ) 
 end
 
-function Plugin:ClientConfirmConnect( client )
-
-	self:TellPlayers( client ) 
+function Plugin:PostJoinTeam( Gamerules, Player, OldTeam, NewTeam, Force, ShineForce ) 
+	if OldTeam == 0 then 
+		local client = GetOwner( Player )
+		self:TellPlayers(  client ) 
+	end
 end
-
+function Plugin:CheckGameStart( Gamerules )
+	if Gamerules:GetGameState()  ==  kGameState.Started and self.Started == false then 
+	
+		self:TellPlayers(  nil ) 
+		self.Started = true
+	end
+end
 function Plugin:TellPlayers( client )
-
-	if not kLiftEnabled then return end
-	self:Notify( client , "The Lift mod is Enabled!" )
-	self:Notify( client , "Use e to lift up a gorge as a lerk." )
-	self:Notify( client , "Use e to lift up any living player as a gorge." )
+	local Gamerules = GetGamerules()
+	if not kLiftEnabled or  Gamerules:GetGameState()  ==  kGameState.NotStarted  then return end
+	self:Notify( client , "I am enabled :D" )
+	self:Notify( client , "Press E to use Lift" )
+	self:Notify( client , "Gorges can pick up any class, Lerks can pick up Gorges." )
 end
 
 function Plugin:CreateCommands()

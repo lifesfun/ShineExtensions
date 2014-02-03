@@ -30,7 +30,7 @@ kAutoBuildRate = 0.3
 // commanders wont receive personal resources for X seconds after logging out
 kCommanderResourceBlockTime = 0
 // commander has  to stay in command structure for the first kCommanderMinTime seconds of each round
-kCommanderMinTime = 30
+kCommanderMinTime = 0
 kCommanderInitialIndivRes = 0
 // setting to true will prevent any placement and construction of marine structures on infested areas
 kPreventMarineStructuresOnInfestation = false
@@ -40,13 +40,13 @@ kAlienStructureMoveSpeed = 1.5
 kShiftStructurespeedScalar = 1
 
 // Time spawning alien player must be in egg before hatching
-kAlienSpawnTime = 2
+kAlienSpawnTime = 1
 kAlienSpawnTime = 10
-kEggGenerationRate = 11
+kEggGenerationRate = 9
 kAlienEggsPerHive = 3
 
 kMarineRespawnTime = 9
-kRecycleTime = 12
+kRecycleTime = 6
 kItemStayTime = 30    // NS1
 
 kResourceTowerResourceInterval = 6
@@ -62,17 +62,17 @@ kSupplyPerTechpoint = 100
 kHiveBiomass = 1
 
 kMACSupply = 5
-kArmorySupply = 0
+kArmorySupply = 10
 kARCSupply = 15
 kSentrySupply = 5
 kRoboticsFactorySupply = 0
 kInfantryPortalSupply = 0
-kPhaseGateSupply = 0
+kPhaseGateSupply = 15
 kDrifterSupply = 5
-kWhipSupply = 5
-kCragSupply = 5
-kShadeSupply = 5
-kShiftSupply = 5
+kWhipSupply = 10
+kCragSupply = 10
+kShadeSupply = 10
+kShiftSupply = 10
 
 
 

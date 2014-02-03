@@ -1,4 +1,0 @@
-modEntry = [[
-	Client: lua/CHUD_Client.lua,
-	Priority: 5
-]]

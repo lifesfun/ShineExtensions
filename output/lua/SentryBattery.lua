@@ -38,7 +38,7 @@ Script.Load("lua/ParasiteMixin.lua")
 
 class 'SentryBattery' (ScriptActor)
 SentryBattery.kMapName = "sentrybattery"
-SentryBattery.kRange = kSentriesRange
+SentryBattery.kRange = kSentryBatteryRange
 
 SentryBattery.kModelName = PrecacheAsset("models/marine/portable_node/portable_node.model")
 local kAnimationGraph = PrecacheAsset("models/marine/portable_node/portable_node.animation_graph")
