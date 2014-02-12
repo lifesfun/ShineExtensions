@@ -113,9 +113,7 @@ function TeamMixin:OnOwnerChanged(oldOwner, newOwner)
 end
 
 function TeamMixin:GetCanBeUsed(player, useSuccessTable)
-    
-    if GetAreEnemies(player, self)  and not kLiftEnabled then
-        useSuccessTable.useSuccess = false
-    end
 
+    if Lift and Lift.Enabled then useSuccessTable.useSuccess = true return end
+    if GetAreEnemies(player, self)  then useSuccessTable.useSuccess = false end
 end

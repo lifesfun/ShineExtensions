@@ -1,7 +1,18 @@
-name        = "[ Shine ]LerkLift Beta"
+name        = "[ Shine ]LerkLift"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[Stable. Needs Documentation. Needs more testing in public servers. Lerks can lift gorges, Gorges can lift marines and all aliens. lftdev 1 for all lift mode.
+description = [=[ModID: d19a606
+
+As a lerk press E to your friendly gorge to give him a ride. 
+
+To release, either the lerk or the gorge can press E while looking at the other lifeform.
+
+Pregame, Cheats , or the command lftdev 1, will enable all lift mode. Every lifeform and marine can now lift each other!!.
+
+lft 0/1 can disable/enable the plugin.
+
+Enjoy!
+
 ]=]
 image       = "preview.jpg"
 publish_id = "d19a606"

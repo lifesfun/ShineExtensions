@@ -8,7 +8,6 @@
 // The origin of the player is at their feet.
 //
 // ========= For more information, visit us at http://www.unknownworlds.com =====================
-
 Script.Load("lua/Globals.lua")
 Script.Load("lua/TechData.lua")
 Script.Load("lua/Utility.lua")
@@ -30,6 +29,7 @@ Script.Load("lua/EntityChangeMixin.lua")
 Script.Load("lua/BadgeMixin.lua")
 Script.Load("lua/UnitStatusMixin.lua")
 Script.Load("lua/AFKMixin.lua")
+Script.Load("lua/PhaseGateUserMixin.lua")
 
 if Client then
     Script.Load("lua/HelpMixin.lua")
@@ -287,7 +287,7 @@ local function GetTabDirectionVector(buttonReleased)
     return tapVector[TAP_NONE]
 
 end
-
+AddMixinNetworkVars(PhaseGateUserMixin, networkVars)
 function Player:OnCreate()
 
     ScriptActor.OnCreate(self)
@@ -306,6 +306,7 @@ function Player:OnCreate()
     InitMixin(self, PointGiverMixin)
     InitMixin(self, EntityChangeMixin)
     InitMixin(self, BadgeMixin)
+	InitMixin(self, PhaseGateUserMixin)
     
     if Client then
         InitMixin(self, HelpMixin)
@@ -696,43 +697,6 @@ function Player:Reload()
     
 end
 
-local function GetIsValidUseOfPoint(self, entity, usablePoint, useRange)
-
-    if GetPlayerCanUseEntity(self, entity) then
-    
-        local viewCoords = self:GetViewAngles():GetCoords()
-        local toUsePoint = usablePoint - self:GetEyePos()
-        
-        return toUsePoint:GetLength() < useRange and viewCoords.zAxis:DotProduct(GetNormalizedVector(toUsePoint)) > 0.8
-        
-    end
-    
-    return false
-    
-end
-
-/**
- * Will return true if the passed in entity can be used by self and
- * the entity has no attach points to use.
- */
-local function GetCanEntityBeUsedWithNoUsablePoint(self, entity)
-
-    if HasMixin(entity, "Usable") then
-    
-        // Ignore usable points if a Structure has not been built.
-        local usablePointOverride = HasMixin(entity, "Construct") and not entity:GetIsBuilt()
-        
-        local usablePoints = entity:GetUsablePoints()
-        if usablePointOverride or (not usablePoints or #usablePoints == 0) and GetPlayerCanUseEntity(self, entity) then
-            return true, nil
-        end
-        
-    end
-    
-    return false, nil
-    
-end
-
 function Player:PerformUseTrace()
 
     local startPoint = self:GetEyePos()
@@ -753,29 +717,26 @@ function Player:PerformUseTrace()
     
     // Get possible useable entities within useRange that have an attach point.
     local ents = GetEntitiesWithMixinWithinRange("Usable", self:GetOrigin(), useRange)
+	
     for e = 1, #ents do
     
         local entity = ents[e]
         // Filter away anything on the enemy team. Allow using entities not on any team.
         if not HasMixin(entity, "Team") or self:GetTeamNumber() == entity:GetTeamNumber() then
         
-            local usablePoints = entity:GetUsablePoints()
+            local cPoints = entity:GetUsablePoints()
             if usablePoints then
             
                 for p = 1, #usablePoints do
                 
                     local usablePoint = usablePoints[p]
-                    local success = GetIsValidUseOfPoint(self, entity, usablePoint, useRange)
+                    local success = self:GetIsValidUseOfPoint( entity, usablePoint, useRange)
                     if success then
                         return entity, usablePoint
                     end
-                    
                 end
-                
             end
-            
         end
-        
     end
     
     // If failed, do a regular trace with entities that don't have usable points.
@@ -789,7 +750,7 @@ function Player:PerformUseTrace()
     
         // Only return this entity if it can be used and it does not have a usable point (which should have been
         // caught in the above cases).
-        if GetCanEntityBeUsedWithNoUsablePoint(self, trace.entity) then
+        if self:GetCanEntityBeUsedWithNoUsablePoint( trace.entity) then
             return trace.entity, trace.endPoint
         end
         
@@ -801,7 +762,7 @@ function Player:PerformUseTrace()
     endPoint = startPoint + viewCoords.zAxis * (useRange - maxUseLength / 2)
     local traceBox = Shared.TraceBox(kUseBoxSize, startPoint, endPoint, CollisionRep.Move, PhysicsMask.AllButPCs, EntityFilterTwo(self, activeWeapon))
     // Only return this entity if it can be used and it does not have a usable point (which should have been caught in the above cases).
-    if traceBox.fraction < 1 and traceBox.entity ~= nil and GetCanEntityBeUsedWithNoUsablePoint(self, traceBox.entity) then
+    if traceBox.fraction < 1 and traceBox.entity ~= nil and self:GetCanEntityBeUsedWithNoUsablePoint( traceBox.entity) then
     
         local direction = startPoint - traceBox.entity:GetOrigin()
         direction:Normalize()
@@ -820,7 +781,6 @@ end
 function Player:UseTarget(entity, timePassed)
 
     assert(entity)
-    
     local useSuccessTable = { useSuccess = false } 
     if entity.OnUse then
     
@@ -828,11 +788,64 @@ function Player:UseTarget(entity, timePassed)
         entity:OnUse(self, timePassed, useSuccessTable)
         
     end
-    
     self:OnUseTarget(entity)
     
     return useSuccessTable.useSuccess
+end
+
+function Player:OnUseTarget(target)
+end
+
+function Player:OnUseEnd()
+end
+
+function Player:EndUse(deltaTime)
+
+    if not self:GetIsUsing() then return end
     
+    local callOnUseEnd = false
+    
+    // Pull out weapon again if we haven't built for a bit
+    if (Shared.GetTime() - self.timeOfLastUse) > kUseInterval then
+    
+        self:SetIsUsing(false)
+        callOnUseEnd = true
+        
+    elseif self:isa("Alien") then self:SetIsUsing(false) callOnUseEnd = true end
+	
+    if callOnUseEnd then self:OnUseEnd() end
+    self.updatedSinceUse = true
+end
+
+function Player:GetIsValidUseOfPoint( entity, usablePoint, useRange)
+
+    if GetPlayerCanUseEntity(self, entity) then
+    
+        local viewCoords = self:GetViewAngles():GetCoords()
+        local toUsePoint = usablePoint - self:GetEyePos()
+        
+        return toUsePoint:GetLength() < useRange and viewCoords.zAxis:DotProduct(GetNormalizedVector(toUsePoint)) > 0.8
+    end
+    return false
+end
+
+/**
+ * Will return true if the passed in entity can be used by self and
+ * the entity has no attach points to use.
+ */
+function Player:GetCanEntityBeUsedWithNoUsablePoint( entity)
+
+    if HasMixin(entity, "Usable") then
+    
+        // Ignore usable points if a Structure has not been built.
+        local usablePointOverride = HasMixin(entity, "Construct") and not entity:GetIsBuilt()
+        
+        local usablePoints = entity:GetUsablePoints()
+        if usablePointOverride or (not usablePoints or #usablePoints == 0) and GetPlayerCanUseEntity(self, entity) then
+            return true, nil
+        end 
+    end
+    return false, nil
 end
 
 /**
@@ -845,43 +858,37 @@ local function AttemptToUse(self, timePassed)
     
     assert(timePassed >= 0)
     
-    if (Shared.GetTime() - self.timeOfLastUse) < kUseInterval then
-        return false
-    end
-    if not kLiftEnabled  then  
-    // Cannot use anything unless playing the game (a non-spectating player).
-    if not self:GetIsOnPlayingTeam() then
-        return false
-    end
-    
-    if GetIsVortexed(self) then
-        return false
-    end
-    
-	end
+    if (Shared.GetTime() - self.timeOfLastUse) < kUseInterval then return false end
+     	 
     // Trace to find use entity.
     local entity, usablePoint = self:PerformUseTrace()
     
     // Use it.
-    if entity then
-        if not kLiftEnabled  then  
-        // if the game isn't started yet, check if the entity is usuable in non-started game
-        // (allows players to select commanders before the game has started)
-        if not self:GetGameStarted() and not (entity.GetUseAllowedBeforeGameStart and entity:GetUseAllowedBeforeGameStart()) then
-            return false
-        end
-        end
-        // Use it.
-        if self:UseTarget(entity, kUseInterval) then
-        
-            self:SetIsUsing(true)
-            self.timeOfLastUse = Shared.GetTime()
-            return true
-            
-        end
-        
-    end
-    
+    if not entity then return end
+	if Lift and Lift.Enabled and self:UseTarget(entity, kUseInterval) then
+	
+		self:SetIsUsing(true) 
+		self.timeOfLastUse = Shared.GetTime()
+		
+		return true 
+	end
+	 
+	 // Cannot use anything unless playing the game (a non-spectating player).
+    if not self:GetIsOnPlayingTeam() then return false end
+    // if the game isn't started yet, check if the entity is usuable in non-started game
+    // (allows players to select commanders before the game has started)
+    if not self:GetGameStarted() and not (entity.GetUseAllowedBeforeGameStart and entity:GetUseAllowedBeforeGameStart()) then
+        return false
+     end
+
+	  // Use it.
+	if self:UseTarget(entity, kUseInterval) then
+	
+		self:SetIsUsing(true) 
+		self.timeOfLastUse = Shared.GetTime()
+		
+		return true 
+	end
 end
 
 function Player:Buy()
@@ -1079,40 +1086,7 @@ function Player:ModifyGravityForce(gravityTable)
 
 end
 
-function Player:OnUseTarget(target)
-end
 
-function Player:OnUseEnd()
-end
-
-function Player:EndUse(deltaTime)
-
-    if not self:GetIsUsing() then
-        return
-    end
-    
-    local callOnUseEnd = false
-    
-    // Pull out weapon again if we haven't built for a bit
-    if (Shared.GetTime() - self.timeOfLastUse) > kUseInterval then
-    
-        self:SetIsUsing(false)
-        callOnUseEnd = true
-        
-    elseif self:isa("Alien") then
-    
-        self:SetIsUsing(false)
-        callOnUseEnd = true
-        
-    end
-    
-    if callOnUseEnd then
-        self:OnUseEnd()
-    end
-    
-    self.updatedSinceUse = true
-    
-end
 
 function Player:GetMinimapFov(targetEntity)
 
@@ -1896,6 +1870,7 @@ function Player:GetSecondaryAttackLastFrame()
 end
 
 function Player:GetIsAbleToUse()
+	if Lift and Lift.Enabled then return true end
     return self:GetIsAlive()
 end
 
