@@ -1,6 +1,4 @@
 Lift = {
-	Enabled = true,
-	Dev = false,
 	Interval = 0.5,
 	OnSound = "alien_vision_on",
 	OffSound = "alien_vision_off",
@@ -10,8 +8,9 @@ Lift = {
 
 function Lift:All()
 
+	return true
 	local gamerules = GetGamerules()
-	if Shared.GetCheatsEnabled() or self.Dev or not gamerules:GetGameStarted() then return true end
+	if Shared.GetCheatsEnabled() or not gamerules:GetGameStarted() then return true end
 end
 
 function Lift:Liftable( lifter , lifted )
