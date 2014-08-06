@@ -3,7 +3,7 @@ Marine.LiftTolerance = 0.16
 Marine.LiftTime = nil
 Marine.LiftLastUse = 0
 Marine.LiftID = nil
-
+Script.Load("lua/Lift.lua")
 function Marine:MinTime() 
 
 	self.LiftTime = Shared.GetTime()

@@ -1,4 +1,5 @@
 Lift = {
+	Enabled = true,
 	Interval = 0.5,
 	OnSound = "alien_vision_on",
 	OffSound = "alien_vision_off",
@@ -8,7 +9,6 @@ Lift = {
 
 function Lift:All()
 
-	return true
 	local gamerules = GetGamerules()
 	if Shared.GetCheatsEnabled() or not gamerules:GetGameStarted() then return true end
 end
@@ -18,7 +18,6 @@ function Lift:Liftable( lifter , lifted )
 	if not self.Enabled then return end
 	if self:All() then return true end
 
-	if lifted.LiftedID or lifted.LifterID then return end 
 	if not lifter:GetIsAlive() or not lifted:GetIsAlive() then return end
 	
 	if lifted:isa( "Gorge" ) and lifter:isa( "Lerk" ) then return true end
@@ -56,11 +55,9 @@ function Lift:KeepLifting( lifted , lifterID )
 	local lifter = Shared.GetEntity( lifterID ) 
 	if not lifter then self:Detach( lifted ) return end
 
-	if self:All() then self:Lift( lifter , lifted ) 
+	if not lifter:GetIsAlive() or not lifted:GetIsAlive() then self:Detach( lifter ) 
 	
-	elseif lifter:GetIsAlive() and lifted:GetIsAlive() then self:Lift( lifter, lifted ) 
-	
-	else self:Detach( lifter ) end
+	else self:Lift( lifter, lifted ) end
 end
 
 function Lift:Lift( lifter , lifted )
@@ -80,10 +77,7 @@ function Lift:Lift( lifter , lifted )
 	
 	local distanceXY = ( attachPoint - liftedOrigin ):GetLength()
 	if minTolerance < distanceXY and distanceXY < maxTolerance then return end
-	
-   -- local moveDir = GetNormalizedVector( attachPoint - liftedOrigin)
 
 	lifted:SetOrigin( attachPoint )
---	lifted:SetOrigin( liftedOrigin + moveDir * distanceXY )
 end
 

@@ -3,7 +3,7 @@ Alien.LiftTolerance = 0.28
 Alien.LiftTime = nil
 Alien.LiftLastUse = 0
 Alien.LiftID = nil
-
+Script.Load("lua/Lift.lua")
 function Alien:MinTime() 
 
 	self.LiftTime = Shared.GetTime()
