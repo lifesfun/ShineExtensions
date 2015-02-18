@@ -1,0 +1,17 @@
+Script.Load("lua/lifty.lua")
+
+function Marine:GetCanBeUsed( target , useSuccessTable )
+
+	useSuccessTable.UseSuccess = true 
+end
+function Marine:OnUse( target , elapsedTime , useSuccessTable )
+
+	if not target then return end
+	if not elapsedTime then return end
+	if not useSuccessTable then return end
+	if Lifty:UseLift( target , self ) then useSuccessTable.UseSuccess = true end
+end
+function Marine:UpdateMove( input , runningPrediction )
+
+	if self.LiftID then Lifty:KeepLifting( self , self.LiftID ) end
+end

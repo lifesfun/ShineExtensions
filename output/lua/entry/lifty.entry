@@ -1,0 +1,4 @@
+modEntry = [[
+Server: lua/lifty/lifty.lua,
+Priority: 5
+]]
